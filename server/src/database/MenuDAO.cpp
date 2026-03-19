@@ -8,7 +8,7 @@ std::vector<MenuDTO> MenuDAO::getMenusByStoreId(int storeId) {
 
     try {
         // 1. 커넥션 풀에서 DB 연결 빌려오기
-        auto conn = DbManager::getInstance().getConnection();
+        auto conn = DBManager::getInstance().getConnection();
         
         // 2. PreparedStatement 준비 (SQL 인젝션 해킹 방지 및 성능 향상)
         // ? 자리에 나중에 storeId가 쏙 들어갑니다.

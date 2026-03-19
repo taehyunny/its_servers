@@ -9,7 +9,7 @@
 #include "ItsServer.h"
 #include "ThreadPool.h"
 #include "ClientSession.h"
-
+#include "DbManager.h" // DB 커넥션 풀 매니저
 // 3. 데이터 모델 (그릇)
 // DTO는 DAO나 Handler에서 참조하므로 위쪽에 두는 것이 안전합니다.
 #include "AllDTOs.h"
@@ -23,6 +23,10 @@
 // 5. 비즈니스 로직 (요리사)
 #include "UserHandler.h"
 #include "StoreHandler.h"
+#include "MenuHandler.h"
+#include "OrderHandler.h"
+#include "SystemHandler.h"
+#include "Dispatcher.h" // 요청을 각 Handler로 분배하는 역할
 
 // =========================================================================
 // [추가] 전역 종료 플래그
@@ -95,24 +99,22 @@ int main(int argc, char *argv[])
 
     try
     {
-        // [수정] ThreadPool 을 전역에서 → main 스코프 안으로 이동
-        // 전역 객체는 소멸 순서가 보장되지 않아 서버 종료 시 크래시가 날 수 있습니다.
-        // main 안에 선언하면 ItsServer 보다 나중에 생성되고 먼저 소멸되므로
-        // 소멸 순서가 역순으로 보장됩니다. (LIFO 규칙)
-        ThreadPool threadPool(threadCount); // 스레드 풀 생성 (CPU 코어 수 기반)
+// 1. DB 연결 (태현님의 실제 비밀번호로 꼭 확인하세요!)
+        DBManager::getInstance().init("jdbc:mariadb://localhost:3306/its_bedalyo", "root", "1234", threadCount);
 
-        // [수정] ItsServer 생성자에 threadPool 을 주입
-        // 기존: ItsServer server(port)
-        // 변경: ItsServer server(port, threadPool)
-        // ItsServer 가 외부에서 ThreadPool 을 받아 사용하도록 의존성 주입 적용
-        // ItsServer.h 생성자 시그니처도 (int port, ThreadPool& pool) 로 수정 필요
+        // 2. [오늘의 성과] 데이터 로드 테스트 (서버 부팅 시 콘솔 출력용)
+        std::cout << "-------------------------------------------" << std::endl;
+        auto stores = StoreDAO::getInstance().getAllStores();
+        // 황귱쟁반(ID: 1)의 메뉴가 잘 들어있는지도 한 번 찔러봅니다.
+        auto menus = MenuDAO::getInstance().getMenusByStoreId(1); 
+        std::cout << "-------------------------------------------" << std::endl;
 
-        ItsServer server(port, threadPool); // 서버 객체 생성 (포트와 스레드 풀 주입)
+        // 3. 서버 실행 준비
+        ThreadPool threadPool(threadCount);
+        ItsServer server(port, threadPool);
 
-        // 메인 이벤트 루프 (블로킹)
-        // server.run() 내부에서 g_running 을 체크하여
-        // 종료 신호 수신 시 루프를 빠져나옵니다.
-        server.run();
+        std::cout << "[INFO] 모든 핸들러 및 데이터 로드 완료. 서비스를 시작합니다." << std::endl;
+        server.run();  // 서버의 메인 심장 (이벤트 루프)
     }
     catch (const std::exception &e)
     {

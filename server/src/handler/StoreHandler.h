@@ -3,8 +3,7 @@
 #include "json.hpp"
 #include "ClientSession.h"
 
-class StoreHandler
-{
-public:
-    static void handleStoreListRequest(std::shared_ptr<ClientSession> session, const nlohmann::json &requestJson);
+class StoreHandler {
+public: // 상점 목록 요청 처리 함수
+    static void handleStoreListRequest(ClientSession* session, const nlohmann::json& requestJson);
 };
