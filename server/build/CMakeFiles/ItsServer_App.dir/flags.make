@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/lms/Documents/its_server/server/include -I/home/lms/Documents/its_server/server/dto -I/home/lms/Documents/its_server/server/src/session -I/home/lms/Documents/its_server/server/src/handler -I/home/lms/Documents/its_server/server/mariadb-connector-cpp/include
+CXX_INCLUDES = -I/home/lms/Documents/its_server/server -I/home/lms/Documents/its_server/server/src -I/home/lms/Documents/its_server/server/src/database -I/home/lms/Documents/its_server/server/src/handler -I/home/lms/Documents/its_server/server/src/network -I/home/lms/Documents/its_server/server/src/service -I/home/lms/Documents/its_server/server/src/session -I/home/lms/Documents/its_server/server/src/thread -I/home/lms/Documents/its_server/server/src/util -I/home/lms/Documents/its_server/server/include -I/home/lms/Documents/its_server/server/../include -I/home/lms/Documents/its_server/server/../dto -I/home/lms/Documents/its_server/server/mariadb-connector-cpp/include
 
 CXX_FLAGS = -std=gnu++17
 
