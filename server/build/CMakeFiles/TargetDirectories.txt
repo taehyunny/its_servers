@@ -1,0 +1,3 @@
+/home/lms/Documents/its_server/server/build/CMakeFiles/ItsServer_App.dir
+/home/lms/Documents/its_server/server/build/CMakeFiles/edit_cache.dir
+/home/lms/Documents/its_server/server/build/CMakeFiles/rebuild_cache.dir

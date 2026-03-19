@@ -1,0 +1,184 @@
+-- ==========================================
+-- 1. 최상위 공통 도메인 (계정 및 쿠폰 마스터)
+-- ==========================================
+
+-- 1-1. 사용자 통합 테이블 (고객, 사장님, 라이더)
+CREATE TABLE USERS (
+    user_id VARCHAR(50) PRIMARY KEY,     
+    password_hash VARCHAR(255) NOT NULL, 
+    user_name VARCHAR(50) NOT NULL,
+    phone_number VARCHAR(20) NOT NULL UNIQUE,
+    role INT NOT NULL,                   -- 0: 고객, 1: 사장님, 2: 라이더
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 1-2. 발행 가능한 쿠폰 종류 (마스터)
+CREATE TABLE COUPON_MASTER (
+    coupon_id INT AUTO_INCREMENT PRIMARY KEY,
+    coupon_name VARCHAR(100) NOT NULL,
+    discount_amount INT NOT NULL,        -- 할인 금액
+    min_order_amount INT DEFAULT 0,      -- 최소 주문 금액
+    expires_at DATETIME NOT NULL         -- 유효 기간
+);
+
+-- ==========================================
+-- 2. 카탈로그 도메인 (상점 및 메뉴 - JSON 유연성 극대화)
+-- ==========================================
+
+-- 2-1. 상점 테이블 (C++ 서버 메모리 캐싱의 핵심 타겟)
+CREATE TABLE STORES (
+    store_id INT AUTO_INCREMENT PRIMARY KEY,
+    owner_id VARCHAR(50) NOT NULL,       
+    store_name VARCHAR(100) NOT NULL,
+    category VARCHAR(20) NOT NULL,       -- 예: '한식', '중식'
+    operating_hours JSON,                -- [JSON] 요일별 영업시간 
+    delivery_fees JSON,                  -- [JSON] 동네별 배달 팁
+    status INT DEFAULT 1,                -- 1: 영업중, 0: 준비중
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (owner_id) REFERENCES USERS(user_id)
+);
+
+-- 2-2. 메뉴 테이블 (Qt 동적 UI 렌더링용 스키마 포함)
+CREATE TABLE MENUS (
+    menu_id INT AUTO_INCREMENT PRIMARY KEY,
+    store_id INT NOT NULL,
+    menu_name VARCHAR(100) NOT NULL,
+    base_price INT NOT NULL,             -- 기본 단가
+    menu_options JSON,                   -- [JSON] 클라이언트 위젯 생성용 규격 (라디오/체크박스)
+    is_sold_out TINYINT(1) DEFAULT 0,    -- 0: 판매중, 1: 품절
+    FOREIGN KEY (store_id) REFERENCES STORES(store_id)
+);
+
+-- ==========================================
+-- 3. 트랜잭션 도메인 (돈과 직결되는 결제 및 주문)
+-- ==========================================
+
+-- 3-1. 주문 마스터 테이블
+CREATE TABLE ORDERS (
+    order_id VARCHAR(50) PRIMARY KEY,    -- 예: ORD-20260317-001
+    user_id VARCHAR(50) NOT NULL,        
+    store_id INT NOT NULL,               
+    total_price INT NOT NULL,            -- 최종 결제 금액
+    order_status INT DEFAULT 0,          -- 0: 대기, 1: 수락, 2: 조리중, 3: 배달중, 4: 완료, 9: 취소
+    delivery_address VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id),
+    FOREIGN KEY (store_id) REFERENCES STORES(store_id)
+);
+
+-- 3-2. 주문 상세 내역 (★ 태현 님의 '스냅샷' 철학이 담긴 테이블)
+CREATE TABLE ORDER_ITEMS (
+    item_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(50) NOT NULL,
+    menu_id INT NOT NULL,
+    quantity INT DEFAULT 1,
+    unit_price INT NOT NULL,             -- [스냅샷] 주문 당시의 가격 박제 (불변)
+    selected_options JSON,               -- [스냅샷] 주문 당시 선택한 옵션 내역 박제 (불변)
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+    FOREIGN KEY (menu_id) REFERENCES MENUS(menu_id)
+);
+
+-- 3-3. 사용자 보유 쿠폰 (동시성 Lock 제어용)
+CREATE TABLE USER_COUPONS (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id VARCHAR(50) NOT NULL,
+    coupon_id INT NOT NULL,
+    is_used TINYINT(1) DEFAULT 0,        -- 0: 미사용, 1: 사용됨
+    used_order_id VARCHAR(50),           -- 사용된 주문번호 추적
+    issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id),
+    FOREIGN KEY (coupon_id) REFERENCES COUPON_MASTER(coupon_id),
+    FOREIGN KEY (used_order_id) REFERENCES ORDERS(order_id)
+);
+
+-- ==========================================
+-- 4. 부가 및 시계열 도메인 (배달, 리뷰, 채팅)
+-- ==========================================
+
+-- 4-1. 배달 상태 트래킹 테이블
+CREATE TABLE DELIVERIES (
+    delivery_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(50) NOT NULL UNIQUE,
+    rider_id VARCHAR(50),                -- 배차 전 NULL
+    pickup_time DATETIME,                
+    complete_time DATETIME,              
+    delivery_status INT DEFAULT 0,       -- 0: 대기, 1: 픽업이동중, 2: 배달중, 3: 완료
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+    FOREIGN KEY (rider_id) REFERENCES USERS(user_id)
+);
+
+-- 4-2. 리뷰 테이블 (독립된 생명주기)
+CREATE TABLE REVIEWS (
+    review_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(50) NOT NULL UNIQUE, -- 1주문 1리뷰 강제
+    user_id VARCHAR(50) NOT NULL,
+    store_id INT NOT NULL,
+    rating INT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    content TEXT NOT NULL,
+    image_url VARCHAR(255),
+    owner_reply TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id),
+    FOREIGN KEY (store_id) REFERENCES STORES(store_id)
+);
+CREATE INDEX idx_review_store ON REVIEWS (store_id, rating); -- 빠른 별점 통계용 인덱스
+
+-- 4-3. 실시간 채팅 메시지 기록 (무한 누적 대비)
+CREATE TABLE CHAT_MESSAGES (
+    message_id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    order_id VARCHAR(50) NOT NULL,
+    sender_id VARCHAR(50) NOT NULL,
+    message_text TEXT NOT NULL,
+    is_read TINYINT(1) DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_id) REFERENCES ORDERS(order_id),
+    FOREIGN KEY (sender_id) REFERENCES USERS(user_id)
+);
+CREATE INDEX idx_chat_order_time ON CHAT_MESSAGES (order_id, created_at); -- 채팅방 빠른 조회용 인덱스
+
+
+
+
+
+
+------------------------------------------- [사장파트] 관련 테이블 수정 -------------------------------------------
+
+[STORES 테이블 수정]
+ALTER TABLE STORES ADD cook_time INT DEFAULT 30;         -- [추가] 실시간 조리시간 (분 단위)
+
+[MENUS 테이블 수정]
+ALTER TABLE MENUS ADD description VARCHAR(255);          -- [추가] 메뉴 상세 설명
+
+[ORDERS 테이블 수정]
+ALTER TABLE ORDERS ADD reject_reason VARCHAR(100);       -- [추가] 주문 거절 사유 (수락/완료 시엔 NULL)
+
+[COUPON_MASTER 테이블 수정]
+ALTER TABLE COUPON_MASTER ADD store_id INT;              -- [추가] 쿠팡이츠 본사 쿠폰이 아닌 특정 매장 전용 쿠폰일 경우 매장ID 저장 (NULL이면 본사 쿠폰)
+ALTER TABLE COUPON_MASTER ADD FOREIGN KEY (store_id) REFERENCES STORES(store_id);
+
+-------------------------------------------------------------------------------------------------------------------
+
+------------------------------------------- [사장파트] 관련 테이블 추가 -------------------------------------------
+
+[사장님 리뷰 답글 템플릿] - 자주 쓰는 말(템플릿) 관리 기능
+CREATE TABLE OWNER_REPLY_TEMPLATES (
+    template_id INT AUTO_INCREMENT PRIMARY KEY,
+    store_id INT NOT NULL,
+    title VARCHAR(50) NOT NULL,       -- 예: "친절한 감사인사"
+    content TEXT NOT NULL,            -- 예: "주문해주셔서 감사합니다! 늘 노력하는..."
+    FOREIGN KEY (store_id) REFERENCES STORES(store_id)
+);
+
+[악성 고객 차단 목록] - 특정 고객의 주문을 받지 않도록 차단 요청을 관리
+CREATE TABLE BLOCKED_CUSTOMERS (
+    block_id INT AUTO_INCREMENT PRIMARY KEY,
+    store_id INT NOT NULL,
+    user_id VARCHAR(50) NOT NULL,     -- 차단당한 고객 ID
+    reason VARCHAR(255),              -- 차단 사유
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (store_id) REFERENCES STORES(store_id),
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id)
+);
+
+-------------------------------------------------------------------------------------------------------------------
