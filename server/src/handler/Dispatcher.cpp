@@ -3,6 +3,7 @@
 #include "UserHandler.h"
 #include "OrderHandler.h"
 #include "SystemHandler.h"
+#include "StoreHandler.h"
 #include <iostream>
 
 void Dispatcher::dispatch(ClientSession *session, const PacketHeader &header, const std::string &jsonBody, ThreadPool &pool)
@@ -16,16 +17,14 @@ void Dispatcher::dispatch(ClientSession *session, const PacketHeader &header, co
         pool.enqueue([session, jsonBody]()
                      { UserHandler::handleSignup(session, jsonBody); }); // 람다 캡처로 session과 jsonBody를 넘겨줍니다.
         break;
-
     case CmdID::REQ_LOGIN:
         pool.enqueue([session, jsonBody]()
                      { UserHandler::handleLogin(session, jsonBody); }); // 로그인 요청도 UserHandler에서 처리하도록 합니다.
         break;
-
-        // case CmdID::REQ_HEARTBEAT:
-        //     g_threadPool.enqueue([session, jsonBody]()
-        //                          { SystemHandler::handleHeartbeat(session, jsonBody); });
-        //     break;
+    case CmdID::REQ_STORE_LIST:
+        pool.enqueue([session, jsonBody]()
+                     { StoreHandler::handleStoreListRequest(session, jsonBody); });
+        break;
 
         // case CmdID::REQ_STORE_LIST:
         // case CmdID::REQ_ORDER_CREATE:

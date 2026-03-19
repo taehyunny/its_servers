@@ -26,15 +26,28 @@ CREATE TABLE COUPON_MASTER (
 -- ==========================================
 
 -- 2-1. 상점 테이블 (C++ 서버 메모리 캐싱의 핵심 타겟)
+-- ==========================================
+-- 2. 카탈로그 도메인 (상점 및 메뉴 - JSON 유연성 극대화)
+-- ==========================================
+
+-- 2-1. 상점 테이블 (C++ 서버 메모리 캐싱의 핵심 타겟)
 CREATE TABLE STORES (
-    store_id INT AUTO_INCREMENT PRIMARY KEY,
-    owner_id VARCHAR(50) NOT NULL,       
-    store_name VARCHAR(100) NOT NULL,
+    store_id INT AUTO_INCREMENT PRIMARY KEY,  
+    owner_id VARCHAR(50) NOT NULL,       -- 사장님 이름  
+    store_name VARCHAR(100) NOT NULL,    -- 가게 이름
     category VARCHAR(20) NOT NULL,       -- 예: '한식', '중식'
     operating_hours JSON,                -- [JSON] 요일별 영업시간 
     delivery_fees JSON,                  -- [JSON] 동네별 배달 팁
     status INT DEFAULT 1,                -- 1: 영업중, 0: 준비중
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    cook_time INT DEFAULT 30,            -- [상용화] 실시간 조리시간 (분 단위)
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    
+    image_url VARCHAR(255),              -- 가게 썸네일 이미지 링크
+    min_order_amount INT DEFAULT 0,      -- 최소 주문 금액
+    rating DECIMAL(2,1) DEFAULT 0.0,     -- 별점 (예: 4.9)
+    review_count INT DEFAULT 0,          -- 리뷰 개수
+    delivery_time_range VARCHAR(50) DEFAULT '20~30분', -- 예상 배달 시간
+    
     FOREIGN KEY (owner_id) REFERENCES USERS(user_id)
 );
 
@@ -44,8 +57,15 @@ CREATE TABLE MENUS (
     store_id INT NOT NULL,
     menu_name VARCHAR(100) NOT NULL,
     base_price INT NOT NULL,             -- 기본 단가
-    menu_options JSON,                   -- [JSON] 클라이언트 위젯 생성용 규격 (라디오/체크박스)
+    menu_options JSON,                   -- [JSON] 클라이언트 위젯 생성용 규격
     is_sold_out TINYINT(1) DEFAULT 0,    -- 0: 판매중, 1: 품절
+    
+    -- [상용화 디테일 추가]
+    description VARCHAR(255),            -- 메뉴 상세 설명
+    image_url VARCHAR(255),              -- 음식 사진 링크
+    menu_category VARCHAR(50) DEFAULT '기본 메뉴', -- 메뉴 그룹명 (예: '메인', '사이드')
+    is_popular TINYINT(1) DEFAULT 0,     -- 1: 인기메뉴(BEST), 0: 일반
+    
     FOREIGN KEY (store_id) REFERENCES STORES(store_id)
 );
 

@@ -1,14 +1,28 @@
+// 1. 표준 라이브러리 (가장 기초가 되는 도구들)
 #include <iostream>
 #include <exception>
-#include <csignal> // [추가] Ctrl+C / kill 시그널 처리를 위해 추가
-#include <thread>  // [추가] CPU 코어 수 자동 감지(hardware_concurrency)를 위해 추가
+#include <csignal>
+#include <thread>
+#include <vector> // DTO나 DAO에서 쓸 수 있으니 확인
+
+// 2. 프로젝트 공통 인프라 (서버의 뼈대)
 #include "ItsServer.h"
 #include "ThreadPool.h"
 #include "ClientSession.h"
+
+// 3. 데이터 모델 (그릇)
+// DTO는 DAO나 Handler에서 참조하므로 위쪽에 두는 것이 안전합니다.
+#include "AllDTOs.h"
+
+// 4. 데이터 접근 객체 (국자)
 #include "UserDAO.h"
 #include "AuthDAO.h"
+#include "StoreDAO.h"
+#include "MenuDAO.h"
+
+// 5. 비즈니스 로직 (요리사)
 #include "UserHandler.h"
-#include "AllDTOs.h"
+#include "StoreHandler.h"
 
 // =========================================================================
 // [추가] 전역 종료 플래그
