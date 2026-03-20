@@ -11,9 +11,10 @@ public:
         static UserDAO instance;
         return instance;
     }
-
+    bool existsById(const std::string &userId);
+    bool existsByPhoneAndRole(const std::string &phoneNumber, int role); // 🚀 이름과 매개변수 변경
     // 회원가입: USERS 테이블에 새로운 레코드 삽입
-    bool insertUser(const SignupReqDTO &dto);
+    SignupResult insertUser(const SignupReqDTO &dto);
 
 private:
     UserDAO() = default;

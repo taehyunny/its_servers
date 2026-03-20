@@ -2,7 +2,8 @@
 #include <string>
 #include <nlohmann/json.hpp>
 #include <mariadb/conncpp.hpp>
-
+#include <utility>
+#include "AllDTOs.h"
 class AuthDAO
 {
 public:
@@ -14,7 +15,7 @@ public:
     }
 
     // 로그인 검증 (ID/PW 확인 후 유저 정보 반환)
-    nlohmann::json validateLogin(const std::string &userId, const std::string &password);
+    std::pair<LoginResult, nlohmann::json> validateLogin(const std::string &userId, const std::string &password);
 
 private:
     AuthDAO() = default;

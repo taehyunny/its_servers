@@ -99,14 +99,13 @@ int main(int argc, char *argv[])
 
     try
     {
-// 1. DB 연결 (태현님의 실제 비밀번호로 꼭 확인하세요!)
-        DBManager::getInstance().init("jdbc:mariadb://localhost:3306/its_bedalyo", "root", "1234", threadCount);
+        DBManager::getInstance().init("jdbc:mariadb://localhost:3306/its_bedalyo", "bedalyo", "1234", threadCount);
 
         // 2. [오늘의 성과] 데이터 로드 테스트 (서버 부팅 시 콘솔 출력용)
         std::cout << "-------------------------------------------" << std::endl;
         auto stores = StoreDAO::getInstance().getAllStores();
         // 황귱쟁반(ID: 1)의 메뉴가 잘 들어있는지도 한 번 찔러봅니다.
-        auto menus = MenuDAO::getInstance().getMenusByStoreId(1); 
+        auto menus = MenuDAO::getInstance().getMenusByStoreId(1);
         std::cout << "-------------------------------------------" << std::endl;
 
         // 3. 서버 실행 준비
@@ -114,7 +113,7 @@ int main(int argc, char *argv[])
         ItsServer server(port, threadPool);
 
         std::cout << "[INFO] 모든 핸들러 및 데이터 로드 완료. 서비스를 시작합니다." << std::endl;
-        server.run();  // 서버의 메인 심장 (이벤트 루프)
+        server.run(); // 서버의 메인 심장 (이벤트 루프)
     }
     catch (const std::exception &e)
     {

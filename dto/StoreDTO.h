@@ -4,18 +4,20 @@
 #include "json.hpp"
 
 // 1. 순서 교정: MenuDTO가 먼저 와야 다른 곳에서 쓸 수 있습니다.
-struct MenuDTO // 개별 메뉴 정보
+struct MenuDTO
 {
-    int menuId;                 // 메뉴 고유 ID
-    std::string menuName;       // 메뉴 이름
-    int basePrice;              // 기본 가격 (옵션 제외)
-    int isSoldOut;              // 품절 여부 (0: 판매 중, 1: 품절
-    nlohmann::json menuOptions; // 옵션 정보 (JSON 형태로 유연하게 저장)
-    std::string description;    // 메뉴 설명
+    int menuId;
+    std::string menuName;
+    int basePrice;
 
-    std::string imageUrl;     // 메뉴 이미지 URL (옵션)
-    std::string menuCategory; // 메뉴 카테고리 (예: "사이드", "음료", "디저트")
-    bool isPopular;           // 인기 메뉴 여부 (클라이언트 UI용)
+    // 🚀 int 대신 bool로 통일! (클라이언트에서도 true/false로 받는 게 편합니다)
+    bool isSoldOut;
+
+    nlohmann::json menuOptions;
+    std::string description;
+    std::string imageUrl;
+    std::string menuCategory;
+    bool isPopular;
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuDTO, menuId, menuName, basePrice, isSoldOut, menuOptions, description, imageUrl, menuCategory, isPopular)
 };
@@ -23,23 +25,30 @@ struct MenuDTO // 개별 메뉴 정보
 // 2. StoreDTO (개별 가게 정보)
 struct StoreDTO
 {
-    int storeId;                 // 가게 고유 ID
-    std::string storeName;       // 가게 이름
-    std::string category;        // 가게 카테고리 (예: "한식", "중식", "패스트푸드")
-    int status;                  // 가게 상태 (0: 영업 중, 1: 휴업, 2: 폐업)
-    nlohmann::json deliveryFees; // 배달비 정보 (JSON 형태로 유연하게 저장)
-    int cookTime;                // 예상 조리 시간 (분 단위)
+    int storeId;
+    std::string storeName;
+    std::string category;
+    int status;
+    nlohmann::json deliveryFees;
+    int cookTime;
+    std::string imageUrl;
+    int minOrderAmount;
+    double rating;
+    int reviewCount;
+    std::string deliveryTimeRange;
 
-    std::string imageUrl;          // 가게 이미지 URL (옵션)
-    int minOrderAmount;            // 최소 주문 금액 (원 단위)
-    double rating;                 // 가게 평점
-    int reviewCount;               // 리뷰 수
-    std::string deliveryTimeRange; // 배달 예상 시간 범위
+    // 🚀 [추가된 컬럼들]
+    std::string storeAddress; // 매장 주소
+    std::string openTime;     // 오픈 시간 (예: "09:00")
+    std::string closeTime;    // 마감 시간 (예: "22:00")
 
-    // [옵션] 목록에서 보여줄 대표 메뉴 1개 (클라이언트 UI용)
     MenuDTO popularMenu;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreDTO, storeId, storeName, category, status, deliveryFees, cookTime, imageUrl, minOrderAmount, rating, reviewCount, deliveryTimeRange, popularMenu)
+    // ⚠️ 매크로 마지막 부분에 새 변수 3개를 꼭 추가해야 합니다!
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreDTO,
+                                   storeId, storeName, category, status, deliveryFees, cookTime,
+                                   imageUrl, minOrderAmount, rating, reviewCount, deliveryTimeRange,
+                                   storeAddress, openTime, closeTime, popularMenu)
 };
 
 // 3. StoreListResDTO (가게 목록 전송용 껍데기)

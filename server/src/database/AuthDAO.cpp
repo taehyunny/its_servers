@@ -1,36 +1,50 @@
 #include "AuthDAO.h"
-#include "DbManager.h" // 서버용 MariaDB 커넥션 풀 매니저
+#include "DbManager.h"
+#include "Global_protocol.h"
 #include <iostream>
+#include <mariadb/conncpp.hpp>
 
-nlohmann::json AuthDAO::validateLogin(const std::string &userId, const std::string &password)
+std::pair<LoginResult, nlohmann::json> AuthDAO::validateLogin(const std::string &inputId, const std::string &inputPw)
 {
-    nlohmann::json userDoc;
+    std::shared_ptr<sql::Connection> conn;
+    nlohmann::json userInfo;
 
     try
     {
-        // 서버용 DBManager에서 연결 빌려오기 (DSDBManager의 connectDatabase 역할)
-        auto conn = DBManager::getInstance().getConnection();
+        conn = DBManager::getInstance().getConnection();
 
-        // 쿼리 준비 (PreparedStatement 사용으로 보안 강화)
+        // 1. 아이디 존재 여부 및 유저 정보 조회
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "SELECT user_name, role FROM USERS WHERE user_id = ? AND password_hash = ?"));
+            "SELECT password_hash, user_name, role FROM USERS WHERE user_id = ?"));
+        pstmt->setString(1, inputId);
 
-        pstmt->setString(1, userId);
-        pstmt->setString(2, password); // 실제로는 해싱된 값과 비교
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
-        std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
-
-        if (res->next())
+        // 결과가 없다면 아이디가 틀린(없는) 것
+        if (!rs->next())
         {
-            // 로그인 성공 시 정보를 JSON으로 담기 (태현님의 JSON 선호 스타일 반영)
-            userDoc["user_name"] = std::string(res->getString("user_name"));
-            userDoc["role"] = res->getInt("role");
+            std::cout << "[AuthDAO] 로그인 실패: 존재하지 않는 아이디 (" << inputId << ")" << std::endl;
+            return {LoginResult::ID_NOT_FOUND, userInfo};
         }
+
+        // 2. 비밀번호 검증
+        std::string dbPassword = rs->getString("password_hash").c_str();
+        if (dbPassword != inputPw)
+        {
+            std::cout << "[AuthDAO] 로그인 실패: 비밀번호 불일치 (" << inputId << ")" << std::endl;
+            return {LoginResult::WRONG_PASSWORD, userInfo};
+        }
+
+        // 3. 인증 성공 시 데이터 세팅
+        userInfo["user_name"] = rs->getString("user_name");
+        userInfo["role"] = rs->getInt("role");
+
+        std::cout << "[AuthDAO] 로그인 성공 (" << inputId << ")" << std::endl;
+        return {LoginResult::SUCCESS, userInfo};
     }
     catch (sql::SQLException &e)
     {
-        std::cerr << "❌ AuthDAO 로그인 검증 실패: " << e.what() << std::endl;
+        std::cerr << "[AuthDAO] DB 오류: " << e.what() << std::endl;
+        return {LoginResult::SERVER_ERROR, userInfo};
     }
-
-    return userDoc;
 }
