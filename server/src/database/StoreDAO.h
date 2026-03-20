@@ -14,7 +14,9 @@ public:
     }
 
     // 서버 시작 시 캐싱을 위해 모든 상점 정보를 DB에서 가져오는 함수
-    std::vector<StoreDTO> getAllStores();
+    std::vector<TopStoreInfo> getAllStores();
+    std::vector<TopStoreInfo> getStoresByCategory(const std::string &category);
+    std::vector<TopStoreInfo> getStoresByCategory(const std::string &categoryName);
 
 private:
     StoreDAO() = default;

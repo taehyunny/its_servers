@@ -108,7 +108,7 @@ struct PhoneCheckReqDTO
 {
     std::string phoneNumber; // 전화번호 (핸들러의 req.phoneNumber에 대응)
     int role;                // 🚀 핵심: 사장님(1)인지 손님(0)인지 구분!
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(PhoneCheckReqDTO, phoneNumber, role)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(PhoneCheckReqDTO, phoneNumber, role) // JSON <-> Struct 자동 변환 매크로
 };
 
 // 1043: 폰번호 중복 확인 응답
@@ -118,4 +118,4 @@ struct PhoneCheckResDTO
     bool isAvailable;                                                              // 🚀 핵심: 사용 가능 여부 (true: 사용 가능, false: 중복)
     std::string message;                                                           // 유저에게 보여줄 메시지 (예: "이미 사용 중인 전화번호입니다.")
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(PhoneCheckResDTO, status, isAvailable, message) // JSON <-> Struct 자동 변환 매크로
-};
+};  

@@ -3,15 +3,15 @@
 #include "Global_protocol.h"
 #include <iostream>
 #include <mariadb/conncpp.hpp>
-
+//  AuthDAO는 로그인 검증을 담당하는 DAO입니다. DB에서 아이디와 비밀번호를 조회하여 검증 결과와 유저 정보를 반환합니다. DB 연결은 DBManager의 커넥션 풀에서 가져옵니다.
 std::pair<LoginResult, nlohmann::json> AuthDAO::validateLogin(const std::string &inputId, const std::string &inputPw)
 {
-    std::shared_ptr<sql::Connection> conn;
+    std::shared_ptr<sql::Connection> conn;  // 스마트 포인터 사용으로 DB 연결 관리가 훨씬 안전해졌습니다!
     nlohmann::json userInfo;
 
     try
     {
-        conn = DBManager::getInstance().getConnection();
+        conn = DBManager::getInstance().getConnection(); // DBManager에서 커넥션을 빌려옵니다. 스마트 포인터이므로 사용 후 자동으로 풀에 반환됩니다.
 
         // 1. 아이디 존재 여부 및 유저 정보 조회
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(

@@ -1,36 +1,33 @@
 #include "CategoryHandler.h"
+#include "CategoryDAO.h"
+#include "StoreDAO.h"
 #include "AllDTOs.h"
+#include "Global_protocol.h"
 #include <iostream>
 
-void CategoryHandler::handleCategoryRequest(ClientSession *session, const std::string &jsonBody)
+void CategoryHandler::handleCategoryRequest(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
-    std::cout << "[CategoryHandler] 클라이언트(fd: " << session->getFd() << ")가 카테고리 목록을 요청했습니다!" << std::endl;
+    std::cout << "[CategoryHandler] 클라이언트(fd: " << session->getFd() << ") 메인 화면 통합 데이터 요청!" << std::endl;
 
     try
     {
-        CategoryListResDTO res;
+        // 🚀 1. 통합 바구니 준비
+        MainHomeResDTO res;
         res.status = 200;
 
-        // 🚀 DB 연동 없이 하드코딩으로 빠르게 클라이언트에게 카테고리를 쏴줍니다!
+        // 🚀 2. DB에서 각각 긁어와서 바구니에 담기
+        res.categories = CategoryDAO::getInstance().getAllCategories();
+        res.topStores = StoreDAO::getInstance().getTopStoresByCategory();
 
-        res.categories.push_back({1, "한식", "korean.png"});
-        res.categories.push_back({2, "중식", "chinese.png"});
-        res.categories.push_back({3, "돈까스/일식", "japanese.png"});
-        res.categories.push_back({4, "양식", "western.png"});
-        res.categories.push_back({5, "치킨", "chicken.png"});
-        res.categories.push_back({6, "피자", "pizza.png"});
-        res.categories.push_back({7, "햄버거", "burger.png"});
-        res.categories.push_back({8, "족발/보쌈", "jokbal_bossam.png"});
-        res.categories.push_back({9, "도시락", "lunchbox.png"});
-        res.categories.push_back({10, "초밥/회", "sushi_sashimi.png"});
-
-        // 1061번(RES_CATEGORY)으로 발사!
+        // 🚀 3. 클라이언트에게 단 한 번의 패킷(1061번)으로 묵직하게 발사!
+        // (기존의 RES_CATEGORY = 1061 을 그대로 사용하면 됩니다)
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_CATEGORY), res);
 
-        std::cout << "[CategoryHandler] 카테고리 " << res.categories.size() << "개 전송 완료!" << std::endl;
+        std::cout << "[CategoryHandler] 메인 화면 데이터(카테고리 " << res.categories.size()
+                  << "개, 1등 매장 " << res.topStores.size() << "개) 한방에 전송 완료!" << std::endl;
     }
     catch (const std::exception &e)
     {
-        std::cerr << "[CategoryHandler] 카테고리 전송 중 에러 발생: " << e.what() << std::endl;
+        std::cerr << "[CategoryHandler] 메인 화면 전송 에러: " << e.what() << std::endl;
     }
 }

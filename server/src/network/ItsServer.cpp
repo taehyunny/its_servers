@@ -11,16 +11,16 @@
 #include <unistd.h>
 #include <cstring>
 #include <cerrno>
+#include <memory> // 🚀 std::shared_ptr 사용을 위해 든든하게 추가!
 
 // ==========================================================
 // 1. 서버 초기화 (생성자)
 // ==========================================================
-ItsServer::ItsServer(int port, ThreadPool &threadPool) : threadPool(threadPool) // ThreadPool을 외부에서 주입받습니다.
+ItsServer::ItsServer(int port, ThreadPool &threadPool) : threadPool(threadPool)
 {
-    sessionManager = new SessionManager(); // 세션 관리자 초기화
-    events = new epoll_event[MAX_EVENTS];  // 이벤트 바구니 할당
+    sessionManager = new SessionManager();
+    events = new epoll_event[MAX_EVENTS];
 
-    // 1. 대표 전화 개통 (TCP 소켓)
     serverFd = socket(AF_INET, SOCK_STREAM, 0);
     if (serverFd == -1)
     {
@@ -28,14 +28,12 @@ ItsServer::ItsServer(int port, ThreadPool &threadPool) : threadPool(threadPool) 
         exit(EXIT_FAILURE);
     }
 
-    // 2. 주소 할당 및 바인딩
     struct sockaddr_in serverAddr;
     std::memset(&serverAddr, 0, sizeof(serverAddr));
     serverAddr.sin_family = AF_INET;
     serverAddr.sin_addr.s_addr = htonl(INADDR_ANY);
     serverAddr.sin_port = htons(port);
 
-    // 포트 재사용 옵션 (서버 재시작 시 포트 충돌 방지)
     int opt = 1;
     setsockopt(serverFd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
@@ -51,10 +49,8 @@ ItsServer::ItsServer(int port, ThreadPool &threadPool) : threadPool(threadPool) 
         exit(EXIT_FAILURE);
     }
 
-    // 서버 소켓을 논블로킹 모드로 전환
     setNonBlocking(serverFd);
 
-    // epoll 문지기 고용
     epollFd = epoll_create1(0);
     if (epollFd == -1)
     {
@@ -62,7 +58,6 @@ ItsServer::ItsServer(int port, ThreadPool &threadPool) : threadPool(threadPool) 
         exit(EXIT_FAILURE);
     }
 
-    // 서버 소켓을 epoll 감시망에 등록 (엣지 트리거 방식)
     struct epoll_event event;
     event.events = EPOLLIN | EPOLLET;
     event.data.fd = serverFd;
@@ -111,7 +106,7 @@ void ItsServer::run()
         if (event_count == -1)
         {
             if (errno == EINTR)
-                continue; // 시스템 인터럽트 발생 시 무시하고 계속 진행
+                continue;
             std::cerr << "[ERROR] epoll_wait 오류 발생" << std::endl;
             break;
         }
@@ -135,12 +130,11 @@ void ItsServer::run()
 // ==========================================================
 // 5. 신규 클라이언트 수락 (Accept)
 // ==========================================================
-void ItsServer::acceptNewClient() // 서버 소켓에 새로운 연결이 들어왔을 때 호출됩니다.
+void ItsServer::acceptNewClient()
 {
     struct sockaddr_in clientAddr;
     socklen_t clientLen = sizeof(clientAddr);
 
-    // 엣지 트리거이므로, 대기열에 있는 모든 손님을 한 번에 다 받음
     while (true)
     {
         int clientFd = accept(serverFd, (struct sockaddr *)&clientAddr, &clientLen);
@@ -149,7 +143,7 @@ void ItsServer::acceptNewClient() // 서버 소켓에 새로운 연결이 들어
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
-                break; // 더 이상 수락할 손님이 없으면 탈출
+                break;
             }
             else
             {
@@ -160,10 +154,8 @@ void ItsServer::acceptNewClient() // 서버 소켓에 새로운 연결이 들어
 
         setNonBlocking(clientFd);
 
-        // 프론트 데스크에 새 객실 등록 (Session 생성)
         sessionManager->createSession(clientFd);
 
-        // 새 클라이언트 소켓을 epoll 감시망에 등록
         struct epoll_event event;
         event.events = EPOLLIN | EPOLLET;
         event.data.fd = clientFd;
@@ -182,25 +174,26 @@ void ItsServer::readFromClient(int clientFd)
 {
     char buffer[4096];
 
-    // 논블로킹 소켓이므로, 버퍼에 있는 데이터를 남김없이 다 긁어와야 함
     while (true)
     {
         int readBytes = read(clientFd, buffer, sizeof(buffer));
 
         if (readBytes > 0)
         {
-            ClientSession *session = sessionManager->getSession(clientFd); // 프론트 데스크에서 해당 FD의 세션을 찾아옵니다.
+            // 🚀 완벽하게 적용된 스마트 포인터!
+            std::shared_ptr<ClientSession> session = sessionManager->getSession(clientFd);
+
             if (session != nullptr)
             {
-                // PacketFramer에게 조립 위임
-                PacketFramer::onReceiveData(session, buffer, readBytes, threadPool); // 🚀 ThreadPool도 함께 전달
+                // 🚀 안전하게 Dispatcher와 ThreadPool까지 이어지는 데이터 흐름!
+                PacketFramer::onReceiveData(session, buffer, readBytes, threadPool);
             }
         }
         else if (readBytes == -1)
         {
             if (errno == EAGAIN || errno == EWOULDBLOCK)
             {
-                break; // 소켓 버퍼를 다 비웠음
+                break;
             }
             else
             {
@@ -211,7 +204,6 @@ void ItsServer::readFromClient(int clientFd)
         }
         else
         {
-            // readBytes == 0 이면 클라이언트가 정상적으로 FIN을 보내 연결을 종료한 것
             disconnectClient(clientFd);
             break;
         }

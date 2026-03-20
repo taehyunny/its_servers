@@ -25,7 +25,7 @@ public:
     {
         std::unique_lock<std::mutex> lock(m_mutex); // 자물쇠를 걸어서 큐에 안전하게 접근합니다.
         m_cond.wait(lock, [this]
-                    { return !m_queue.empty(); });
+                    { return !m_queue.empty(); }); // 큐가 비어있으면 대기합니다. 데이터가 들어오면 깨어납니다.
 
         T value = std::move(m_queue.front()); // 큐에서 데이터를 꺼냅니다. std::move로 효율적으로 이동시킵니다.
         m_queue.pop();
@@ -37,17 +37,17 @@ public:
     {
         std::lock_guard<std::mutex> lock(m_mutex); // 자물쇠를 걸어서 큐에 안전하게 접근합니다.
         if (m_queue.empty())
-            return std::nullopt;
+            return std::nullopt; // 데이터가 없으면 nullopt를 반환합니다. 호출하는 쪽에서 std::optional을 체크해야 합니다.
 
         T value = std::move(m_queue.front()); // 큐에서 데이터를 꺼냅니다. std::move로 효율적으로 이동시킵니다.
         m_queue.pop();
         return value;
     }
 
-    bool empty() const
+    bool empty() const // 큐가 비어있는지 확인하는 함수입니다. 호출하는 쪽에서 큐의 상태를 체크할 때 유용합니다.
     {
-        std::lock_guard<std::mutex> lock(m_mutex);
-        return m_queue.empty();
+        std::lock_guard<std::mutex> lock(m_mutex); // 자물쇠를 걸어서 큐에 안전하게 접근합니다.
+        return m_queue.empty();                    // 큐가 비어있는지 확인합니다.
     }
 
 private:

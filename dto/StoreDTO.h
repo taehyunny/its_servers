@@ -89,3 +89,41 @@ struct MenuUpdateReqDTO
     MenuDTO menuData; // 메뉴 데이터 (추가/수정 시 사용, 삭제 시 menuId만 필요)
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuUpdateReqDTO, storeId, actionType, menuData)
 };
+
+struct TopStoreInfo //  카테고리별 1등 매장 정보 DTO
+{
+    int storeId;
+    std::string storeName;
+    std::string category;
+    std::string iconPath; // 카테고리 아이콘 경로
+    int totalSales;       // 총 매출 (1등 선정 기준)
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(TopStoreInfo, storeId, storeName, category, iconPath, totalSales)
+};
+
+// 🚀 메인 화면용 '통합' 응답 패킷!
+struct MainHomeResDTO
+{
+    int status;
+    std::vector<CategoryItem> categories; // 위에는 카테고리
+    std::vector<TopStoreInfo> topStores;  // 아래는 1등 매장들!
+
+    // 이 한 줄로 JSON 변환 끝!
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MainHomeResDTO, status, categories, topStores)
+};
+
+// 🚀 클라이언트 -> 서버: "이 카테고리 매장 다 주세요!" (예: REQ_STORES_BY_CATEGORY)
+struct StoreListReqDTO
+{
+    std::string category; // 예: "한식"
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreListReqDTO, category)
+};
+
+// 🚀 서버 -> 클라이언트: "여기 주문하신 매장 리스트입니다!" (예: RES_STORES_BY_CATEGORY)
+// 매장 정보는 아까 만든 TopStoreInfo를 이름만 StoreInfo로 바꿔서 재활용하면 개꿀입니다! ㅋㅋㅋ
+struct StoreListResDTO
+{
+    int status;
+    std::vector<TopStoreInfo> stores; // 사실상 StoreInfo와 구조 동일
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreListResDTO, status, stores)
+};
