@@ -291,4 +291,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: \
  /home/lms/Documents/its_server/server/src/handler/UserHandler.h \
  /home/lms/Documents/its_server/server/src/handler/OrderHandler.h \
  /home/lms/Documents/its_server/server/src/handler/SystemHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/StoreHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/MenuHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/CategoryHandler.h \
  /usr/include/c++/13/iostream

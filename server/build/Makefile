@@ -225,6 +225,30 @@ src/database/DbManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.s
 .PHONY : src/database/DbManager.cpp.s
 
+src/database/MenuDAO.o: src/database/MenuDAO.cpp.o
+.PHONY : src/database/MenuDAO.o
+
+# target to build an object file
+src/database/MenuDAO.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o
+.PHONY : src/database/MenuDAO.cpp.o
+
+src/database/MenuDAO.i: src/database/MenuDAO.cpp.i
+.PHONY : src/database/MenuDAO.i
+
+# target to preprocess a source file
+src/database/MenuDAO.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.i
+.PHONY : src/database/MenuDAO.cpp.i
+
+src/database/MenuDAO.s: src/database/MenuDAO.cpp.s
+.PHONY : src/database/MenuDAO.s
+
+# target to generate assembly for a file
+src/database/MenuDAO.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.s
+.PHONY : src/database/MenuDAO.cpp.s
+
 src/database/OrderDAO.o: src/database/OrderDAO.cpp.o
 .PHONY : src/database/OrderDAO.o
 
@@ -248,6 +272,54 @@ src/database/OrderDAO.s: src/database/OrderDAO.cpp.s
 src/database/OrderDAO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.s
 .PHONY : src/database/OrderDAO.cpp.s
+
+src/database/ProductDAO.o: src/database/ProductDAO.cpp.o
+.PHONY : src/database/ProductDAO.o
+
+# target to build an object file
+src/database/ProductDAO.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o
+.PHONY : src/database/ProductDAO.cpp.o
+
+src/database/ProductDAO.i: src/database/ProductDAO.cpp.i
+.PHONY : src/database/ProductDAO.i
+
+# target to preprocess a source file
+src/database/ProductDAO.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.i
+.PHONY : src/database/ProductDAO.cpp.i
+
+src/database/ProductDAO.s: src/database/ProductDAO.cpp.s
+.PHONY : src/database/ProductDAO.s
+
+# target to generate assembly for a file
+src/database/ProductDAO.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.s
+.PHONY : src/database/ProductDAO.cpp.s
+
+src/database/StoreDAO.o: src/database/StoreDAO.cpp.o
+.PHONY : src/database/StoreDAO.o
+
+# target to build an object file
+src/database/StoreDAO.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o
+.PHONY : src/database/StoreDAO.cpp.o
+
+src/database/StoreDAO.i: src/database/StoreDAO.cpp.i
+.PHONY : src/database/StoreDAO.i
+
+# target to preprocess a source file
+src/database/StoreDAO.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.i
+.PHONY : src/database/StoreDAO.cpp.i
+
+src/database/StoreDAO.s: src/database/StoreDAO.cpp.s
+.PHONY : src/database/StoreDAO.s
+
+# target to generate assembly for a file
+src/database/StoreDAO.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.s
+.PHONY : src/database/StoreDAO.cpp.s
 
 src/database/UserDAO.o: src/database/UserDAO.cpp.o
 .PHONY : src/database/UserDAO.o
@@ -273,6 +345,30 @@ src/database/UserDAO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.s
 .PHONY : src/database/UserDAO.cpp.s
 
+src/handler/CategoryHandler.o: src/handler/CategoryHandler.cpp.o
+.PHONY : src/handler/CategoryHandler.o
+
+# target to build an object file
+src/handler/CategoryHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o
+.PHONY : src/handler/CategoryHandler.cpp.o
+
+src/handler/CategoryHandler.i: src/handler/CategoryHandler.cpp.i
+.PHONY : src/handler/CategoryHandler.i
+
+# target to preprocess a source file
+src/handler/CategoryHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.i
+.PHONY : src/handler/CategoryHandler.cpp.i
+
+src/handler/CategoryHandler.s: src/handler/CategoryHandler.cpp.s
+.PHONY : src/handler/CategoryHandler.s
+
+# target to generate assembly for a file
+src/handler/CategoryHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.s
+.PHONY : src/handler/CategoryHandler.cpp.s
+
 src/handler/Dispatcher.o: src/handler/Dispatcher.cpp.o
 .PHONY : src/handler/Dispatcher.o
 
@@ -297,6 +393,30 @@ src/handler/Dispatcher.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.s
 .PHONY : src/handler/Dispatcher.cpp.s
 
+src/handler/MenuHandler.o: src/handler/MenuHandler.cpp.o
+.PHONY : src/handler/MenuHandler.o
+
+# target to build an object file
+src/handler/MenuHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o
+.PHONY : src/handler/MenuHandler.cpp.o
+
+src/handler/MenuHandler.i: src/handler/MenuHandler.cpp.i
+.PHONY : src/handler/MenuHandler.i
+
+# target to preprocess a source file
+src/handler/MenuHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.i
+.PHONY : src/handler/MenuHandler.cpp.i
+
+src/handler/MenuHandler.s: src/handler/MenuHandler.cpp.s
+.PHONY : src/handler/MenuHandler.s
+
+# target to generate assembly for a file
+src/handler/MenuHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.s
+.PHONY : src/handler/MenuHandler.cpp.s
+
 src/handler/OrderHandler.o: src/handler/OrderHandler.cpp.o
 .PHONY : src/handler/OrderHandler.o
 
@@ -320,6 +440,30 @@ src/handler/OrderHandler.s: src/handler/OrderHandler.cpp.s
 src/handler/OrderHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.s
 .PHONY : src/handler/OrderHandler.cpp.s
+
+src/handler/StoreHandler.o: src/handler/StoreHandler.cpp.o
+.PHONY : src/handler/StoreHandler.o
+
+# target to build an object file
+src/handler/StoreHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o
+.PHONY : src/handler/StoreHandler.cpp.o
+
+src/handler/StoreHandler.i: src/handler/StoreHandler.cpp.i
+.PHONY : src/handler/StoreHandler.i
+
+# target to preprocess a source file
+src/handler/StoreHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.i
+.PHONY : src/handler/StoreHandler.cpp.i
+
+src/handler/StoreHandler.s: src/handler/StoreHandler.cpp.s
+.PHONY : src/handler/StoreHandler.s
+
+# target to generate assembly for a file
+src/handler/StoreHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.s
+.PHONY : src/handler/StoreHandler.cpp.s
 
 src/handler/SystemHandler.o: src/handler/SystemHandler.cpp.o
 .PHONY : src/handler/SystemHandler.o
@@ -582,18 +726,36 @@ help:
 	@echo "... src/database/DbManager.o"
 	@echo "... src/database/DbManager.i"
 	@echo "... src/database/DbManager.s"
+	@echo "... src/database/MenuDAO.o"
+	@echo "... src/database/MenuDAO.i"
+	@echo "... src/database/MenuDAO.s"
 	@echo "... src/database/OrderDAO.o"
 	@echo "... src/database/OrderDAO.i"
 	@echo "... src/database/OrderDAO.s"
+	@echo "... src/database/ProductDAO.o"
+	@echo "... src/database/ProductDAO.i"
+	@echo "... src/database/ProductDAO.s"
+	@echo "... src/database/StoreDAO.o"
+	@echo "... src/database/StoreDAO.i"
+	@echo "... src/database/StoreDAO.s"
 	@echo "... src/database/UserDAO.o"
 	@echo "... src/database/UserDAO.i"
 	@echo "... src/database/UserDAO.s"
+	@echo "... src/handler/CategoryHandler.o"
+	@echo "... src/handler/CategoryHandler.i"
+	@echo "... src/handler/CategoryHandler.s"
 	@echo "... src/handler/Dispatcher.o"
 	@echo "... src/handler/Dispatcher.i"
 	@echo "... src/handler/Dispatcher.s"
+	@echo "... src/handler/MenuHandler.o"
+	@echo "... src/handler/MenuHandler.i"
+	@echo "... src/handler/MenuHandler.s"
 	@echo "... src/handler/OrderHandler.o"
 	@echo "... src/handler/OrderHandler.i"
 	@echo "... src/handler/OrderHandler.s"
+	@echo "... src/handler/StoreHandler.o"
+	@echo "... src/handler/StoreHandler.i"
+	@echo "... src/handler/StoreHandler.s"
 	@echo "... src/handler/SystemHandler.o"
 	@echo "... src/handler/SystemHandler.i"
 	@echo "... src/handler/SystemHandler.s"

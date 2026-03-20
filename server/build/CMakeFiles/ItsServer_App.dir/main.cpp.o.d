@@ -188,19 +188,19 @@ CMakeFiles/ItsServer_App.dir/main.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
  /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
  /usr/include/c++/13/limits /usr/include/c++/13/ctime \
- /usr/include/c++/13/bits/parse_numbers.h \
+ /usr/include/c++/13/bits/parse_numbers.h /usr/include/c++/13/vector \
+ /usr/include/c++/13/bits/stl_uninitialized.h \
+ /usr/include/c++/13/bits/stl_vector.h \
+ /usr/include/c++/13/bits/stl_bvector.h \
+ /usr/include/c++/13/bits/vector.tcc \
  /home/lms/Documents/its_server/server/src/network/ItsServer.h \
  /usr/include/x86_64-linux-gnu/sys/epoll.h \
  /usr/include/x86_64-linux-gnu/bits/epoll.h \
  /home/lms/Documents/its_server/server/src/thread/ThreadPool.h \
- /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_uninitialized.h \
- /usr/include/c++/13/bits/stl_vector.h \
- /usr/include/c++/13/bits/stl_bvector.h \
- /usr/include/c++/13/bits/vector.tcc /usr/include/c++/13/queue \
- /usr/include/c++/13/deque /usr/include/c++/13/bits/stl_deque.h \
- /usr/include/c++/13/bits/deque.tcc /usr/include/c++/13/bits/stl_heap.h \
- /usr/include/c++/13/bits/stl_queue.h /usr/include/c++/13/mutex \
- /usr/include/c++/13/bits/std_mutex.h \
+ /usr/include/c++/13/queue /usr/include/c++/13/deque \
+ /usr/include/c++/13/bits/stl_deque.h /usr/include/c++/13/bits/deque.tcc \
+ /usr/include/c++/13/bits/stl_heap.h /usr/include/c++/13/bits/stl_queue.h \
+ /usr/include/c++/13/mutex /usr/include/c++/13/bits/std_mutex.h \
  /usr/include/c++/13/bits/unique_lock.h \
  /usr/include/c++/13/condition_variable \
  /usr/include/c++/13/bits/shared_ptr.h \
@@ -348,7 +348,7 @@ CMakeFiles/ItsServer_App.dir/main.cpp.o: \
  /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
  /home/lms/Documents/its_server/server/../include/Global_protocol.h \
  /home/lms/Documents/its_server/server/../include/json.hpp \
- /home/lms/Documents/its_server/server/src/database/UserDAO.h \
+ /home/lms/Documents/its_server/server/src/database/DbManager.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \
  /usr/local/include/mariadb/conncpp/buildconf.hpp \
@@ -389,5 +389,13 @@ CMakeFiles/ItsServer_App.dir/main.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/AccountDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
+ /home/lms/Documents/its_server/server/src/database/UserDAO.h \
  /home/lms/Documents/its_server/server/src/database/AuthDAO.h \
- /home/lms/Documents/its_server/server/src/handler/UserHandler.h
+ /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
+ /home/lms/Documents/its_server/server/src/database/MenuDAO.h \
+ /home/lms/Documents/its_server/server/src/handler/UserHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/StoreHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/MenuHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/OrderHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/SystemHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/Dispatcher.h
