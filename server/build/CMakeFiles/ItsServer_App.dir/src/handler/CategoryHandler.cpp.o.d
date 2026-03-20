@@ -315,10 +315,12 @@ CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o: \
  /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
  /home/lms/Documents/its_server/server/../include/Global_protocol.h \
  /home/lms/Documents/its_server/server/../include/json.hpp \
+ /home/lms/Documents/its_server/server/src/database/CategoryDAO.h \
  /home/lms/Documents/its_server/server/../dto/AllDTOs.h \
  /home/lms/Documents/its_server/server/../dto/BaseDTO.h \
  /home/lms/Documents/its_server/server/../include/json.hpp \
  /home/lms/Documents/its_server/server/../dto/AccountDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
+ /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
  /usr/include/c++/13/iostream

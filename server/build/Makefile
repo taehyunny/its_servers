@@ -177,6 +177,30 @@ src/database/AuthDAO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.s
 .PHONY : src/database/AuthDAO.cpp.s
 
+src/database/CategoryDAO.o: src/database/CategoryDAO.cpp.o
+.PHONY : src/database/CategoryDAO.o
+
+# target to build an object file
+src/database/CategoryDAO.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o
+.PHONY : src/database/CategoryDAO.cpp.o
+
+src/database/CategoryDAO.i: src/database/CategoryDAO.cpp.i
+.PHONY : src/database/CategoryDAO.i
+
+# target to preprocess a source file
+src/database/CategoryDAO.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.i
+.PHONY : src/database/CategoryDAO.cpp.i
+
+src/database/CategoryDAO.s: src/database/CategoryDAO.cpp.s
+.PHONY : src/database/CategoryDAO.s
+
+# target to generate assembly for a file
+src/database/CategoryDAO.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.s
+.PHONY : src/database/CategoryDAO.cpp.s
+
 src/database/ConnectionPool.o: src/database/ConnectionPool.cpp.o
 .PHONY : src/database/ConnectionPool.o
 
@@ -720,6 +744,9 @@ help:
 	@echo "... src/database/AuthDAO.o"
 	@echo "... src/database/AuthDAO.i"
 	@echo "... src/database/AuthDAO.s"
+	@echo "... src/database/CategoryDAO.o"
+	@echo "... src/database/CategoryDAO.i"
+	@echo "... src/database/CategoryDAO.s"
 	@echo "... src/database/ConnectionPool.o"
 	@echo "... src/database/ConnectionPool.i"
 	@echo "... src/database/ConnectionPool.s"

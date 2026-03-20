@@ -23,7 +23,8 @@ void Dispatcher::dispatch(std::shared_ptr<ClientSession> session, const PacketHe
         pool.enqueue([session, jsonBody]()
                      {
             try {
-                UserHandler::handleSignup(session.get(), jsonBody);
+                // ⚠️ UserHandler는 아직 리팩토링 전이므로 .get() 유지
+                UserHandler::handleSignup(session.get(), jsonBody); 
             } catch (const std::exception& e) { 
                 std::cerr << "🚨 [Dispatcher-Signup] 에러: " << e.what() << std::endl;  
             } });
@@ -33,46 +34,40 @@ void Dispatcher::dispatch(std::shared_ptr<ClientSession> session, const PacketHe
         pool.enqueue([session, jsonBody]()
                      {
             try {
-                UserHandler::handleLogin(session.get(), jsonBody); // 로그인은 JSON 파싱이 내부에서 일어나므로 예외 처리를 핸들러 내부로 이동
+                UserHandler::handleLogin(session.get(), jsonBody); 
             } catch (const std::exception& e) {
                 std::cerr << "🚨 [Dispatcher-Login] 에러: " << e.what() << std::endl;
             } });
         break;
 
-    case CmdID::REQ_STORE_LIST:
+    case CmdID::REQ_STORE_LIST: // 카테고리별 매장 목록 요청
         pool.enqueue([session, jsonBody]()
                      {
             try {
-                nlohmann::json jsonPayload = nlohmann::json::parse(jsonBody);  // JSON 파싱을 여기서 시도하여 에러를 잡아냅니다.
-                StoreHandler::handleStoreListRequest(session.get(), jsonPayload);    // 매장 목록 요청은 JSON 파싱이 필요하므로 예외 처리를 추가합니다.
+                // 🚀 우리가 완벽하게 리팩토링한 StoreHandler! (session 그대로 전달, 파싱도 내부에서)
+                StoreHandler::handleStoreListRequest(session, jsonBody);    
             } catch (const std::exception &e) {
-                std::cerr << "🚨 [Dispatcher-StoreList] JSON 파싱 에러: " << e.what() << std::endl;
+                std::cerr << "🚨 [Dispatcher-StoreList] 에러: " << e.what() << std::endl;
             } });
         break;
 
-    case CmdID::REQ_MENU_LIST:
+    case CmdID::REQ_MENU_LIST: // 매장별 메뉴 목록 요청
         pool.enqueue([session, jsonBody]()
                      {
             try {
-                nlohmann::json jsonPayload = nlohmann::json::parse(jsonBody);  // JSON 파싱을 여기서 시도하여 에러를 잡아냅니다.
-                MenuHandler::handleMenuListRequest(session.get(), jsonPayload);     // 메뉴 목록 요청은 JSON 파싱이 필요하므로 예외 처리를 추가합니다.
+                // ⚠️ MenuHandler는 아직 리팩토링 전이므로 기존 로직 유지
+                nlohmann::json jsonPayload = nlohmann::json::parse(jsonBody);  
+                MenuHandler::handleMenuListRequest(session.get(), jsonPayload);     
             } catch (const std::exception& e) {
                 std::cerr << "🚨 [Dispatcher-MenuList] JSON 파싱 에러: " << e.what() << std::endl;
             } });
-        break;
-
-    case CmdID::REQ_CATEGORY: // 카테고리 요청은 JSON 파싱이 필요 없으므로 핸들러 내부에서 예외 처리를 하지 않고 바로 호출합니다.
-        pool.enqueue([session, jsonBody]()
-                     {
-            // 카테고리는 파싱 없이 문자열만 던지므로 비교적 안전합니다.
-            CategoryHandler::handleCategoryRequest(session.get(), jsonBody); });
         break;
 
     case CmdID::REQ_AUTH_CHECK: // 아이디 중복 확인 요청
         pool.enqueue([session, jsonBody]()
                      {
             try {
-                UserHandler::handleAuthCheck(session.get(), jsonBody);  /// 아이디 중복 확인도 JSON 파싱이 필요하므로 예외 처리를 추가합니다.
+                UserHandler::handleAuthCheck(session.get(), jsonBody);  
             } catch (const std::exception& e) {
                 std::cerr << "🚨 [Dispatcher-AuthCheck] 에러: " << e.what() << std::endl;
             } });

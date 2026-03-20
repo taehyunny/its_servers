@@ -1,20 +1,25 @@
 #include "StoreDAO.h"
-#include "DbManager.h" // ⚠️ 태현님 프로젝트의 실제 파일명에 맞게 대소문자 확인
+#include "DbManager.h"
 #include <iostream>
 #include <mariadb/conncpp.hpp>
 
-std::vector<TopStoreInfo> StoreDAO::getAllStores()
+// ---------------------------------------------------------
+// 1. 메인 화면용: 각 카테고리별 매출 1등 매장들만 가져오기
+// ---------------------------------------------------------
+std::vector<TopStoreInfo> StoreDAO::getTopStoresByCategory()
 {
     std::vector<TopStoreInfo> topStores;
     try
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 JOIN을 써서 CATEGORIES 테이블의 icon_name을 바로 가져옵니다!
+        // 🚀 새로 추가된 컬럼들을 모조리 SELECT 합니다! (내부적으로 total_sales로 1등 계산)
         std::string query = R"(
-            SELECT S.store_id, S.store_name, S.category, S.total_sales, C.icon_name
+            SELECT S.store_id, S.store_name, S.category, C.icon_name,
+                   S.delivery_time_range, S.rating, S.review_count, S.min_order_amount, S.delivery_fee
             FROM (
                 SELECT store_id, store_name, category, total_sales,
+                       delivery_time_range, rating, review_count, min_order_amount, delivery_fee,
                        ROW_NUMBER() OVER (PARTITION BY category ORDER BY total_sales DESC) as rnk
                 FROM STORES
             ) as S
@@ -31,32 +36,79 @@ std::vector<TopStoreInfo> StoreDAO::getAllStores()
             store.storeId = rs->getInt("store_id");
             store.storeName = rs->getString("store_name");
             store.category = rs->getString("category");
-            store.totalSales = rs->getInt("total_sales");
-            // 🚀 DB에서 가져온 값을 그대로 꽂아주면 끝! (동적 구현)
             store.iconPath = rs->getString("icon_name");
+
+            // 🚀 새로운 필드들 파싱! (DB 컬럼명이 다르면 여기서 맞춰주세요)
+            store.deliveryTimeRange = rs->getString("delivery_time_range");
+            store.rating = rs->getDouble("rating");
+            store.reviewCount = rs->getInt("review_count");
+            store.minOrderAmount = rs->getInt("min_order_amount");
+            store.deliveryFee = rs->getInt("delivery_fee");
 
             topStores.push_back(store);
         }
     }
     catch (sql::SQLException &e)
     {
-        std::cerr << "[StoreDAO] 메인 화면 조회 실패: " << e.what() << std::endl;
+        std::cerr << "[StoreDAO] 메인 화면 1등 매장 조회 실패: " << e.what() << std::endl;
     }
     return topStores;
 }
-std::vector<TopStoreInfo> StoreDAO::getStoresByCategory(const std::string &categoryName)
+
+// ---------------------------------------------------------
+// 2. 특정 카테고리의 전체 매장 추출 (상세 리스트용)
+// ---------------------------------------------------------
+std::vector<TopStoreInfo> StoreDAO::getStoresByCategory(const std::string &categoryName) {
+    std::vector<TopStoreInfo> stores;
+    try {
+        auto conn = DBManager::getInstance().getConnection();
+        
+        // 🚀 여기도 JOIN을 걸어서 icon_name까지 예쁘게 다 채워줍니다!
+        std::string query = R"(
+            SELECT S.store_id, S.store_name, S.category, C.icon_name,
+                   S.delivery_time_range, S.rating, S.review_count, S.min_order_amount, S.delivery_fee
+            FROM STORES S
+            JOIN CATEGORIES C ON S.category = C.name
+            WHERE S.category = ?
+            ORDER BY S.total_sales DESC
+        )";
+        
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
+        pstmt->setString(1, categoryName);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        while (rs->next()) {
+            TopStoreInfo store;
+            store.storeId = rs->getInt("store_id");
+            store.storeName = rs->getString("store_name");
+            store.category = rs->getString("category");
+            store.iconPath = rs->getString("icon_name");
+            
+            // 🚀 새로운 필드들 파싱!
+            store.deliveryTimeRange = rs->getString("delivery_time_range");
+            store.rating = rs->getDouble("rating");
+            store.reviewCount = rs->getInt("review_count");
+            store.minOrderAmount = rs->getInt("min_order_amount");
+            store.deliveryFee = rs->getInt("delivery_fee");
+
+            stores.push_back(store);
+        }
+    } catch (sql::SQLException &e) {
+        std::cerr << "[StoreDAO] 카테고리별 매장 리스트 조회 실패: " << e.what() << std::endl;
+    }
+    return stores;
+}
+std::vector<TopStoreInfo> StoreDAO::getAllStores()
 {
     std::vector<TopStoreInfo> stores;
     try
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 선택된 카테고리의 매장만 매출 1등부터 꼴등까지 쫙 가져옵니다!
-        std::string query = "SELECT store_id, store_name, category, total_sales FROM STORES WHERE category = ? ORDER BY total_sales DESC";
-        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
-        pstmt->setString(1, categoryName);
-
-        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+        // 카테고리 상관없이 모든 매장을 매출순으로 가져오는 쿼리
+        std::string query = "SELECT store_id, store_name, category, total_sales FROM STORES ORDER BY total_sales DESC";
+        std::unique_ptr<sql::Statement> stmt(conn->createStatement());
+        std::unique_ptr<sql::ResultSet> rs(stmt->executeQuery(query));
 
         while (rs->next())
         {
@@ -64,14 +116,20 @@ std::vector<TopStoreInfo> StoreDAO::getStoresByCategory(const std::string &categ
             store.storeId = rs->getInt("store_id");
             store.storeName = rs->getString("store_name");
             store.category = rs->getString("category");
-            store.totalSales = rs->getInt("total_sales");
-            // 아이콘은 이미 메인 화면에서 보여줬으므로 여기선 생략해도 무방합니다.
+            store.iconPath = rs->getString("icon_name");
+            
+            // 🚀 새로운 필드들 파싱!
+            store.deliveryTimeRange = rs->getString("delivery_time_range");
+            store.rating = rs->getDouble("rating");
+            store.reviewCount = rs->getInt("review_count");
+            store.minOrderAmount = rs->getInt("min_order_amount");
+            store.deliveryFee = rs->getInt("delivery_fee");
             stores.push_back(store);
         }
     }
     catch (sql::SQLException &e)
     {
-        std::cerr << "[StoreDAO] 카테고리별 매장 리스트 조회 실패: " << e.what() << std::endl;
+        std::cerr << "[StoreDAO] 전체 매장 조회 실패: " << e.what() << std::endl;
     }
     return stores;
 }

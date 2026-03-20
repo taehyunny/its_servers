@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ItsServer_App.dir/main.cpp.o.d"
   "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o"
   "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o.d"
+  "CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o"
+  "CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o.d"
   "CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o"
   "CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o.d"
   "CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o"

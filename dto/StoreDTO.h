@@ -53,14 +53,6 @@ struct StoreDTO
 
 // 3. StoreListResDTO (가게 목록 전송용 껍데기)
 // 군더더기 없이 리스트 자체만 전송합니다.
-struct StoreListResDTO
-{
-    int status;                   // 0: 성공, 1: 실패
-    std::string message;          // 상태 메시지 (예: "성공", "데이터 없음", "서버 오류")
-    std::vector<StoreDTO> stores; // 모든 데이터는 이 안에 다 들어있습니다.
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreListResDTO, status, message, stores)
-};
 
 // 4. MenuListResDTO (특정 가게의 상세 메뉴 전송용)
 struct MenuListResDTO
@@ -90,15 +82,20 @@ struct MenuUpdateReqDTO
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuUpdateReqDTO, storeId, actionType, menuData)
 };
 
-struct TopStoreInfo //  카테고리별 1등 매장 정보 DTO
+struct TopStoreInfo
 {
     int storeId;
     std::string storeName;
     std::string category;
-    std::string iconPath; // 카테고리 아이콘 경로
-    int totalSales;       // 총 매출 (1등 선정 기준)
+    std::string iconPath;
+    std::string deliveryTimeRange;
+    double rating = 0.0;
+    int reviewCount = 0;
+    int minOrderAmount = 0;
+    int deliveryFee = 0;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(TopStoreInfo, storeId, storeName, category, iconPath, totalSales)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(TopStoreInfo, storeId, storeName, category, iconPath,
+                                   deliveryTimeRange, rating, reviewCount, minOrderAmount, deliveryFee)
 };
 
 // 🚀 메인 화면용 '통합' 응답 패킷!
@@ -124,6 +121,8 @@ struct StoreListReqDTO
 struct StoreListResDTO
 {
     int status;
-    std::vector<TopStoreInfo> stores; // 사실상 StoreInfo와 구조 동일
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreListResDTO, status, stores)
+    std::string message;              // 메시지 필드가 필요하다면 유지
+    std::vector<TopStoreInfo> stores; // 🚀 우리가 통일한 TopStoreInfo 바구니!
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreListResDTO, status, message, stores)
 };

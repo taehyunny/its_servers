@@ -11,16 +11,14 @@ void CategoryHandler::handleCategoryRequest(std::shared_ptr<ClientSession> sessi
 
     try
     {
-        // 🚀 1. 통합 바구니 준비
         MainHomeResDTO res;
         res.status = 200;
 
-        // 🚀 2. DB에서 각각 긁어와서 바구니에 담기
+        // 🚀 이제 컴파일러가 아주 평온하게 에러 없이 잘 받아들입니다.
         res.categories = CategoryDAO::getInstance().getAllCategories();
         res.topStores = StoreDAO::getInstance().getTopStoresByCategory();
 
-        // 🚀 3. 클라이언트에게 단 한 번의 패킷(1061번)으로 묵직하게 발사!
-        // (기존의 RES_CATEGORY = 1061 을 그대로 사용하면 됩니다)
+        // 클라이언트에게 한 방에 전송!
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_CATEGORY), res);
 
         std::cout << "[CategoryHandler] 메인 화면 데이터(카테고리 " << res.categories.size()

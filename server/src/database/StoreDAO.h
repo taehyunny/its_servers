@@ -1,28 +1,26 @@
 #pragma once
 #include <vector>
-#include <memory>
-#include "AllDTOs.h" // CMake에서 경로를 잡았으므로 파일명만 적습니다.
+#include <string>
+#include "AllDTOs.h"
 
 class StoreDAO
 {
 public:
-    // 싱글톤 인스턴스 반환
     static StoreDAO &getInstance()
     {
         static StoreDAO instance;
         return instance;
     }
 
-    // 서버 시작 시 캐싱을 위해 모든 상점 정보를 DB에서 가져오는 함수
+    // 🚀 1. 메인 화면용: 각 카테고리별 매출 1등 매장들만 가져오기
+    std::vector<TopStoreInfo> getTopStoresByCategory();
     std::vector<TopStoreInfo> getAllStores();
-    std::vector<TopStoreInfo> getStoresByCategory(const std::string &category);
+    // 🚀 2. 상세 화면용: 특정 카테고리의 모든 매장을 매출순으로 가져오기
     std::vector<TopStoreInfo> getStoresByCategory(const std::string &categoryName);
 
 private:
     StoreDAO() = default;
     ~StoreDAO() = default;
-
-    // 복사 방지
     StoreDAO(const StoreDAO &) = delete;
     StoreDAO &operator=(const StoreDAO &) = delete;
 };

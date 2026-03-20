@@ -97,10 +97,24 @@ CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lms/Documents/its_server/server/src/database/AuthDAO.cpp -o CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.s
 
+CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
+CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o: /home/lms/Documents/its_server/server/src/database/CategoryDAO.cpp
+CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o -c /home/lms/Documents/its_server/server/src/database/CategoryDAO.cpp
+
+CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/lms/Documents/its_server/server/src/database/CategoryDAO.cpp > CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.i
+
+CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/lms/Documents/its_server/server/src/database/CategoryDAO.cpp -o CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.s
+
 CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o: /home/lms/Documents/its_server/server/src/database/ConnectionPool.cpp
 CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o -c /home/lms/Documents/its_server/server/src/database/ConnectionPool.cpp
 
 CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.i: cmake_force
@@ -114,7 +128,7 @@ CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o: /home/lms/Documents/its_server/server/src/database/DbManager.cpp
 CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o -c /home/lms/Documents/its_server/server/src/database/DbManager.cpp
 
 CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.i: cmake_force
@@ -128,7 +142,7 @@ CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o: /home/lms/Documents/its_server/server/src/database/MenuDAO.cpp
 CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o -c /home/lms/Documents/its_server/server/src/database/MenuDAO.cpp
 
 CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.i: cmake_force
@@ -142,7 +156,7 @@ CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.o: /home/lms/Documents/its_server/server/src/database/OrderDAO.cpp
 CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.o -c /home/lms/Documents/its_server/server/src/database/OrderDAO.cpp
 
 CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.i: cmake_force
@@ -156,7 +170,7 @@ CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o: /home/lms/Documents/its_server/server/src/database/ProductDAO.cpp
 CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o -c /home/lms/Documents/its_server/server/src/database/ProductDAO.cpp
 
 CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.i: cmake_force
@@ -170,7 +184,7 @@ CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o: /home/lms/Documents/its_server/server/src/database/StoreDAO.cpp
 CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o -c /home/lms/Documents/its_server/server/src/database/StoreDAO.cpp
 
 CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.i: cmake_force
@@ -184,7 +198,7 @@ CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o: /home/lms/Documents/its_server/server/src/database/UserDAO.cpp
 CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o -c /home/lms/Documents/its_server/server/src/database/UserDAO.cpp
 
 CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.i: cmake_force
@@ -198,7 +212,7 @@ CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o: /home/lms/Documents/its_server/server/src/handler/CategoryHandler.cpp
 CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_10) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o -c /home/lms/Documents/its_server/server/src/handler/CategoryHandler.cpp
 
 CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.i: cmake_force
@@ -212,7 +226,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: /home/lms/Documents/its_server/server/src/handler/Dispatcher.cpp
 CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_11) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o -c /home/lms/Documents/its_server/server/src/handler/Dispatcher.cpp
 
 CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.i: cmake_force
@@ -226,7 +240,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o: /home/lms/Documents/its_server/server/src/handler/MenuHandler.cpp
 CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_12) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o -c /home/lms/Documents/its_server/server/src/handler/MenuHandler.cpp
 
 CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.i: cmake_force
@@ -240,7 +254,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: /home/lms/Documents/its_server/server/src/handler/OrderHandler.cpp
 CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_13) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o -c /home/lms/Documents/its_server/server/src/handler/OrderHandler.cpp
 
 CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.i: cmake_force
@@ -254,7 +268,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: /home/lms/Documents/its_server/server/src/handler/StoreHandler.cpp
 CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_14) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o -c /home/lms/Documents/its_server/server/src/handler/StoreHandler.cpp
 
 CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.i: cmake_force
@@ -268,7 +282,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o: /home/lms/Documents/its_server/server/src/handler/SystemHandler.cpp
 CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_15) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o -c /home/lms/Documents/its_server/server/src/handler/SystemHandler.cpp
 
 CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.i: cmake_force
@@ -282,7 +296,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o: /home/lms/Documents/its_server/server/src/handler/UserHandler.cpp
 CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_16) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o -c /home/lms/Documents/its_server/server/src/handler/UserHandler.cpp
 
 CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.i: cmake_force
@@ -296,7 +310,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o: /home/lms/Documents/its_server/server/src/network/ItsServer.cpp
 CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_17) "Building CXX object CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o -c /home/lms/Documents/its_server/server/src/network/ItsServer.cpp
 
 CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.i: cmake_force
@@ -310,7 +324,7 @@ CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o: /home/lms/Documents/its_server/server/src/network/PacketFramer.cpp
 CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_18) "Building CXX object CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o -c /home/lms/Documents/its_server/server/src/network/PacketFramer.cpp
 
 CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.i: cmake_force
@@ -324,7 +338,7 @@ CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.o: /home/lms/Documents/its_server/server/src/service/OrderService.cpp
 CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_19) "Building CXX object CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.o -c /home/lms/Documents/its_server/server/src/service/OrderService.cpp
 
 CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.i: cmake_force
@@ -338,7 +352,7 @@ CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o: /home/lms/Documents/its_server/server/src/session/ClientSession.cpp
 CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_20) "Building CXX object CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o -c /home/lms/Documents/its_server/server/src/session/ClientSession.cpp
 
 CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.i: cmake_force
@@ -352,7 +366,7 @@ CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o: /home/lms/Documents/its_server/server/src/session/SessionManager.cpp
 CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_21) "Building CXX object CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o -c /home/lms/Documents/its_server/server/src/session/SessionManager.cpp
 
 CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.i: cmake_force
@@ -366,7 +380,7 @@ CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o: /home/lms/Documents/its_server/server/src/thread/ThreadPool.cpp
 CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_22) "Building CXX object CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o -c /home/lms/Documents/its_server/server/src/thread/ThreadPool.cpp
 
 CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.i: cmake_force
@@ -380,7 +394,7 @@ CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o: /home/lms/Documents/its_server/server/src/util/Logger.cpp
 CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_23) "Building CXX object CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o -c /home/lms/Documents/its_server/server/src/util/Logger.cpp
 
 CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.i: cmake_force
@@ -394,7 +408,7 @@ CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.s: cmake_force
 CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o: CMakeFiles/ItsServer_App.dir/flags.make
 CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o: /home/lms/Documents/its_server/server/src/util/TimeUtil.cpp
 CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o: CMakeFiles/ItsServer_App.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_24) "Building CXX object CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Building CXX object CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o -MF CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o.d -o CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o -c /home/lms/Documents/its_server/server/src/util/TimeUtil.cpp
 
 CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.i: cmake_force
@@ -409,6 +423,7 @@ CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.s: cmake_force
 ItsServer_App_OBJECTS = \
 "CMakeFiles/ItsServer_App.dir/main.cpp.o" \
 "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o" \
+"CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o" \
 "CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o" \
 "CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o" \
 "CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o" \
@@ -437,6 +452,7 @@ ItsServer_App_EXTERNAL_OBJECTS =
 
 ItsServer_App: CMakeFiles/ItsServer_App.dir/main.cpp.o
 ItsServer_App: CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o
+ItsServer_App: CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o
 ItsServer_App: CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o
 ItsServer_App: CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o
 ItsServer_App: CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o
@@ -462,7 +478,7 @@ ItsServer_App: CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o
 ItsServer_App: CMakeFiles/ItsServer_App.dir/build.make
 ItsServer_App: /home/lms/Documents/its_server/server/mariadb-connector-cpp/build/libmariadbcpp-static.a
 ItsServer_App: CMakeFiles/ItsServer_App.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_25) "Linking CXX executable ItsServer_App"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/lms/Documents/its_server/server/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_26) "Linking CXX executable ItsServer_App"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/ItsServer_App.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

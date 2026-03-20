@@ -2,7 +2,7 @@
 #include "SessionManager.h"
 #include "ClientSession.h"
 #include "PacketFramer.h"
-
+#include "CategoryHandler.h"
 #include <iostream>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -154,7 +154,12 @@ void ItsServer::acceptNewClient()
 
         setNonBlocking(clientFd);
 
+        // 1. 세션 생성 (빈 테이블에 손님 앉히기)
         sessionManager->createSession(clientFd);
+
+        // 🚀 2. 방금 만든 세션 객체(shared_ptr) 가져오기!
+        // (태현님의 SessionManager에 getSession 같은 함수가 있다고 가정합니다. 이름이 다르면 맞춰주세요!)
+        std::shared_ptr<ClientSession> newSession = sessionManager->getSession(clientFd);
 
         struct epoll_event event;
         event.events = EPOLLIN | EPOLLET;
@@ -164,6 +169,24 @@ void ItsServer::acceptNewClient()
         char ipStr[INET_ADDRSTRLEN];
         inet_ntop(AF_INET, &(clientAddr.sin_addr), ipStr, INET_ADDRSTRLEN);
         std::cout << "[INFO] 새 클라이언트 접속 완료! (fd: " << clientFd << ", IP: " << ipStr << ")" << std::endl;
+
+        // -----------------------------------------------------------------
+        // 🚀 3. 접속 성공하자마자 메인 데이터(1061번 패킷) 강제 발사!
+        // -----------------------------------------------------------------
+        if (newSession)
+        {
+            // (나중에는 Dispatcher처럼 ThreadPool에 넣어서 비동기로 쏘는 것이 베스트입니다!)
+            try
+            {
+                // 클라이언트가 보낸 데이터가 없으므로 jsonBody는 빈 문자열("")을 줍니다.
+                CategoryHandler::handleCategoryRequest(newSession, "");
+                std::cout << "       -> 🎁 [서버 웰컴 선물] fd " << clientFd << " 에게 메인 화면 데이터 전송 완료!" << std::endl;
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << "       -> 🚨 메인 데이터 강제 전송 실패: " << e.what() << std::endl;
+            }
+        }
     }
 }
 

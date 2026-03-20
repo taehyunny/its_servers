@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/main.cpp" "CMakeFiles/ItsServer_App.dir/main.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/main.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/AuthDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o.d"
+  "/home/lms/Documents/its_server/server/src/database/CategoryDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/ConnectionPool.cpp" "CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/DbManager.cpp" "CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/MenuDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o.d"
