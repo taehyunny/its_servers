@@ -24,6 +24,22 @@ struct SignupReqDTO
     std::string category;
     std::string storeAddress;
 
+    friend void to_json(nlohmann::json &j, const SignupReqDTO &dto)
+    {
+        j = nlohmann::json{
+            {"userId", dto.userId},
+            {"password", dto.password},
+            {"userName", dto.userName},
+            {"phoneNumber", dto.phoneNumber},
+            {"role", dto.role},
+            {"address", dto.address},
+            {"businessNumber", dto.businessNumber},
+            {"accountNumber", dto.accountNumber},
+            {"storeName", dto.storeName},
+            {"category", dto.category},
+            {"storeAddress", dto.storeAddress}};
+    }
+
     // ⚠️ 매크로 대신 커스텀 파서 사용! (선택적 필드 처리)
     friend void from_json(const nlohmann::json &j, SignupReqDTO &dto)
     {

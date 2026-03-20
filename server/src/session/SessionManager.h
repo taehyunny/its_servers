@@ -1,17 +1,19 @@
 #pragma once
 #include <unordered_map>
-
-// ClientSession.h가 필요하다면 포함,
-// 포인터만 사용한다면 전방 선언(class ClientSession;)으로 대체 가능합니다.
+#include <mutex>
+#include <memory> // shared_ptr을 위해 필수
 #include "ClientSession.h"
 
 class SessionManager
 {
 public:
-    void createSession(int fd); // 중괄호 { } 대신 세미콜론 ; 사용
-    ClientSession *getSession(int fd);
+    void createSession(int fd);
+    // 🚀 [수정] 리턴 타입도 무조건 shared_ptr로 맞춰야 합니다!
+    std::shared_ptr<ClientSession> getSession(int fd);
     void removeSession(int fd);
 
 private:
-    std::unordered_map<int, ClientSession *> sessionMap;
+    std::mutex sessionMutex; // 🚀 자물쇠 이름 (cpp와 통일)
+    // 🚀 [수정] 값의 타입이 shared_ptr이어야 합니다.
+    std::unordered_map<int, std::shared_ptr<ClientSession>> sessionMap;
 };

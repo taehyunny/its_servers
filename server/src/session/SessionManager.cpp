@@ -1,27 +1,34 @@
-// 서버에 접속한 수천 명의 ClientSession을 총괄 관리하는 지휘통제실입니다.
 #include "SessionManager.h"
 #include <iostream>
 
 void SessionManager::createSession(int fd)
 {
-    // 1만 명 이상의 동시 접속을 고려한 효율적인 세션 생성
-    sessionMap[fd] = new ClientSession(fd);
+    std::lock_guard<std::mutex> lock(sessionMutex); // 🚀 자물쇠!
+    // raw pointer 대신 shared_ptr 사용
+    sessionMap[fd] = std::make_shared<ClientSession>(fd);
     std::cout << "[SessionManager] 세션 생성 완료 (FD: " << fd << ")" << std::endl;
 }
 
-ClientSession *SessionManager::getSession(int fd)
+// 🚀 [수정] 반환 타입을 shared_ptr로 변경
+std::shared_ptr<ClientSession> SessionManager::getSession(int fd)
 {
-    if (sessionMap.find(fd) == sessionMap.end())
+    std::lock_guard<std::mutex> lock(sessionMutex); // 🚀 조회할 때도 자물쇠 필수!
+
+    auto it = sessionMap.find(fd); // 세션이 존재하는지 먼저 확인
+    if (it == sessionMap.end())    // 없으면 nullptr 반환
         return nullptr;
-    return sessionMap[fd];
+
+    // 🚀 [수정] sessionMap[fd] 대신 it->second를 반환해야 안전합니다.
+    return it->second;
 }
 
-void SessionManager::removeSession(int fd)
+void SessionManager::removeSession(int fd) // 세션 제거는 erase만 해도 shared_ptr이 알아서 메모리 정리해줍니다.
 {
-    auto it = sessionMap.find(fd);
-    if (it != sessionMap.end())
+    std::lock_guard<std::mutex> lock(sessionMutex); // 🚀 자물쇠!
+    auto it = sessionMap.find(fd);                  // 세션이 존재하는지 먼저 확인
+    if (it != sessionMap.end())                     // 있으면 제거
     {
-        delete it->second; // 메모리 누수 방지
+        // shared_ptr이므로 erase만 해도 참조가 없으면 자동 delete 됩니다.
         sessionMap.erase(it);
         std::cout << "[SessionManager] 세션 제거 완료 (FD: " << fd << ")" << std::endl;
     }

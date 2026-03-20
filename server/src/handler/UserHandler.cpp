@@ -7,41 +7,42 @@
 
 void UserHandler::handleSignup(ClientSession *session, const std::string &jsonBody)
 {
-    AuthResDTO res; // 로그인과 동일한 응답 DTO를 재활용합니다.
+    AuthResDTO res;
     try
     {
-        auto req = nlohmann::json::parse(jsonBody).get<SignupReqDTO>(); // JSON을 DTO로 변환
+        auto req = nlohmann::json::parse(jsonBody).get<SignupReqDTO>();
+        SignupResult result = UserDAO::getInstance().insertUser(req);
 
-        // 🚀 [수정됨] int가 아니라 SignupResult 열거형으로 받습니다!
-        SignupResult result = UserDAO::getInstance().insertUser(req); // 회원가입 시도 및 결과 받기
-
-        // 🚀 [수정됨] 숫자가 아닌 명확한 Enum 값으로 비교합니다.
         if (result == SignupResult::SUCCESS)
         {
             res.status = 200;
             res.message = "회원가입 성공";
-            res.userName = req.userName; // 성공 시 유저 이름도 담아줍니다.
+            res.userName = req.userName;
         }
         else if (result == SignupResult::DUPLICATE_ID)
         {
             res.status = 409;
             res.message = "이미 사용 중인 아이디입니다.";
         }
+        // 🚀 [필수 추가] 폰 번호 중복 시 500이 아닌 정확한 에러 전달!
         else if (result == SignupResult::DUPLICATE_PHONE)
         {
-            res.status = 410;
+            res.status = 410; // 또는 409
             res.message = "이미 등록된 전화번호입니다.";
         }
+        // 🚀 [디버깅 추가] 서버 에러 시 로그 출력
         else
         {
             res.status = 500;
-            res.message = "서버 내부 오류가 발생했습니다.";
+            res.message = "서버 내부 오류 (DB 혹은 데이터 규격 확인 필요)";
+            std::cout << ">>> [ERROR] 회원가입 실패 결과 코드: " << static_cast<int>(result) << std::endl;
         }
     }
-    catch (...)
-    {
+    catch (const std::exception &e)
+    { // catch(...) 대신 상세 에러 출력
         res.status = 400;
         res.message = "데이터 형식이 잘못되었습니다.";
+        std::cerr << ">>> [JSON ERROR] " << e.what() << std::endl;
     }
 
     session->sendPacket(static_cast<uint16_t>(CmdID::RES_SIGNUP), res);

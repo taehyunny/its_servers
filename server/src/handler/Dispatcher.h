@@ -9,7 +9,7 @@ class Dispatcher
 {
 public:
     // 🚀 수정: ThreadPool 참조(&)를 매개변수로 추가로 받습니다.
-    static void dispatch(ClientSession *session, const PacketHeader &header, const std::string &jsonBody, ThreadPool &pool);
+    static void dispatch(std::shared_ptr<ClientSession> session, const PacketHeader &header, const std::string &jsonBody, ThreadPool &pool);
 
 private:
     Dispatcher() = delete;
