@@ -325,4 +325,10 @@ CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o: \
  /usr/include/c++/13/condition_variable /usr/include/c++/13/future \
  /usr/include/c++/13/bits/atomic_futex.h /usr/include/c++/13/atomic \
  /home/lms/Documents/its_server/server/src/handler/Dispatcher.h \
+ /home/lms/Documents/its_server/server/../dto/AllDTOs.h \
+ /home/lms/Documents/its_server/server/../dto/BaseDTO.h \
+ /home/lms/Documents/its_server/server/../include/json.hpp \
+ /home/lms/Documents/its_server/server/../dto/AccountDTO.h \
+ /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
+ /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
  /usr/include/c++/13/iostream

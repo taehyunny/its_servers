@@ -3,36 +3,78 @@
 #include "AllDTOs.h"
 #include "Global_protocol.h"
 #include "ClientSession.h"
+#include "SessionManager.h"
 #include <iostream>
 
+// =========================================================================
+// 🛒 1. 고객의 주문 생성 요청 (2020번) - 아까 만든 진짜 Create 로직!
+// =========================================================================
 void OrderHandler::handleOrderCreate(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     try
     {
-        // 1. JSON 까보기
         auto req = nlohmann::json::parse(jsonBody).get<OrderCreateReqDTO>();
-        std::cout << "[OrderHandler] 🛒 유저 '" << req.userId << "'의 장바구니 결제 요청 수신 (총액: " << req.totalPrice << "원)" << std::endl;
+        std::cout << "[OrderHandler] 🛒 유저 '" << req.userId << "'의 장바구니 결제 요청 수신" << std::endl;
 
-        // 2. 태현님의 완벽한 트랜잭션 DAO 호출!
         OrderResult dbResult = OrderDAO::getInstance().createOrder(req);
 
-        // 3. 응답 봉투(DTO) 준비
         OrderCreateResDTO res;
-        res.status = dbResult.isSuccess ? 0 : 1; // 0: 성공, 1: 실패
+        res.status = dbResult.isSuccess ? 0 : 1;
         res.message = dbResult.message;
-        res.orderId = dbResult.orderId; // 예: ORD-1710992345678
+        res.orderId = dbResult.orderId;
 
-        // 4. 2021번으로 시원하게 발사!
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_CREATE), res);
     }
     catch (const std::exception &e)
     {
-        std::cerr << "🚨 [OrderHandler] JSON 파싱 또는 처리 중 에러: " << e.what() << std::endl;
+        std::cerr << "🚨 [OrderHandler] 주문 생성 중 에러: " << e.what() << std::endl;
+    }
+}
 
-        OrderCreateResDTO errorRes;
-        errorRes.status = 1;
-        errorRes.message = "잘못된 주문 데이터 형식입니다.";
-        errorRes.orderId = "";
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_CREATE), errorRes);
+// =========================================================================
+// 🧑‍🍳 2. 사장님의 주문 수락 요청 (3000번) - 이름을 Accept로 제대로 바꿈!
+// =========================================================================
+void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    try
+    {
+        auto req = nlohmann::json::parse(jsonBody).get<OrderAcceptReqDTO>();
+        std::cout << "[OrderHandler] 🧑‍🍳 사장님이 주문(" << req.orderId << ")을 수락. 예상시간: " << req.estimatedTime << "분" << std::endl;
+
+        bool isDbSuccess = OrderDAO::getInstance().updateOrderStatus(req.orderId, 1);
+
+        if (isDbSuccess)
+        {
+            // 액션 1: 사장님 응답
+            OrderAcceptResDTO res = {0, "주문이 성공적으로 수락되었습니다."};
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), res);
+
+            // 액션 2: 고객 푸시 알림
+            NotifyOrderStateDTO notifyCustomer;
+            notifyCustomer.orderId = req.orderId;
+            notifyCustomer.state = 1;
+            notifyCustomer.message = "사장님이 조리를 시작했습니다! (" + std::to_string(req.estimatedTime) + "분 소요 예정)";
+
+            std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
+            SessionManager::getInstance().sendToUser(customerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notifyCustomer);
+
+            // 액션 3: 라이더 브로드캐스트
+            NotifyDeliveryCallDTO notifyRiders;
+            notifyRiders.orderId = req.orderId;
+            notifyRiders.pickupAddress = "황궁짜장 (송정점)";
+            notifyRiders.deliveryAddress = "고객 배달 주소";
+
+            int ROLE_RIDER = 2;
+            SessionManager::getInstance().broadcastToRole(ROLE_RIDER, static_cast<uint16_t>(CmdID::NOTIFY_DELIVERY_CALL), notifyRiders);
+        }
+        else
+        {
+            OrderAcceptResDTO res = {1, "DB 오류로 주문 수락에 실패했습니다."};
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), res);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [OrderHandler] 주문 수락 중 에러: " << e.what() << std::endl;
     }
 }

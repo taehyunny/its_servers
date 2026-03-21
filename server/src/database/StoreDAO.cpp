@@ -58,33 +58,36 @@ std::vector<TopStoreInfo> StoreDAO::getTopStoresByCategory()
 // ---------------------------------------------------------
 // 2. 특정 카테고리의 전체 매장 추출 (상세 리스트용)
 // ---------------------------------------------------------
-std::vector<TopStoreInfo> StoreDAO::getStoresByCategory(const std::string &categoryName) {
+std::vector<TopStoreInfo> StoreDAO::getStoresByCategoryId(int categoryId)
+{
     std::vector<TopStoreInfo> stores;
-    try {
+    try
+    {
         auto conn = DBManager::getInstance().getConnection();
-        
-        // 🚀 여기도 JOIN을 걸어서 icon_name까지 예쁘게 다 채워줍니다!
+
+        // 🚀 [핵심] CATEGORIES 테이블과 JOIN해서 category_id로 필터링합니다!
         std::string query = R"(
             SELECT S.store_id, S.store_name, S.category, C.icon_name,
                    S.delivery_time_range, S.rating, S.review_count, S.min_order_amount, S.delivery_fee
             FROM STORES S
             JOIN CATEGORIES C ON S.category = C.name
-            WHERE S.category = ?
+            WHERE C.category_id = ?
             ORDER BY S.total_sales DESC
         )";
-        
+
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
-        pstmt->setString(1, categoryName);
+        pstmt->setInt(1, categoryId); // 🎯 클라이언트가 보낸 숫자(2, 3 등)를 여기에 꽂습니다.
+
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
-        while (rs->next()) {
+        while (rs->next())
+        {
             TopStoreInfo store;
             store.storeId = rs->getInt("store_id");
             store.storeName = rs->getString("store_name");
             store.category = rs->getString("category");
             store.iconPath = rs->getString("icon_name");
-            
-            // 🚀 새로운 필드들 파싱!
+
             store.deliveryTimeRange = rs->getString("delivery_time_range");
             store.rating = rs->getDouble("rating");
             store.reviewCount = rs->getInt("review_count");
@@ -93,8 +96,11 @@ std::vector<TopStoreInfo> StoreDAO::getStoresByCategory(const std::string &categ
 
             stores.push_back(store);
         }
-    } catch (sql::SQLException &e) {
-        std::cerr << "[StoreDAO] 카테고리별 매장 리스트 조회 실패: " << e.what() << std::endl;
+        std::cout << "[StoreDAO] 카테고리 ID " << categoryId << " 상점 " << stores.size() << "개 로드 완료." << std::endl;
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[StoreDAO] 카테고리 ID 기반 조회 실패: " << e.what() << std::endl;
     }
     return stores;
 }
@@ -105,8 +111,15 @@ std::vector<TopStoreInfo> StoreDAO::getAllStores()
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // 카테고리 상관없이 모든 매장을 매출순으로 가져오는 쿼리
-        std::string query = "SELECT store_id, store_name, category, total_sales FROM STORES ORDER BY total_sales DESC";
+        // ✅ [수정] 쿼리에 필요한 모든 컬럼을 넣고, icon_name을 위해 CATEGORIES와 JOIN 합니다!
+        std::string query = R"(
+            SELECT S.store_id, S.store_name, S.category, C.icon_name,
+                   S.delivery_time_range, S.rating, S.review_count, S.min_order_amount, S.delivery_fee
+            FROM STORES S
+            JOIN CATEGORIES C ON S.category = C.name
+            ORDER BY S.total_sales DESC
+        )";
+
         std::unique_ptr<sql::Statement> stmt(conn->createStatement());
         std::unique_ptr<sql::ResultSet> rs(stmt->executeQuery(query));
 
@@ -116,14 +129,14 @@ std::vector<TopStoreInfo> StoreDAO::getAllStores()
             store.storeId = rs->getInt("store_id");
             store.storeName = rs->getString("store_name");
             store.category = rs->getString("category");
-            store.iconPath = rs->getString("icon_name");
-            
-            // 🚀 새로운 필드들 파싱!
+            store.iconPath = rs->getString("icon_name"); // 이제 에러 안 남!
+
             store.deliveryTimeRange = rs->getString("delivery_time_range");
             store.rating = rs->getDouble("rating");
             store.reviewCount = rs->getInt("review_count");
             store.minOrderAmount = rs->getInt("min_order_amount");
             store.deliveryFee = rs->getInt("delivery_fee");
+
             stores.push_back(store);
         }
     }

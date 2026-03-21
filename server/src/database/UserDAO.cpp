@@ -79,13 +79,12 @@ SignupResult UserDAO::insertUser(const SignupReqDTO &dto)
         conn->setAutoCommit(false);
 
         std::unique_ptr<sql::PreparedStatement> pstmtUser(conn->prepareStatement(
-            "INSERT INTO USERS (user_id, password_hash, user_name, phone_number, role, business_number) VALUES (?, ?, ?, ?, ?, ?, ?)"));
+            "INSERT INTO USERS (user_id, password_hash, user_name, phone_number, role) VALUES (?, ?, ?, ?, ? )"));
         pstmtUser->setString(1, dto.userId);
         pstmtUser->setString(2, dto.password);
         pstmtUser->setString(3, dto.userName);
         pstmtUser->setString(4, dto.phoneNumber);
         pstmtUser->setInt(5, dto.role);
-        pstmtUser->setString(6, dto.businessNumber);
         pstmtUser->executeUpdate();
 
         // ---------------------------------------------------------
@@ -168,4 +167,43 @@ bool UserDAO::existsByBizNum(const std::string &businessNum)
         std::cerr << "[UserDAO] 사업자 번호 중복 체크 실패: " << e.what() << std::endl;
     }
     return false;
+}
+
+std::pair<LoginResult, nlohmann::json> UserDAO::checkLogin(const std::string &userId, const std::string &password)
+{
+    nlohmann::json userJson;
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+        std::string query = R"(
+            SELECT U.user_id, U.user_name, U.phone_number, U.role, C.address, S.store_name
+            FROM USERS U
+            LEFT JOIN CUSTOMERS C ON U.user_id = C.user_id
+            LEFT JOIN STORES S ON U.user_id = S.owner_id
+            WHERE U.user_id = ? AND U.password_hash = ?
+        )";
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
+        pstmt->setString(1, userId);
+        pstmt->setString(2, password);
+
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            userJson["user_id"] = rs->getString("user_id").c_str();
+            userJson["user_name"] = rs->getString("user_name").c_str();
+            userJson["phone_number"] = rs->isNull("phone_number") ? "" : rs->getString("phone_number").c_str();
+            userJson["role"] = rs->getInt("role");
+            userJson["address"] = rs->isNull("address") ? "" : rs->getString("address").c_str();
+            userJson["store_name"] = rs->isNull("store_name") ? "" : rs->getString("store_name").c_str();
+
+            return {LoginResult::SUCCESS, userJson}; // ✅ 성공 코드와 함께 반환!
+        }
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[UserDAO] 로그인 조회 실패: " << e.what() << std::endl;
+    }
+    return {LoginResult::ID_PASS_WRONG, nullptr}; // ❌ 실패 시
 }

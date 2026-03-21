@@ -11,34 +11,36 @@ void StoreHandler::handleStoreListRequest(std::shared_ptr<ClientSession> session
     try
     {
         json requestJson = json::parse(jsonBody);
-        std::string targetCategory = "ALL";
 
-        if (requestJson.contains("category"))
-        {
-            targetCategory = requestJson["category"].get<std::string>();
-        }
+        // 🚀 1. 클라이언트가 보낸 categoryId (int)를 읽습니다.
+        // 만약 필드가 없으면 기본값 0(전체)으로 설정합니다.
+        int categoryId = requestJson.value("categoryId", 0);
 
-        std::cout << "[StoreHandler] 상점 목록 요청 수신 - 카테고리: " << targetCategory << std::endl;
+        std::cout << "[StoreHandler] 상점 목록 요청 수신 - 카테고리 ID: " << categoryId << std::endl;
 
         StoreListResDTO resDto;
         resDto.status = 200;
 
-        if (targetCategory == "ALL")
+        // 🚀 2. ID가 0이면 전체 조회, 아니면 우리가 방금 만든 ID 기반 함수 호출!
+        if (categoryId == 0)
         {
-            // 🚀 만약 ALL이 필요 없다면 그냥 이 if문을 통째로 지워도 됩니다.
-            // 하지만 필요하다면 StoreDAO에 getAllStores()를 꼭 만들어두셔야 합니다! (아래 참고)
             resDto.stores = StoreDAO::getInstance().getAllStores();
         }
         else
         {
-            resDto.stores = StoreDAO::getInstance().getStoresByCategory(targetCategory);
+            resDto.stores = StoreDAO::getInstance().getStoresByCategoryId(categoryId);
         }
 
-        // 🚀 해결: 다시 JSON으로 예쁘게 포장해서 던집니다!
-        nlohmann::json resJson = resDto;
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_STORE_LIST), resJson.dump());
+        // 🚀 3. 결과를 JSON으로 포장해서 전송
+        nlohmann::json debugJson = resDto;
+        std::cout << ">>> [DEBUG] 전송할 JSON 데이터:\n"
+                  << debugJson.dump(4) << std::endl;
 
-        std::cout << "[StoreHandler] " << targetCategory << " 상점 " << resDto.stores.size() << "개 전송 완료." << std::endl;
+        // 2. 🚀 핵심: dump() 문자열이 아닌 '객체(resDto)'를 직접 던지기!
+        // 이렇게 하면 이중 직렬화 문제 없이 클라이언트가 바로 읽을 수 있습니다.
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_STORE_LIST), resDto);
+
+        std::cout << "[StoreHandler] 전송 완료." << std::endl;
     }
     catch (const std::exception &e)
     {

@@ -22,7 +22,7 @@ struct MenuDTO
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuDTO, menuId, menuName, basePrice, isSoldOut, menuOptions, description, imageUrl, menuCategory, isPopular)
 };
 
-struct MenuListReqDTO   // 클라이언트 -> 서버: "이 가게 메뉴 다 주세요!" 요청 DTO
+struct MenuListReqDTO // 클라이언트 -> 서버: "이 가게 메뉴 다 주세요!" 요청 DTO
 {
     int storeId;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuListReqDTO, storeId)
@@ -30,15 +30,15 @@ struct MenuListReqDTO   // 클라이언트 -> 서버: "이 가게 메뉴 다 주
 
 // 🚀 응답 (RES_MENU_LIST = 2011)
 // 서버가 "자, 1번 매장의 턔현님표 MenuDTO 리스트야!" 라고 응답할 때 씁니다.
-struct MenuListResDTO   // 서버 -> 클라이언트: "여기 주문하신 매장 메뉴 리스트입니다!" 응답 DTO
+struct MenuListResDTO
 {
-    int status;
-    std::string message;
-    std::vector<MenuDTO> menus; // 👈 태현님의 완벽한 DTO를 리스트로 담습니다!
+    int status;          // 0: 성공, 1: 실패
+    std::string message; // "조회 성공" 등
+    int storeId;         // 👈 어떤 가게의 메뉴인지 명시 (중요!)
+    std::vector<MenuDTO> menus;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuListResDTO, status, message, menus)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuListResDTO, status, message, storeId, menus)
 };
-
 // 2. StoreDTO (개별 가게 정보)
 struct StoreDTO
 {
@@ -72,15 +72,6 @@ struct StoreDTO
 // 군더더기 없이 리스트 자체만 전송합니다.
 
 // 4. MenuListResDTO (특정 가게의 상세 메뉴 전송용)
-struct MenuListResDTO
-{
-    int status;                 // 0: 성공, 1: 실패
-    std::string message;        // 상태 메시지 (예: "성공", "데이터 없음", "서버 오류")
-    int storeId;                // 가게 ID
-    std::vector<MenuDTO> menus; // 메뉴 목록
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuListResDTO, status, message, storeId, menus)
-};
 
 // 5. 사장님 전용 REQ DTO (수정 없음, 완벽함)
 struct StoreStatusUpdateReqDTO
@@ -129,8 +120,8 @@ struct MainHomeResDTO
 // 🚀 클라이언트 -> 서버: "이 카테고리 매장 다 주세요!" (예: REQ_STORES_BY_CATEGORY)
 struct StoreListReqDTO
 {
-    std::string category; // 예: "한식"
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreListReqDTO, category)
+    int categoryId;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreListReqDTO, categoryId)
 };
 
 // 🚀 서버 -> 클라이언트: "여기 주문하신 매장 리스트입니다!" (예: RES_STORES_BY_CATEGORY)

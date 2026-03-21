@@ -70,13 +70,28 @@ struct LoginReqDTO
     // JSON <-> Struct 자동 변환 매크로
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoginReqDTO, userId, password)
 };
+
+struct LoginResDTO
+{
+    int status;
+    std::string message;
+    std::string userName;
+    std::string address;
+    std::string phoneNumber;
+    std::string role;
+    std::string storeName;
+
+    // 🚀 매크로 필수!
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoginResDTO, status, message, userName, address, phoneNumber, role, storeName)
+};
 // ------------------------------------------------------
 // [3] 통합 인증 응답 DTO (서버 -> 클라이언트)
 // ---------------------------------------------------------
 // 회원가입과 로그인 모두 상태값(status), 메시지(message), 유저이름(userName)을 반환하므로 하나로 통합합니다.
 struct AuthResDTO
 {
-    int status;              // 200(성공), 400(잘못된 요청), 401(비번틀림), 404(아이디없음), 409(중복)
+    int status;
+    std::string userId;      // 200(성공), 400(잘못된 요청), 401(비번틀림), 404(아이디없음), 409(중복)
     std::string message;     // 유저에게 보여줄 알림창 문구
     std::string userName;    // 성공 시에만 채워줌
     std::string phoneNumber; // 로그인 성공 시 클라이언트에 폰번호도 같이 보내주면, 로그인 후 화면에서 환영 메시지에 활용 가능!
@@ -85,7 +100,7 @@ struct AuthResDTO
     std::string address;     // 고객 로그인 시 주소도 같이 보내주면, 화면에서 "OOO님 환영합니다! 배달 주소: XXX" 등으로 활용 가능! (사장님이 아닌 경우는 빈 문자열(""))
     std::string errorType;   // "DUPLICATE_ID", "WRONG_PASSWORD" 등 로직 처리용 키워드
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AuthResDTO, status, message, userName, address, phoneNumber, role, storeName, errorType)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AuthResDTO, status, userId, message, userName, address, phoneNumber, role, storeName, errorType)
 };
 // ---------------------------------------------------------
 // [5] 중복 확인 DTO (1040 ~ 1043)

@@ -47,3 +47,39 @@ struct OrderCreateResDTO
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderCreateResDTO, status, message, orderId)
 };
+
+// 🧑‍🍳 1. 사장님의 주문 수락 요청 (REQ_ORDER_ACCEPT = 3000)
+struct OrderAcceptReqDTO {
+    std::string orderId;   // 수락할 주문번호 (예: "ORD-1710992345678")
+    int estimatedTime;     // 예상 조리 시간 (분 단위, 예: 40)
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderAcceptReqDTO, orderId, estimatedTime)
+};
+
+// 🧑‍🍳 2. 서버 -> 사장님 수락 결과 응답 (RES_ORDER_ACCEPT = 3001)
+struct OrderAcceptResDTO {
+    int status;            // 0: 성공, 1: 실패 (DB 에러 등)
+    std::string message;   // "주문이 성공적으로 수락되었습니다."
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderAcceptResDTO, status, message)
+};
+
+// 🙋‍♂️ 3. 서버 -> 고객 실시간 상태 푸시 (NOTIFY_ORDER_STATE = 9010)
+struct NotifyOrderStateDTO {
+    std::string orderId;   // 상태가 변경된 주문번호
+    int state;             // 1: 조리중, 2: 조리완료, 3: 배달중 등 상태 코드
+    std::string message;   // 고객 폰에 띄울 팝업 메시지 ("사장님이 조리를 시작했습니다!")
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NotifyOrderStateDTO, orderId, state, message)
+};
+
+// 🏍️ 4. 서버 -> 라이더들 실시간 콜 브로드캐스트 (NOTIFY_DELIVERY_CALL = 9020)
+struct NotifyDeliveryCallDTO {
+    std::string orderId;         // 배달할 주문번호
+    std::string pickupAddress;   // 픽업지 (황궁짜장 주소)
+    std::string deliveryAddress; // 도착지 (고객 주소)
+    int deliveryFee;             // 라이더가 받을 배달료 (예: 3500)
+
+    // (참고: 나중에 메뉴 요약 정보 "짜장면 외 1건" 같은 걸 추가해도 좋습니다!)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(NotifyDeliveryCallDTO, orderId, pickupAddress, deliveryAddress, deliveryFee)
+};

@@ -1,5 +1,4 @@
 #include "Dispatcher.h"
-#include "AllDTOs.h"
 #include "UserHandler.h"
 #include "OrderHandler.h"
 #include "SystemHandler.h"
@@ -8,100 +7,65 @@
 #include "CategoryHandler.h"
 #include <iostream>
 
+// 핸들러 맵 초기화
+const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap = {
+    {CmdID::REQ_SIGNUP, [](auto s, auto b)
+     { UserHandler::handleSignup(s, b); }},
+    {CmdID::REQ_LOGIN, [](auto s, auto b)
+     { UserHandler::handleLogin(s, b); }},
+    {CmdID::REQ_STORE_LIST, [](auto s, auto b)
+     { StoreHandler::handleStoreListRequest(s, b); }},
+    {CmdID::REQ_MENU_LIST, [](auto s, auto b)
+     { MenuHandler::handleMenuListRequest(s, b); }},
+    {CmdID::REQ_AUTH_CHECK, [](auto s, auto b)
+     { UserHandler::handleAuthCheck(s, b); }},
+    {CmdID::REQ_PHONE_CHECK, [](auto s, auto b)
+     { UserHandler::handlePhoneCheck(s, b); }},
+    {CmdID::REQ_BUISNESS_NUM_CHECK, [](auto s, auto b)
+     { UserHandler::handleBizNumCheck(s, b); }},
+    {CmdID::REQ_ORDER_CREATE, [](auto s, auto b)
+     { OrderHandler::handleOrderCreate(s, b); }},
+    {CmdID::REQ_MENU_LIST, [](auto s, auto b)
+     { MenuHandler::handleMenuListRequest(s, b); }},
+    {CmdID::REQ_ORDER_CREATE, [](auto s, auto b)
+     { OrderHandler::handleOrderCreate(s, b); }},
+    {CmdID::REQ_ORDER_ACCEPT, [](auto s, auto b)
+     { OrderHandler::handleOrderAccept(s, b); }},
+
+    // ❌ 주문 거절 (3010) - 나중에 구현할 때 대비해서 미리 등록!
+    // {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)
+    //     { OrderHandler::handleOrderReject(s, b); }}
+
+};
+
+// 🚀 [2단계] Dispatch 함수 본체 (반복되던 스레드 풀과 try-catch를 하나로 통합!)
 void Dispatcher::dispatch(std::shared_ptr<ClientSession> session, const PacketHeader &header, const std::string &jsonBody, ThreadPool &pool)
 {
-    // 🚀 [핵심 로그] 어떤 세션에서 어떤 명령어가, 어떤 데이터와 함께 들어왔는지 최전선에서 기록!
     std::cout << "\n==================================================" << std::endl;
     std::cout << "[Dispatcher] 📥 수신된 CmdID: " << static_cast<int>(header.cmdId) << std::endl;
     std::cout << "[Dispatcher] 📦 Payload: " << (jsonBody.empty() ? "(empty)" : jsonBody) << std::endl;
     std::cout << "==================================================\n"
               << std::endl;
 
-    switch (header.cmdId)
+    // 맵에서 명령어 찾기
+    auto it = _handlerMap.find(header.cmdId);
+
+    if (it != _handlerMap.end())
     {
+        auto handler = it->second;                        // 실행할 함수 추출
+        int cmdIdForLog = static_cast<int>(header.cmdId); // 로그용 ID
 
-    case CmdID::REQ_SIGNUP: // 회원가입 요청
-        pool.enqueue([session, jsonBody]()
+        // 스레드 풀에 작업 할당 (여기서 단 한 번만 작성!)
+        pool.enqueue([handler, session, jsonBody, cmdIdForLog]()
                      {
             try {
-                // ⚠️ UserHandler는 아직 리팩토링 전이므로 .get() 유지
-                UserHandler::handleSignup(session.get(), jsonBody); 
-            } catch (const std::exception& e) { 
-                std::cerr << "🚨 [Dispatcher-Signup] 에러: " << e.what() << std::endl;  
-            } });
-        break;
-
-    case CmdID::REQ_LOGIN: // 로그인 요청
-        pool.enqueue([session, jsonBody]()
-                     {
-            try {
-                UserHandler::handleLogin(session.get(), jsonBody); 
+                handler(session, jsonBody); // 실제 핸들러 실행
             } catch (const std::exception& e) {
-                std::cerr << "🚨 [Dispatcher-Login] 에러: " << e.what() << std::endl;
+                std::cerr << "🚨 [Dispatcher-CmdID: " << cmdIdForLog << "] 에러: " << e.what() << std::endl;
             } });
-        break;
-
-    case CmdID::REQ_STORE_LIST: // 카테고리별 매장 목록 요청
-        pool.enqueue([session, jsonBody]()
-                     {
-            try {
-                // 🚀 우리가 완벽하게 리팩토링한 StoreHandler! (session 그대로 전달, 파싱도 내부에서)
-                StoreHandler::handleStoreListRequest(session, jsonBody);    
-            } catch (const std::exception &e) {
-                std::cerr << "🚨 [Dispatcher-StoreList] 에러: " << e.what() << std::endl;
-            } });
-        break;
-
-    case CmdID::REQ_MENU_LIST: // 2010번: 특정 상점 메뉴 목록 요청
-        pool.enqueue([session, jsonBody]()
-                     {
-        try {
-            // 태현님이 아까 만든 완벽한 핸들러를 호출!
-            MenuHandler::handleMenuListRequest(session, jsonBody);
-        } catch (const std::exception& e) {
-            std::cerr << "🚨 [Dispatcher-Menu] 메뉴 리스트 요청 처리 중 에러: " << e.what() << std::endl;
-        } });
-        break;
-
-    case CmdID::REQ_AUTH_CHECK: // 아이디 중복 확인 요청
-        pool.enqueue([session, jsonBody]()
-                     {
-            try {
-                UserHandler::handleAuthCheck(session.get(), jsonBody);  
-            } catch (const std::exception& e) {
-                std::cerr << "🚨 [Dispatcher-AuthCheck] 에러: " << e.what() << std::endl;
-            } });
-        break;
-
-    case CmdID::REQ_PHONE_CHECK: // 전화번호 중복 확인 요청
-        pool.enqueue([session, jsonBody]()
-                     {
-            try {
-                UserHandler::handlePhoneCheck(session.get(), jsonBody);
-            } catch (const std::exception& e) {
-                std::cerr << "🚨 [Dispatcher-PhoneCheck] 에러: " << e.what() << std::endl;
-            } });
-        break;
-
-    case CmdID::REQ_BUISNESS_NUM_CHECK: // 사업자 번호 중복 확인 요청
-        pool.enqueue([session, jsonBody]()
-                     {
-        try { UserHandler::handleBizNumCheck(session, jsonBody); }
-        catch (const std::exception& e) { std::cerr << "🚨 [BizNumCheck] 에러: " << e.what() << std::endl; } });
-        break;
-
-    case CmdID::REQ_ORDER_CREATE: // 장바구니 결제 요청
-        pool.enqueue([session, jsonBody]()
-                     {
-        try {
-            OrderHandler::handleOrderCreate(session, jsonBody);
-        } catch (const std::exception& e) {
-            std::cerr << "🚨 [Dispatcher-Order] 장바구니 결제 디스패치 에러: " << e.what() << std::endl;
-        } });
-        break;
-
-    default:
-        std::cerr << "⚠️ [WARNING] 알 수 없는 명령어 수신: " << static_cast<int>(header.cmdId) << std::endl;
-        break;
+    }
+    else
+    {
+        std::cerr << "⚠️ [WARNING] 등록되지 않은 알 수 없는 명령어 수신: " << static_cast<int>(header.cmdId) << std::endl;
     }
 }

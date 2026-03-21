@@ -393,6 +393,30 @@ src/handler/CategoryHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.s
 .PHONY : src/handler/CategoryHandler.cpp.s
 
+src/handler/ChatHandler.o: src/handler/ChatHandler.cpp.o
+.PHONY : src/handler/ChatHandler.o
+
+# target to build an object file
+src/handler/ChatHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.o
+.PHONY : src/handler/ChatHandler.cpp.o
+
+src/handler/ChatHandler.i: src/handler/ChatHandler.cpp.i
+.PHONY : src/handler/ChatHandler.i
+
+# target to preprocess a source file
+src/handler/ChatHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.i
+.PHONY : src/handler/ChatHandler.cpp.i
+
+src/handler/ChatHandler.s: src/handler/ChatHandler.cpp.s
+.PHONY : src/handler/ChatHandler.s
+
+# target to generate assembly for a file
+src/handler/ChatHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.s
+.PHONY : src/handler/ChatHandler.cpp.s
+
 src/handler/Dispatcher.o: src/handler/Dispatcher.cpp.o
 .PHONY : src/handler/Dispatcher.o
 
@@ -609,6 +633,30 @@ src/service/OrderService.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/service/OrderService.cpp.s
 .PHONY : src/service/OrderService.cpp.s
 
+src/session/ChatRoomManager.o: src/session/ChatRoomManager.cpp.o
+.PHONY : src/session/ChatRoomManager.o
+
+# target to build an object file
+src/session/ChatRoomManager.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/session/ChatRoomManager.cpp.o
+.PHONY : src/session/ChatRoomManager.cpp.o
+
+src/session/ChatRoomManager.i: src/session/ChatRoomManager.cpp.i
+.PHONY : src/session/ChatRoomManager.i
+
+# target to preprocess a source file
+src/session/ChatRoomManager.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/session/ChatRoomManager.cpp.i
+.PHONY : src/session/ChatRoomManager.cpp.i
+
+src/session/ChatRoomManager.s: src/session/ChatRoomManager.cpp.s
+.PHONY : src/session/ChatRoomManager.s
+
+# target to generate assembly for a file
+src/session/ChatRoomManager.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/session/ChatRoomManager.cpp.s
+.PHONY : src/session/ChatRoomManager.cpp.s
+
 src/session/ClientSession.o: src/session/ClientSession.cpp.o
 .PHONY : src/session/ClientSession.o
 
@@ -771,6 +819,9 @@ help:
 	@echo "... src/handler/CategoryHandler.o"
 	@echo "... src/handler/CategoryHandler.i"
 	@echo "... src/handler/CategoryHandler.s"
+	@echo "... src/handler/ChatHandler.o"
+	@echo "... src/handler/ChatHandler.i"
+	@echo "... src/handler/ChatHandler.s"
 	@echo "... src/handler/Dispatcher.o"
 	@echo "... src/handler/Dispatcher.i"
 	@echo "... src/handler/Dispatcher.s"
@@ -798,6 +849,9 @@ help:
 	@echo "... src/service/OrderService.o"
 	@echo "... src/service/OrderService.i"
 	@echo "... src/service/OrderService.s"
+	@echo "... src/session/ChatRoomManager.o"
+	@echo "... src/session/ChatRoomManager.i"
+	@echo "... src/session/ChatRoomManager.s"
 	@echo "... src/session/ClientSession.o"
 	@echo "... src/session/ClientSession.i"
 	@echo "... src/session/ClientSession.s"

@@ -22,14 +22,27 @@ std::shared_ptr<ClientSession> SessionManager::getSession(int fd)
     return it->second;
 }
 
-void SessionManager::removeSession(int fd) // 세션 제거는 erase만 해도 shared_ptr이 알아서 메모리 정리해줍니다.
+void SessionManager::removeSession(int fd)
 {
-    std::lock_guard<std::mutex> lock(sessionMutex); // 🚀 자물쇠!
-    auto it = sessionMap.find(fd);                  // 세션이 존재하는지 먼저 확인
-    if (it != sessionMap.end())                     // 있으면 제거
+    std::lock_guard<std::mutex> lock(sessionMutex);
+
+    // 1. 먼저 fd로 세션을 찾습니다.
+    auto it = sessionMap.find(fd);
+    if (it != sessionMap.end())
     {
-        // shared_ptr이므로 erase만 해도 참조가 없으면 자동 delete 됩니다.
+        std::shared_ptr<ClientSession> session = it->second;
+
+        // 🚀 [중요] 이 세션에 로그인된 userId가 있다면 userMap에서도 지워줍니다.
+        // ClientSession 클래스에 getUserId() 함수가 있다고 가정합니다.
+        std::string userId = session->getUserId();
+        if (!userId.empty())
+        {
+            userMap.erase(userId);
+            std::cout << "[SessionManager] 유저 '" << userId << "'의 논리적 연결 해제 (fd: " << fd << ")" << std::endl;
+        }
+
+        // 2. 물리적 세션 맵에서 삭제
         sessionMap.erase(it);
-        std::cout << "[SessionManager] 세션 제거 완료 (FD: " << fd << ")" << std::endl;
+        std::cout << "[SessionManager] 소켓 " << fd << " 물리적 세션 제거 완료." << std::endl;
     }
 }

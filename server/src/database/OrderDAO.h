@@ -24,6 +24,11 @@ public:
     // 🚀 핵심: 클라이언트의 요청(DTO)을 받아 DB에 꽂아넣는 함수
     OrderResult createOrder(const OrderCreateReqDTO &req);
 
+    bool updateOrderStatus(const std::string &orderId, int status);
+
+    // 🚀 주문번호로 고객 ID 찾아오기 (알림 대상 식별용)
+    std::string getCustomerIdByOrderId(const std::string &orderId);
+
 private:
     OrderDAO() = default;
     ~OrderDAO() = default;

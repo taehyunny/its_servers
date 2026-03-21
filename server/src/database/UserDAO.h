@@ -16,6 +16,7 @@ public:
     // 회원가입: USERS 테이블에 새로운 레코드 삽입
     SignupResult insertUser(const SignupReqDTO &dto);
     bool existsByBizNum(const std::string &businessNum);
+    std::pair<LoginResult, nlohmann::json> checkLogin(const std::string &userId, const std::string &password); // 로그인 검증 및 유저 정보 반환
 
 private:
     UserDAO() = default;

@@ -6,7 +6,7 @@
 //  AuthDAO는 로그인 검증을 담당하는 DAO입니다. DB에서 아이디와 비밀번호를 조회하여 검증 결과와 유저 정보를 반환합니다. DB 연결은 DBManager의 커넥션 풀에서 가져옵니다.
 std::pair<LoginResult, nlohmann::json> AuthDAO::validateLogin(const std::string &inputId, const std::string &inputPw)
 {
-    std::shared_ptr<sql::Connection> conn;  // 스마트 포인터 사용으로 DB 연결 관리가 훨씬 안전해졌습니다!
+    std::shared_ptr<sql::Connection> conn; // 스마트 포인터 사용으로 DB 연결 관리가 훨씬 안전해졌습니다!
     nlohmann::json userInfo;
 
     try
@@ -23,16 +23,16 @@ std::pair<LoginResult, nlohmann::json> AuthDAO::validateLogin(const std::string 
         // 결과가 없다면 아이디가 틀린(없는) 것
         if (!rs->next())
         {
-            std::cout << "[AuthDAO] 로그인 실패: 존재하지 않는 아이디 (" << inputId << ")" << std::endl;
-            return {LoginResult::ID_NOT_FOUND, userInfo};
+            std::cout << "[AuthDAO] 로그인 실패: 아이디 혹은 비밀번호가 일치하지 않습니다. (" << inputId << ")" << std::endl;
+            return {LoginResult::ID_PASS_WRONG, userInfo};
         }
 
         // 2. 비밀번호 검증
         std::string dbPassword = rs->getString("password_hash").c_str();
         if (dbPassword != inputPw)
         {
-            std::cout << "[AuthDAO] 로그인 실패: 비밀번호 불일치 (" << inputId << ")" << std::endl;
-            return {LoginResult::WRONG_PASSWORD, userInfo};
+            std::cout << "[AuthDAO] 로그인 실패: 아이디 혹은 비밀번호가 일치하지 않습니다. (" << inputId << ")" << std::endl;
+            return {LoginResult::ID_PASS_WRONG, userInfo};
         }
 
         // 3. 인증 성공 시 데이터 세팅

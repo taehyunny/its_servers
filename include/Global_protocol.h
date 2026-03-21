@@ -55,18 +55,18 @@ enum class CmdID : uint16_t
     REQ_BUISNESS_NUM_CHECK = 2006, // 사업자번호 중복 확인 요청 (사장님 회원가입 시)
     RES_BUISNESS_NUM_CHECK = 2007, // 사업자번호 중복 확인 응답
                                    // 매장 / 메뉴 조회 (2000 ~ 2019)
-    REQ_STORE_LIST = 2000,   // 배달 가능 반경 내 상점 목록 요청 (정렬·필터 파라미터 포함)
-    RES_STORE_LIST = 2001,   // 상점 목록 응답 (최소주문금액, 배달예상시간, 별점 등 포함)
-    REQ_STORE_DETAIL = 2002, // 특정 매장 상세 정보 요청 (상호명, 주소, 영업시간, 포장 가능 여부 등)
-    RES_STORE_DETAIL = 2003, // 매장 상세 정보 응답
-    REQ_STORE_SEARCH = 2004, // 매장명 · 메뉴명 · 키워드 검색 요청
-    RES_STORE_SEARCH = 2005, // 검색 응답 (오픈 여부 포함)
-    REQ_MENU_LIST = 2010,    // 특정 상점 메뉴 목록 요청 (카테고리별, 품절 여부 포함)
-    RES_MENU_LIST = 2011,    // 메뉴 목록 응답
-    REQ_MENU_OPTION = 2012,  // 특정 메뉴의 추가 선택 옵션 요청 (필수/선택 옵션)
-    RES_MENU_OPTION = 2013,  // 메뉴 옵션 응답
-    REQ_REVIEW_LIST = 2014,  // 매장 리뷰 목록 요청 (필터·정렬 파라미터 포함)
-    RES_REVIEW_LIST = 2015,  // 리뷰 목록 응답 (주문 메뉴 버튼 포함)
+    REQ_STORE_LIST = 2000,         // 배달 가능 반경 내 상점 목록 요청 (정렬·필터 파라미터 포함)
+    RES_STORE_LIST = 2001,         // 상점 목록 응답 (최소주문금액, 배달예상시간, 별점 등 포함)
+    REQ_STORE_DETAIL = 2002,       // 특정 매장 상세 정보 요청 (상호명, 주소, 영업시간, 포장 가능 여부 등)
+    RES_STORE_DETAIL = 2003,       // 매장 상세 정보 응답
+
+
+    REQ_MENU_LIST = 2010,   // 특정 상점 메뉴 목록 요청 (카테고리별, 품절 여부 포함)
+    RES_MENU_LIST = 2011,   // 메뉴 목록 응답
+    REQ_MENU_OPTION = 2012, // 특정 메뉴의 추가 선택 옵션 요청 (필수/선택 옵션)
+    RES_MENU_OPTION = 2013, // 메뉴 옵션 응답
+    REQ_REVIEW_LIST = 2014, // 매장 리뷰 목록 요청 (필터·정렬 파라미터 포함)
+    RES_REVIEW_LIST = 2015, // 리뷰 목록 응답 (주문 메뉴 버튼 포함)
 
     // 주문 / 결제 (2020 ~ 2029)
     REQ_ORDER_CREATE = 2020, // 장바구니 결제 및 주문 생성 요청
@@ -122,11 +122,19 @@ enum class CmdID : uint16_t
     REQ_MY_INFO = 2100, // 마이페이지 통합 정보 요청 (리뷰수, 주문수, 즐겨찾기수, 좋아요수)
     RES_MY_INFO = 2101, // 마이페이지 통합 정보 응답
 
-    RES_MAIN_TOP_STORES = 2102, // 메인 화면 카테고리별 1등 매장 정보 응답 (카테고리명, 매장명, 예상 배달 시간, 아이콘 등)
-    REQ_MAIN_TOP_STORES = 2103, // 메인 화면 카테고리별 1등 매장 정보 요청 (클라이언트에서 최초 1회만 요청)
-    // ---------------------------------------------------------
-    // [3000번대] 사장님(Owner) 파트
-    // ---------------------------------------------------------
+    RES_MAIN_TOP_STORES = 2102,     // 메인 화면 카테고리별 1등 매장 정보 응답 (카테고리명, 매장명, 예상 배달 시간, 아이콘 등)
+    REQ_MAIN_TOP_STORES = 2103,     // 메인 화면 카테고리별 1등 매장 정보 요청 (클라이언트에서 최초 1회만 요청)
+    REQ_RESEACH_WIDGET = 2108,      // 매장 검색 위젯 요청 (최근 검색어 출력용)
+    RES_RESEACH_WIDGET = 2109,      // 매장 검색 위젯 응답 (최근 검색어 리스트)
+    REQ_RESEARCH_DELETE = 2110,     // 매장 검색 위젯 개별 삭제 요청 (최근 검색어 삭제)
+    RES_RESEARCH_DELETE = 2111,     // 매장 검색 위젯 개별 삭제 응답
+    REQ_RESEARCH_ADD = 2112,        // 매장 검색 위젯 추가 요청 (최근 검색어 추가)
+    RES_RESEARCH_ADD = 2113,        // 매장 검색 위젯 추가 응답
+    REQ_RESEARCH_DEL_ALL = 2114,    // 매장 검색 위젯 전체 삭제 요청 (최근 검색어 전체 삭제)
+    RES_RESEARCH_DEL_ALL = 2115,    // 매장 검색 위젯 전체 삭제 응답
+                                    // ---------------------------------------------------------
+                                    // [3000번대] 사장님(Owner) 파트
+                                    // ---------------------------------------------------------
     REQ_ORDER_ACCEPT = 3000,        // 주문 수락 및 조리 시작 요청 (예상 시간 포함)
     RES_ORDER_ACCEPT = 3001,        // 주문 수락 응답
     REQ_ORDER_REJECT = 3010,        // 주문 거절 요청 (품절 등 사유 포함)
@@ -215,7 +223,6 @@ enum class SignupResult
 enum class LoginResult
 {
     SUCCESS = 1,
-    ID_NOT_FOUND = -1,
-    WRONG_PASSWORD = -2,
+    ID_PASS_WRONG = -1,
     SERVER_ERROR = -99
 };

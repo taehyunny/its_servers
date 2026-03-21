@@ -18,7 +18,7 @@
 // ==========================================================
 ItsServer::ItsServer(int port, ThreadPool &threadPool) : threadPool(threadPool)
 {
-    sessionManager = new SessionManager();
+    sessionManager = &SessionManager::getInstance();
     events = new epoll_event[MAX_EVENTS];
 
     serverFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -79,7 +79,6 @@ ItsServer::~ItsServer()
     close(serverFd);
     close(epollFd);
     delete[] events;
-    delete sessionManager;
     std::cout << "[ItsServer] 서버가 안전하게 종료되었습니다." << std::endl;
 }
 

@@ -17,7 +17,7 @@ public:
     std::vector<TopStoreInfo> getAllStores();
     // 🚀 2. 상세 화면용: 특정 카테고리의 모든 매장을 매출순으로 가져오기
     std::vector<TopStoreInfo> getStoresByCategory(const std::string &categoryName);
-
+    std::vector<TopStoreInfo> getStoresByCategoryId(int categoryId);
 private:
     StoreDAO() = default;
     ~StoreDAO() = default;
