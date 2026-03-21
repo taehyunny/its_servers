@@ -15,6 +15,7 @@ public:
     bool existsByPhoneAndRole(const std::string &phoneNumber, int role); // 🚀 이름과 매개변수 변경
     // 회원가입: USERS 테이블에 새로운 레코드 삽입
     SignupResult insertUser(const SignupReqDTO &dto);
+    bool existsByBizNum(const std::string &businessNum);
 
 private:
     UserDAO() = default;

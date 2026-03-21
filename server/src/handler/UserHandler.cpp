@@ -70,7 +70,12 @@ void UserHandler::handleLogin(ClientSession *session, const std::string &jsonBod
             res.message = "로그인 성공";
             res.userName = userJson["user_name"].get<std::string>();
 
-            // 세션에 로그인 정보 박제
+            // 🚀 나중에 팀원이 "아 맞다 주소!" 할 때를 대비한 '보험'들
+            res.address = userJson.value("address", ""); // 없으면 빈 문자열
+            res.phoneNumber = userJson.value("phone_number", "");
+            res.role = std::to_string(userJson.value("role", 0));
+            res.storeName = userJson.value("store_name", ""); // 사장님일 경우 대비
+
             session->authenticate(req.userId, userJson["role"].get<int>());
         }
         else if (resultCode == LoginResult::ID_NOT_FOUND)
@@ -157,4 +162,35 @@ void UserHandler::handlePhoneCheck(ClientSession *session, const std::string &js
     }
     // 🚀 1043번으로 발사!
     session->sendPacket(static_cast<uint16_t>(CmdID::RES_PHONE_CHECK), res);
+}
+
+void UserHandler::handleBizNumCheck(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    BizNumCheckResDTO res;
+    try
+    {
+        auto req = nlohmann::json::parse(jsonBody).get<BizNumCheckReqDTO>();
+        // 🚀 DAO에 사업자 번호 존재 여부를 묻습니다.
+        bool exists = UserDAO::getInstance().existsByBizNum(req.businessNum);
+
+        if (exists)
+        {
+            res.status = 409;
+            res.isAvailable = false;
+            res.message = "이미 등록된 사업자 번호입니다.";
+        }
+        else
+        {
+            res.status = 200;
+            res.isAvailable = true;
+            res.message = "사용 가능한 사업자 번호입니다.";
+        }
+    }
+    catch (...)
+    {
+        res.status = 400;
+        res.isAvailable = false;
+        res.message = "잘못된 요청 형식입니다.";
+    }
+    session->sendPacket(static_cast<uint16_t>(CmdID::RES_BUISNESS_NUM_CHECK), res);
 }

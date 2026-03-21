@@ -19,6 +19,7 @@ void Dispatcher::dispatch(std::shared_ptr<ClientSession> session, const PacketHe
 
     switch (header.cmdId)
     {
+
     case CmdID::REQ_SIGNUP: // 회원가입 요청
         pool.enqueue([session, jsonBody]()
                      {
@@ -51,16 +52,15 @@ void Dispatcher::dispatch(std::shared_ptr<ClientSession> session, const PacketHe
             } });
         break;
 
-    case CmdID::REQ_MENU_LIST: // 매장별 메뉴 목록 요청
+    case CmdID::REQ_MENU_LIST: // 2010번: 특정 상점 메뉴 목록 요청
         pool.enqueue([session, jsonBody]()
                      {
-            try {
-                // ⚠️ MenuHandler는 아직 리팩토링 전이므로 기존 로직 유지
-                nlohmann::json jsonPayload = nlohmann::json::parse(jsonBody);  
-                MenuHandler::handleMenuListRequest(session.get(), jsonPayload);     
-            } catch (const std::exception& e) {
-                std::cerr << "🚨 [Dispatcher-MenuList] JSON 파싱 에러: " << e.what() << std::endl;
-            } });
+        try {
+            // 태현님이 아까 만든 완벽한 핸들러를 호출!
+            MenuHandler::handleMenuListRequest(session, jsonBody);
+        } catch (const std::exception& e) {
+            std::cerr << "🚨 [Dispatcher-Menu] 메뉴 리스트 요청 처리 중 에러: " << e.what() << std::endl;
+        } });
         break;
 
     case CmdID::REQ_AUTH_CHECK: // 아이디 중복 확인 요청
@@ -81,6 +81,23 @@ void Dispatcher::dispatch(std::shared_ptr<ClientSession> session, const PacketHe
             } catch (const std::exception& e) {
                 std::cerr << "🚨 [Dispatcher-PhoneCheck] 에러: " << e.what() << std::endl;
             } });
+        break;
+
+    case CmdID::REQ_BUISNESS_NUM_CHECK: // 사업자 번호 중복 확인 요청
+        pool.enqueue([session, jsonBody]()
+                     {
+        try { UserHandler::handleBizNumCheck(session, jsonBody); }
+        catch (const std::exception& e) { std::cerr << "🚨 [BizNumCheck] 에러: " << e.what() << std::endl; } });
+        break;
+
+    case CmdID::REQ_ORDER_CREATE: // 장바구니 결제 요청
+        pool.enqueue([session, jsonBody]()
+                     {
+        try {
+            OrderHandler::handleOrderCreate(session, jsonBody);
+        } catch (const std::exception& e) {
+            std::cerr << "🚨 [Dispatcher-Order] 장바구니 결제 디스패치 에러: " << e.what() << std::endl;
+        } });
         break;
 
     default:

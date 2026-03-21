@@ -9,4 +9,5 @@ public:
     static void handleLogin(ClientSession *session, const std::string &jsonBody);
     static void handleAuthCheck(ClientSession *session, const std::string &jsonBody);
     static void handlePhoneCheck(ClientSession *session, const std::string &jsonBody);
+    static void handleBizNumCheck(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
 };

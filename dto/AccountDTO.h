@@ -76,12 +76,16 @@ struct LoginReqDTO
 // 회원가입과 로그인 모두 상태값(status), 메시지(message), 유저이름(userName)을 반환하므로 하나로 통합합니다.
 struct AuthResDTO
 {
-    int status;            // 200(성공), 400(잘못된 요청), 401(비번틀림), 404(아이디없음), 409(중복)
-    std::string message;   // 유저에게 보여줄 알림창 문구
-    std::string userName;  // 성공 시에만 채워줌
-    std::string errorType; // [추가] "DUPLICATE_ID", "WRONG_PASSWORD" 등 로직 처리용 키워드
+    int status;              // 200(성공), 400(잘못된 요청), 401(비번틀림), 404(아이디없음), 409(중복)
+    std::string message;     // 유저에게 보여줄 알림창 문구
+    std::string userName;    // 성공 시에만 채워줌
+    std::string phoneNumber; // 로그인 성공 시 클라이언트에 폰번호도 같이 보내주면, 로그인 후 화면에서 환영 메시지에 활용 가능!
+    std::string role;        // 로그인 성공 시 클라이언트에 역할도 같이 보내주면, 화면에서 "사장님 환영합니다!" / "고객님 환영합니다!" 등으로 활용 가능!
+    std::string storeName;   // 사장님 로그인 시 매장 이름도 같이 보내주면, 화면에서 "OOO님 환영합니다!" 등으로 활용 가능! (사장님이 아닌 경우는 빈 문자열(""))
+    std::string address;     // 고객 로그인 시 주소도 같이 보내주면, 화면에서 "OOO님 환영합니다! 배달 주소: XXX" 등으로 활용 가능! (사장님이 아닌 경우는 빈 문자열(""))
+    std::string errorType;   // "DUPLICATE_ID", "WRONG_PASSWORD" 등 로직 처리용 키워드
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AuthResDTO, status, message, userName, errorType)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AuthResDTO, status, message, userName, address, phoneNumber, role, storeName, errorType)
 };
 // ---------------------------------------------------------
 // [5] 중복 확인 DTO (1040 ~ 1043)
@@ -106,8 +110,8 @@ struct AuthCheckResDTO
 // 1042: 폰번호 중복 확인 요청
 struct PhoneCheckReqDTO
 {
-    std::string phoneNumber; // 전화번호 (핸들러의 req.phoneNumber에 대응)
-    int role;                // 🚀 핵심: 사장님(1)인지 손님(0)인지 구분!
+    std::string phoneNumber;                                            // 전화번호 (핸들러의 req.phoneNumber에 대응)
+    int role;                                                           // 🚀 핵심: 사장님(1)인지 손님(0)인지 구분!
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(PhoneCheckReqDTO, phoneNumber, role) // JSON <-> Struct 자동 변환 매크로
 };
 
@@ -118,4 +122,4 @@ struct PhoneCheckResDTO
     bool isAvailable;                                                              // 🚀 핵심: 사용 가능 여부 (true: 사용 가능, false: 중복)
     std::string message;                                                           // 유저에게 보여줄 메시지 (예: "이미 사용 중인 전화번호입니다.")
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(PhoneCheckResDTO, status, isAvailable, message) // JSON <-> Struct 자동 변환 매크로
-};  
+};

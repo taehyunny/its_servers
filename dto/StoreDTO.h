@@ -22,6 +22,23 @@ struct MenuDTO
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuDTO, menuId, menuName, basePrice, isSoldOut, menuOptions, description, imageUrl, menuCategory, isPopular)
 };
 
+struct MenuListReqDTO   // 클라이언트 -> 서버: "이 가게 메뉴 다 주세요!" 요청 DTO
+{
+    int storeId;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuListReqDTO, storeId)
+};
+
+// 🚀 응답 (RES_MENU_LIST = 2011)
+// 서버가 "자, 1번 매장의 턔현님표 MenuDTO 리스트야!" 라고 응답할 때 씁니다.
+struct MenuListResDTO   // 서버 -> 클라이언트: "여기 주문하신 매장 메뉴 리스트입니다!" 응답 DTO
+{
+    int status;
+    std::string message;
+    std::vector<MenuDTO> menus; // 👈 태현님의 완벽한 DTO를 리스트로 담습니다!
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuListResDTO, status, message, menus)
+};
+
 // 2. StoreDTO (개별 가게 정보)
 struct StoreDTO
 {
@@ -122,7 +139,22 @@ struct StoreListResDTO
 {
     int status;
     std::string message;              // 메시지 필드가 필요하다면 유지
-    std::vector<TopStoreInfo> stores; // 🚀 우리가 통일한 TopStoreInfo 바구니!
+    std::vector<TopStoreInfo> stores; // TopStoreInfo 바구니!
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(StoreListResDTO, status, message, stores)
+};
+
+// 사장님 사업자 번호 중복 체크용 DTO
+struct BizNumCheckReqDTO
+{
+    std::string businessNum;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(BizNumCheckReqDTO, businessNum)
+};
+
+struct BizNumCheckResDTO
+{
+    int status;
+    bool isAvailable;
+    std::string message;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(BizNumCheckResDTO, status, isAvailable, message)
 };

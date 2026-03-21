@@ -79,12 +79,13 @@ SignupResult UserDAO::insertUser(const SignupReqDTO &dto)
         conn->setAutoCommit(false);
 
         std::unique_ptr<sql::PreparedStatement> pstmtUser(conn->prepareStatement(
-            "INSERT INTO USERS (user_id, password_hash, user_name, phone_number, role) VALUES (?, ?, ?, ?, ?)"));
+            "INSERT INTO USERS (user_id, password_hash, user_name, phone_number, role, business_number) VALUES (?, ?, ?, ?, ?, ?, ?)"));
         pstmtUser->setString(1, dto.userId);
         pstmtUser->setString(2, dto.password);
         pstmtUser->setString(3, dto.userName);
         pstmtUser->setString(4, dto.phoneNumber);
         pstmtUser->setInt(5, dto.role);
+        pstmtUser->setString(6, dto.businessNumber);
         pstmtUser->executeUpdate();
 
         // ---------------------------------------------------------
@@ -142,4 +143,29 @@ SignupResult UserDAO::insertUser(const SignupReqDTO &dto)
         }
         return SignupResult::SERVER_ERROR;
     }
+}
+
+bool UserDAO::existsByBizNum(const std::string &businessNum)
+{
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+        // 🚀 USERS 테이블에 business_num 컬럼이 있다고 가정합니다.
+        std::string query = "SELECT COUNT(*) FROM USERS WHERE business_num = ?";
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
+        pstmt->setString(1, businessNum);
+
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            return rs->getInt(1) > 0; // 0보다 크면 이미 존재하는 것!
+        }
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[UserDAO] 사업자 번호 중복 체크 실패: " << e.what() << std::endl;
+    }
+    return false;
 }
