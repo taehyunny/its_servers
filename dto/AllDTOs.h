@@ -9,3 +9,4 @@
 #include "StoreDTO.h"
 #include "OrderDTO.h"
 #include "ResearchDTO.h"
+#include "StoreDetailDTO.h"

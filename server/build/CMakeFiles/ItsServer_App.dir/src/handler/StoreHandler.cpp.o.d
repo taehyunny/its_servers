@@ -280,4 +280,39 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
  /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
+ /home/lms/Documents/its_server/server/src/database/UserDAO.h \
+ /usr/local/include/mariadb/conncpp.hpp \
+ /usr/local/include/mariadb/conncpp/Driver.hpp \
+ /usr/local/include/mariadb/conncpp/buildconf.hpp \
+ /usr/local/include/mariadb/conncpp/SQLString.hpp \
+ /usr/local/include/mariadb/conncpp/Connection.hpp \
+ /usr/local/include/mariadb/conncpp/Savepoint.hpp \
+ /usr/local/include/mariadb/conncpp/jdbccompat.hpp \
+ /usr/local/include/mariadb/conncpp/CArray.hpp \
+ /usr/local/include/mariadb/conncpp/compat/Struct.hpp \
+ /usr/local/include/mariadb/conncpp/compat/Object.hpp \
+ /usr/local/include/mariadb/conncpp/compat/Executor.hpp \
+ /usr/local/include/mariadb/conncpp/DriverManager.hpp \
+ /usr/local/include/mariadb/conncpp/Driver.hpp \
+ /usr/local/include/mariadb/conncpp/Connection.hpp \
+ /usr/local/include/mariadb/conncpp/ResultSet.hpp \
+ /usr/local/include/mariadb/conncpp/Warning.hpp \
+ /usr/local/include/mariadb/conncpp/DatabaseMetaData.hpp \
+ /usr/include/c++/13/list /usr/include/c++/13/bits/stl_list.h \
+ /usr/include/c++/13/bits/list.tcc \
+ /usr/local/include/mariadb/conncpp/ResultSetMetaData.hpp \
+ /usr/local/include/mariadb/conncpp/Statement.hpp \
+ /usr/local/include/mariadb/conncpp/ResultSet.hpp \
+ /usr/local/include/mariadb/conncpp/PreparedStatement.hpp \
+ /usr/local/include/mariadb/conncpp/ParameterMetaData.hpp \
+ /usr/local/include/mariadb/conncpp/Statement.hpp \
+ /usr/local/include/mariadb/conncpp/ParameterMetaData.hpp \
+ /usr/local/include/mariadb/conncpp/CallableStatement.hpp \
+ /usr/local/include/mariadb/conncpp/PreparedStatement.hpp \
+ /usr/local/include/mariadb/conncpp/Warning.hpp \
+ /usr/local/include/mariadb/conncpp/Savepoint.hpp \
+ /usr/local/include/mariadb/conncpp/Types.hpp \
+ /usr/local/include/mariadb/conncpp/SQLString.hpp \
+ /usr/local/include/mariadb/conncpp/Exception.hpp \
+ /usr/local/include/mariadb/conncpp/jdbccompat.hpp \
  /usr/include/c++/13/iostream

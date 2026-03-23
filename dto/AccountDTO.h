@@ -66,7 +66,7 @@ struct LoginReqDTO
 {
     std::string userId;   // 아이디 (핸들러의 req.userId에 대응)
     std::string password; // 비밀번호 (핸들러의 req.password에 대응)
-
+    int role;
     // JSON <-> Struct 자동 변환 매크로
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoginReqDTO, userId, password)
 };
@@ -91,16 +91,32 @@ struct LoginResDTO
 struct AuthResDTO
 {
     int status;
-    std::string userId;      // 200(성공), 400(잘못된 요청), 401(비번틀림), 404(아이디없음), 409(중복)
-    std::string message;     // 유저에게 보여줄 알림창 문구
-    std::string userName;    // 성공 시에만 채워줌
-    std::string phoneNumber; // 로그인 성공 시 클라이언트에 폰번호도 같이 보내주면, 로그인 후 화면에서 환영 메시지에 활용 가능!
-    std::string role;        // 로그인 성공 시 클라이언트에 역할도 같이 보내주면, 화면에서 "사장님 환영합니다!" / "고객님 환영합니다!" 등으로 활용 가능!
-    std::string storeName;   // 사장님 로그인 시 매장 이름도 같이 보내주면, 화면에서 "OOO님 환영합니다!" 등으로 활용 가능! (사장님이 아닌 경우는 빈 문자열(""))
-    std::string address;     // 고객 로그인 시 주소도 같이 보내주면, 화면에서 "OOO님 환영합니다! 배달 주소: XXX" 등으로 활용 가능! (사장님이 아닌 경우는 빈 문자열(""))
-    std::string errorType;   // "DUPLICATE_ID", "WRONG_PASSWORD" 등 로직 처리용 키워드
+    std::string userId;
+    std::string address;
+    std::string message;
+    std::string userName;
+    std::string phoneNumber;
+    std::string role;
+    std::string errorType;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AuthResDTO, status, userId, message, userName, address, phoneNumber, role, storeName, errorType)
+    // ── 사장님 전용 (role == "1" 일 때만 채워짐) ──────────────
+    int storeId = 0; // 사업자번호 겸 매장 ID
+    std::string businessNumber;
+    std::string storeName;
+    std::string category;
+    std::string storeAddress;
+    std::string cookTime;
+    std::string minOrderAmount;
+    std::string openTime;
+    std::string closeTime;
+    std::string accountNumber;
+    int approvalStatus = 0; // 0: 대기, 1: 승인
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AuthResDTO,
+                                   status, message, userId, address, userName, phoneNumber, role, errorType,
+                                   storeId, storeName, category, storeAddress,
+                                   cookTime, minOrderAmount, openTime, closeTime,
+                                   accountNumber, approvalStatus, businessNumber)
 };
 // ---------------------------------------------------------
 // [5] 중복 확인 DTO (1040 ~ 1043)

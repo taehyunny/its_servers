@@ -15,7 +15,7 @@ public:
     }
 
     // 로그인 검증 (ID/PW 확인 후 유저 정보 반환)
-    std::pair<LoginResult, nlohmann::json> validateLogin(const std::string &userId, const std::string &password);
+    std::pair<LoginResult, nlohmann::json> validateLogin(const std::string &userId, const std::string &password, int role); // 🚀 role 매개변수 추가
 
 private:
     AuthDAO() = default;

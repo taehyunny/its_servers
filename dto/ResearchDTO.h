@@ -22,7 +22,8 @@ struct RecentSearch
 {
     int historyId;
     std::string keyword;
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(RecentSearch, historyId, keyword)
+    std::string searchDate;
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(RecentSearch, historyId, keyword, searchDate)
 };
 
 // 3. 매장 검색 결과 (기존에 있으시면 안 넣으셔도 됩니다!)
@@ -57,10 +58,10 @@ struct ReqResearchWidgetDTO
 struct ResResearchWidgetDTO
 {
     int status;                                  // 200: 성공, 400: 실패
-    std::string searchDate;                         // 검색 날짜 보내기
     std::vector<PopularKeyword> popularKeywords; // 인기 카테고리 리스트 (예: "한식", "중식" 등)
     std::vector<RecentSearch> recentSearches;    // 내 최근 검색어 리스트 (예: "떡볶이", "피자" 등)
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResResearchWidgetDTO, status, popularKeywords, recentSearches)
+    std::string searchDate;                      // 검색어 데이터를 가져온 날짜 (예: "2024-06-15")
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResResearchWidgetDTO, status, popularKeywords, recentSearches, searchDate)
 };
 
 // ---------------------------------------------------------

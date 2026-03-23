@@ -12,9 +12,19 @@ std::vector<PopularKeyword> SearchDAO::getPopularCategories(int limit)
     try
     {
         auto conn = DBManager::getInstance().getConnection();
-        // 점수 내림차순으로 상위 N개 가져오기
+
+        // 🚀 핵심: SEARCH_HISTORY와 CATEGORIES를 JOIN해서 '진짜 카테고리 이름'을 가져옵니다!
+        // 조건: 1시간 이내 데이터 + 카테고리 ID가 존재하는(매칭에 성공한) 검색어만 집계
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "SELECT name FROM CATEGORIES ORDER BY popularity_score DESC LIMIT ?"));
+            "SELECT C.name AS category_name, COUNT(SH.category_id) as hit_count "
+            "FROM SEARCH_HISTORY SH "
+            "JOIN CATEGORIES C ON SH.category_id = C.category_id "
+            "WHERE SH.search_date >= DATE_SUB(NOW(), INTERVAL 1 HOUR) "
+            "AND SH.category_id IS NOT NULL "
+            "GROUP BY C.category_id, C.name "
+            "ORDER BY hit_count DESC "
+            "LIMIT ?"));
+
         pstmt->setInt(1, limit);
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
@@ -23,40 +33,14 @@ std::vector<PopularKeyword> SearchDAO::getPopularCategories(int limit)
         {
             PopularKeyword pk;
             pk.rank = currentRank++;
-            pk.keyword = rs->getString("name").c_str(); // 카테고리명을 키워드로 사용
+            // 🚀 keyword DTO 필드에 날것의 단어가 아닌 '정제된 카테고리 이름'을 꽂아줍니다.
+            pk.keyword = rs->getString("category_name").c_str();
             result.push_back(pk);
         }
     }
     catch (sql::SQLException &e)
     {
-        std::cerr << "[SearchDAO] 인기 카테고리 조회 실패: " << e.what() << std::endl;
-    }
-    return result;
-}
-
-std::vector<RecentSearch> SearchDAO::getRecentSearches(const std::string &userId)
-{
-    std::vector<RecentSearch> result;
-    try
-    {
-        auto conn = DBManager::getInstance().getConnection();
-        // 삭제되지 않은(is_visible=1) 내 검색어를 최신순으로 10개만!
-        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "SELECT history_id, keyword FROM SEARCH_HISTORY WHERE user_id = ? AND is_visible = 1 ORDER BY search_date DESC LIMIT 10"));
-        pstmt->setString(1, userId);
-        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
-
-        while (rs->next())
-        {
-            RecentSearch search;
-            search.historyId = rs->getInt("history_id");
-            search.keyword = rs->getString("keyword").c_str();
-            result.push_back(search);
-        }
-    }
-    catch (sql::SQLException &e)
-    {
-        std::cerr << "[SearchDAO] 최근 검색어 조회 실패: " << e.what() << std::endl;
+        std::cerr << "[SearchDAO] 1시간 실시간 인기 카테고리 조회 실패: " << e.what() << std::endl;
     }
     return result;
 }
@@ -74,7 +58,7 @@ bool SearchDAO::insertSearchHistory(const std::string &userId, const std::string
             "INSERT INTO SEARCH_HISTORY (user_id, keyword, is_visible) VALUES (?, ?, 1)"));
         pstmt->setString(1, userId);
         pstmt->setString(2, keyword);
-        pstmt->executeUpdate(); // 데이터를 변경할 때는 executeUpdate!
+        pstmt->executeUpdate();
         return true;
     }
     catch (sql::SQLException &e)
@@ -90,35 +74,30 @@ bool SearchDAO::applySearchScore(const std::string &keyword)
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // =========================================================
-        // 1순위: 완벽한 매장명 검색인지 확인 (STORES 테이블 업데이트)
-        // =========================================================
+        // 1순위: 완벽한 매장명 검색 (name -> store_name 수정 완료)
         std::unique_ptr<sql::PreparedStatement> pstmtStore(conn->prepareStatement(
-            "UPDATE STORES SET popularity_score = popularity_score + 1 WHERE name = ?"));
+            "UPDATE STORES SET popularity_score = popularity_score + 1 WHERE store_name = ?"));
         pstmtStore->setString(1, keyword);
-        int rowsUpdated = pstmtStore->executeUpdate(); // 업데이트된 행의 개수 반환
+        int rowsUpdated = pstmtStore->executeUpdate();
 
-        // 만약 매장명이 정확히 일치해서 점수가 올랐다면? 여기서 로직 끝!
         if (rowsUpdated > 0)
         {
             std::cout << "[SearchDAO] 매장명 일치! 매장 점수 +1 (" << keyword << ")" << std::endl;
             return true;
         }
 
-        // =========================================================
-        // 2 & 3순위: 매장명이 아니라면, 메뉴(정확 or 부분)를 찾아 카테고리 점수 올리기
-        // =========================================================
-        // 서브쿼리 설명: 메뉴 이름에 키워드가 포함된 걸 찾고 -> 그 메뉴의 가게를 찾고 -> 그 가게의 카테고리 점수를 +1
+        // 2 & 3순위: 메뉴 검색
+        // 주의: MENUS 테이블의 메뉴명 컬럼이 'name'이 맞다고 가정합니다! (만약 menu_name이면 수정 필요)
         std::unique_ptr<sql::PreparedStatement> pstmtCategory(conn->prepareStatement(
             "UPDATE CATEGORIES SET popularity_score = popularity_score + 1 "
-            "WHERE name = ("
+            "WHERE menu_name = ("
             "    SELECT S.category "
             "    FROM MENUS M "
             "    JOIN STORES S ON M.store_id = S.store_id "
-            "    WHERE M.name LIKE ? LIMIT 1"
+            "    WHERE M.menu_name LIKE ? LIMIT 1"
             ")"));
 
-        std::string searchPattern = "%" + keyword + "%"; // "돈" -> "%돈%"
+        std::string searchPattern = "%" + keyword + "%";
         pstmtCategory->setString(1, searchPattern);
         int catUpdated = pstmtCategory->executeUpdate();
 
@@ -128,7 +107,6 @@ bool SearchDAO::applySearchScore(const std::string &keyword)
         }
         else
         {
-            // 매장도 없고 메뉴에도 없으면 (ex: "ㅋㅋㅋ") 그냥 넘어감
             std::cout << "[SearchDAO] 검색어에 해당하는 매장/메뉴가 없습니다. (" << keyword << ")" << std::endl;
         }
 
@@ -151,28 +129,38 @@ std::vector<TopStoreInfo> SearchDAO::searchStoresByKeyword(const std::string &ke
     try
     {
         auto conn = DBManager::getInstance().getConnection();
-        // 매장 이름에 키워드가 포함된 것 찾기
-        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "SELECT store_id, name, category, rating, review_count, min_order_price, delivery_time, delivery_fee, icon_path FROM STORES WHERE name LIKE ?"));
 
-        // LIKE 검색을 위해 앞뒤에 % 붙여주기 (예: "%떡%")
+        // 🚀 1. DB 스키마에 완벽하게 맞춘 SELECT 쿼리 (가게 이름 OR 카테고리 검색)
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT store_id, store_name, category, rating, review_count, "
+            "min_order_amount, delivery_time_range, delivery_fee, image_url "
+            "FROM STORES "
+            "WHERE store_name LIKE ? OR category LIKE ?"));
+
         std::string searchPattern = "%" + keyword + "%";
         pstmt->setString(1, searchPattern);
+        pstmt->setString(2, searchPattern); // 카테고리 검색용
 
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
+        // 🚀 2. DB 컬럼명으로 꺼내서 DTO에 매핑하기
         while (rs->next())
         {
             TopStoreInfo store;
             store.storeId = rs->getInt("store_id");
-            store.storeName = rs->getString("name").c_str();
+            store.storeName = rs->getString("store_name").c_str(); // name -> store_name
             store.category = rs->getString("category").c_str();
-            store.rating = rs->getDouble("rating");
-            store.reviewCount = rs->getInt("review_count");
-            store.minOrderPrice = rs->getInt("min_order_price");
-            store.deliveryTime = rs->getString("delivery_time").c_str();
-            store.deliveryFee = rs->getInt("delivery_fee");
-            store.iconPath = rs->getString("icon_path").c_str();
+
+            // NULL 체크를 가미한 안전한 데이터 추출
+            store.rating = rs->isNull("rating") ? 0.0 : rs->getDouble("rating");
+            store.reviewCount = rs->isNull("review_count") ? 0 : rs->getInt("review_count");
+
+            // DTO 변수명(Price)과 DB 컬럼명(amount) 매핑!
+            store.minOrderPrice = rs->isNull("min_order_amount") ? 0 : rs->getInt("min_order_amount");
+            store.deliveryTime = rs->isNull("delivery_time_range") ? "" : rs->getString("delivery_time_range").c_str();
+            store.deliveryFee = rs->isNull("delivery_fee") ? 0 : rs->getInt("delivery_fee");
+            store.iconPath = rs->isNull("image_url") ? "" : rs->getString("image_url").c_str();
+
             result.push_back(store);
         }
     }
@@ -182,9 +170,8 @@ std::vector<TopStoreInfo> SearchDAO::searchStoresByKeyword(const std::string &ke
     }
     return result;
 }
-
 // =========================================================
-// 4. 최근 검색어 삭제 로직 (논리적 삭제)
+// 4. 최근 검색어 삭제 로직
 // =========================================================
 
 bool SearchDAO::deleteRecentSearch(const std::string &userId, int historyId)
@@ -192,16 +179,11 @@ bool SearchDAO::deleteRecentSearch(const std::string &userId, int historyId)
     try
     {
         auto conn = DBManager::getInstance().getConnection();
-
-        // 유저 ID와 고유번호(PK)가 정확히 일치하는 데이터만 화면에서 숨김(0) 처리!
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "UPDATE SEARCH_HISTORY SET is_visible = 0 WHERE user_id = ? AND history_id = ?"));
-
         pstmt->setString(1, userId);
         pstmt->setInt(2, historyId);
-
         pstmt->executeUpdate();
-
         std::cout << "[SearchDAO] 최근 검색어 삭제 완료 (History ID: " << historyId << ")" << std::endl;
         return true;
     }
@@ -217,7 +199,6 @@ bool SearchDAO::deleteAllRecentSearches(const std::string &userId)
     try
     {
         auto conn = DBManager::getInstance().getConnection();
-        // 해당 유저의 모든 검색어를 안 보이게 처리
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "UPDATE SEARCH_HISTORY SET is_visible = 0 WHERE user_id = ?"));
         pstmt->setString(1, userId);
@@ -229,4 +210,43 @@ bool SearchDAO::deleteAllRecentSearches(const std::string &userId)
         std::cerr << "[SearchDAO] 최근 검색어 전체 삭제 실패: " << e.what() << std::endl;
         return false;
     }
+}
+
+std::vector<RecentSearch> SearchDAO::getRecentSearches(const std::string &userId)
+{
+    std::vector<RecentSearch> result;
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+
+        // 🚀 DATE_FORMAT을 사용해 '월.일' (예: 03.23) 포맷으로 변환해서 가져옵니다!
+        std::string query = R"(
+            SELECT history_id, keyword, DATE_FORMAT(search_date, '%m.%d') as formatted_date 
+            FROM SEARCH_HISTORY 
+            WHERE user_id = ? AND is_visible = 1 
+            ORDER BY search_date DESC 
+            LIMIT 10
+        )";
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
+        pstmt->setString(1, userId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        while (rs->next())
+        {
+            RecentSearch rsItem;
+            rsItem.historyId = rs->getInt("history_id");
+            rsItem.keyword = rs->getString("keyword").c_str();
+
+            // 🚀 DB에서 예쁘게 자른 날짜를 DTO에 담아줍니다.
+            rsItem.searchDate = rs->getString("formatted_date").c_str();
+
+            result.push_back(rsItem);
+        }
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[SearchDAO] 최근 검색어 조회 실패: " << e.what() << std::endl;
+    }
+    return result;
 }

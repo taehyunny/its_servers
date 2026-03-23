@@ -5145,6 +5145,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: /home/lms/Documents
   /home/lms/Documents/its_server/include/Global_protocol.h \
   /home/lms/Documents/its_server/include/json.hpp \
   /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
+  /home/lms/Documents/its_server/server/src/database/UserDAO.h \
   /home/lms/Documents/its_server/server/src/handler/StoreHandler.h \
   /home/lms/Documents/its_server/server/src/session/ClientSession.h \
   /usr/include/alloca.h \
@@ -5203,6 +5204,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: /home/lms/Documents
   /usr/include/c++/13/bits/invoke.h \
   /usr/include/c++/13/bits/ios_base.h \
   /usr/include/c++/13/bits/istream.tcc \
+  /usr/include/c++/13/bits/list.tcc \
   /usr/include/c++/13/bits/locale_classes.h \
   /usr/include/c++/13/bits/locale_classes.tcc \
   /usr/include/c++/13/bits/locale_conv.h \
@@ -5246,6 +5248,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: /home/lms/Documents
   /usr/include/c++/13/bits/stl_iterator.h \
   /usr/include/c++/13/bits/stl_iterator_base_funcs.h \
   /usr/include/c++/13/bits/stl_iterator_base_types.h \
+  /usr/include/c++/13/bits/stl_list.h \
   /usr/include/c++/13/bits/stl_map.h \
   /usr/include/c++/13/bits/stl_multimap.h \
   /usr/include/c++/13/bits/stl_numeric.h \
@@ -5309,6 +5312,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: /home/lms/Documents
   /usr/include/c++/13/istream \
   /usr/include/c++/13/iterator \
   /usr/include/c++/13/limits \
+  /usr/include/c++/13/list \
   /usr/include/c++/13/locale \
   /usr/include/c++/13/map \
   /usr/include/c++/13/memory \
@@ -5485,7 +5489,29 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: /home/lms/Documents
   /usr/include/x86_64-linux-gnu/sys/types.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdarg.h \
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stddef.h \
-  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
+  /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h \
+  /usr/local/include/mariadb/conncpp.hpp \
+  /usr/local/include/mariadb/conncpp/CArray.hpp \
+  /usr/local/include/mariadb/conncpp/CallableStatement.hpp \
+  /usr/local/include/mariadb/conncpp/Connection.hpp \
+  /usr/local/include/mariadb/conncpp/DatabaseMetaData.hpp \
+  /usr/local/include/mariadb/conncpp/Driver.hpp \
+  /usr/local/include/mariadb/conncpp/DriverManager.hpp \
+  /usr/local/include/mariadb/conncpp/Exception.hpp \
+  /usr/local/include/mariadb/conncpp/ParameterMetaData.hpp \
+  /usr/local/include/mariadb/conncpp/PreparedStatement.hpp \
+  /usr/local/include/mariadb/conncpp/ResultSet.hpp \
+  /usr/local/include/mariadb/conncpp/ResultSetMetaData.hpp \
+  /usr/local/include/mariadb/conncpp/SQLString.hpp \
+  /usr/local/include/mariadb/conncpp/Savepoint.hpp \
+  /usr/local/include/mariadb/conncpp/Statement.hpp \
+  /usr/local/include/mariadb/conncpp/Types.hpp \
+  /usr/local/include/mariadb/conncpp/Warning.hpp \
+  /usr/local/include/mariadb/conncpp/buildconf.hpp \
+  /usr/local/include/mariadb/conncpp/compat/Executor.hpp \
+  /usr/local/include/mariadb/conncpp/compat/Object.hpp \
+  /usr/local/include/mariadb/conncpp/compat/Struct.hpp \
+  /usr/local/include/mariadb/conncpp/jdbccompat.hpp
 
 CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o: /home/lms/Documents/its_server/server/src/handler/SystemHandler.cpp \
   /usr/include/stdc-predef.h

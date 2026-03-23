@@ -207,3 +207,26 @@ std::pair<LoginResult, nlohmann::json> UserDAO::checkLogin(const std::string &us
     }
     return {LoginResult::ID_PASS_WRONG, nullptr}; // ❌ 실패 시
 }
+
+bool UserDAO::executeUpdate(const std::string &query, const std::vector<std::string> &params)
+{
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
+
+        // 파라미터 개수만큼 순차적으로 바인딩
+        for (size_t i = 0; i < params.size(); ++i)
+        {
+            pstmt->setString(i + 1, params[i]);
+        }
+
+        pstmt->executeUpdate();
+        return true;
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[UserDAO] 동적 업데이트 실패: " << e.what() << std::endl;
+        return false;
+    }
+}

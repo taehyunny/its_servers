@@ -2,6 +2,7 @@
 #include "ClientSession.h"
 #include "AllDTOs.h"
 #include "TimeUtil.h"
+
 #include "Global_protocol.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -15,6 +16,8 @@ void SearchHandler::handleSearchWidgetReq(std::shared_ptr<ClientSession> session
 {
     try
     {
+
+        std::cout << "\n📦 [SearchHandler 디버그] 수신된 원본 JSON: [" << jsonBody << "]" << std::endl;
         SearchDAO searchDao;
         json reqJson = json::parse(jsonBody);
         ReqResearchWidgetDTO reqDto = reqJson.get<ReqResearchWidgetDTO>();
@@ -28,7 +31,7 @@ void SearchHandler::handleSearchWidgetReq(std::shared_ptr<ClientSession> session
         resDto.popularKeywords = searchDao.getPopularCategories(10);
         resDto.recentSearches = searchDao.getRecentSearches(reqDto.userId);
 
-        session->sendPacket(static_cast<int>(CmdID::RES_RESEARCH_WIDGET), json(resDto).dump());
+        session->sendPacket(static_cast<int>(CmdID::RES_RESEARCH_WIDGET), json(resDto));
     }
     catch (const std::exception &e)
     {
@@ -55,7 +58,7 @@ void SearchHandler::handleSearchAddReq(std::shared_ptr<ClientSession> session, c
 
         // 3. 성공 응답 (프로토콜 ID: 2113)
         ResResearchAddDTO resDto{200};
-        session->sendPacket(static_cast<int>(CmdID::RES_RESEARCH_ADD), json(resDto).dump());
+        session->sendPacket(static_cast<int>(CmdID::RES_RESEARCH_ADD), json(resDto));
 
         std::cout << "[SearchHandler] 검색 기록 추가 및 점수 반영 완료 (" << reqDto.keyword << ")" << std::endl;
     }
@@ -80,7 +83,7 @@ void SearchHandler::handleSearchDeleteReq(std::shared_ptr<ClientSession> session
         searchDao.deleteRecentSearch(reqDto.userId, reqDto.historyId);
 
         ResResearchDeleteDTO resDto{200};
-        session->sendPacket(static_cast<int>(CmdID::RES_RESEARCH_DELETE), json(resDto).dump());
+        session->sendPacket(static_cast<int>(CmdID::RES_RESEARCH_DELETE), json(resDto));
     }
     catch (const std::exception &e)
     {
@@ -102,7 +105,7 @@ void SearchHandler::handleSearchDelAllReq(std::shared_ptr<ClientSession> session
         searchDao.deleteAllRecentSearches(reqDto.userId);
 
         ResResearchDelAllDTO resDto{200};
-        session->sendPacket(static_cast<int>(CmdID::RES_RESEARCH_DEL_ALL), json(resDto).dump());
+        session->sendPacket(static_cast<int>(CmdID::RES_RESEARCH_DEL_ALL), json(resDto));
     }
     catch (const std::exception &e)
     {
@@ -127,7 +130,7 @@ void SearchHandler::handleSearchStoreReq(std::shared_ptr<ClientSession> session,
         // 검색 결과가 있으면 200, 없으면 404 세팅
         resDto.status = resDto.storeList.empty() ? 404 : 200;
 
-        session->sendPacket(static_cast<int>(CmdID::RES_SEARCH_STORE), json(resDto).dump());
+        session->sendPacket(static_cast<int>(CmdID::RES_SEARCH_STORE), json(resDto));
 
         std::cout << "[SearchHandler] 실시간 매장 검색 완료 (" << reqDto.keyword << " -> " << resDto.storeList.size() << "건 발견)" << std::endl;
     }

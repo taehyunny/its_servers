@@ -17,6 +17,7 @@ public:
     SignupResult insertUser(const SignupReqDTO &dto);
     bool existsByBizNum(const std::string &businessNum);
     std::pair<LoginResult, nlohmann::json> checkLogin(const std::string &userId, const std::string &password); // 로그인 검증 및 유저 정보 반환
+    bool executeUpdate(const std::string &query, const std::vector<std::string> &params);
 
 private:
     UserDAO() = default;

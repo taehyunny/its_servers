@@ -121,10 +121,10 @@ enum class CmdID : uint16_t
     REQ_MY_INFO = 2100, // 마이페이지 통합 정보 요청 (리뷰수, 주문수, 즐겨찾기수, 좋아요수)
     RES_MY_INFO = 2101, // 마이페이지 통합 정보 응답
 
-    RES_MAIN_TOP_STORES = 2102,     // 메인 화면 카테고리별 1등 매장 정보 응답 (카테고리명, 매장명, 예상 배달 시간, 아이콘 등)
-    REQ_MAIN_TOP_STORES = 2103,     // 메인 화면 카테고리별 1등 매장 정보 요청 (클라이언트에서 최초 1회만 요청)
+    REQ_STORE_INFO_UPDATE = 2102,      // 매장 정보 업데이트 요청 (영업시간, 휴무일 등)
+    RES_STORE_INFO_UPDATE = 2103,    // 매장 정보 업데이트 응답
     REQ_RESEACH_WIDGET = 2108,      // 매장 검색 위젯 요청 (최근 검색어 출력용)
-    RES_RESEARCH_WIDGET = 2109,      // 매장 검색 위젯 응답 (최근 검색어 리스트)
+    RES_RESEARCH_WIDGET = 2109,     // 매장 검색 위젯 응답 (최근 검색어 리스트)
     REQ_RESEARCH_DELETE = 2110,     // 매장 검색 위젯 개별 삭제 요청 (최근 검색어 삭제)
     RES_RESEARCH_DELETE = 2111,     // 매장 검색 위젯 개별 삭제 응답
     REQ_RESEARCH_ADD = 2112,        // 매장 검색 위젯 추가 요청 (최근 검색어 추가)
