@@ -48,12 +48,15 @@ void UserHandler::handleSignup(std::shared_ptr<ClientSession> session, const std
 }
 
 // 🚀 [수정] ClientSession* -> std::shared_ptr<ClientSession> 으로 변경
+// 🚀 [완벽 수정본] ClientSession* -> std::shared_ptr<ClientSession>
 void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     try
     {
         auto req = nlohmann::json::parse(jsonBody).get<LoginReqDTO>();
-        auto [resultCode, userJson] = UserDAO::getInstance().checkLogin(req.userId, req.password);
+
+        // 🚀 1. UserDAO가 아니라 AuthDAO 호출! (req.role 까지 3개의 파라미터 전달)
+        auto [resultCode, userJson] = AuthDAO::getInstance().validateLogin(req.userId, req.password, req.role);
 
         AuthResDTO res;
 
@@ -61,19 +64,38 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
         {
             res.status = 200;
             res.message = "로그인 성공";
-            res.userId = userJson["user_id"].get<std::string>();
-            res.userName = userJson["user_name"].get<std::string>();
+            res.userId = userJson.value("user_id", userJson.value("userId", ""));
+            res.userName = userJson.value("userName", userJson.value("user_name", ""));
             res.address = userJson.value("address", "");
-            res.phoneNumber = userJson.value("phone_number", "");
-            res.role = std::to_string(userJson.value("role", 0));
-            res.storeName = userJson.value("store_name", "");
+            res.phoneNumber = userJson.value("phoneNumber", "");
 
-            session->authenticate(res.userId, userJson["role"].get<int>());
+            std::string roleStr = userJson.value("role", "0");
+            int dbRole = std::stoi(roleStr);
+
+            res.role = roleStr;
+
+            // 🚀 2. 사장님(role == 1)일 경우 꽉꽉 채워주는 전용 데이터 매핑!
+            if (dbRole == 1)
+            {
+                res.businessNumber = userJson.value("businessNumber", "");
+                res.accountNumber = userJson.value("accountNumber", "");
+                res.approvalStatus = userJson.value("approvalStatus", 0);
+                res.storeId = userJson.value("storeId", 0);
+                res.storeName = userJson.value("storeName", "");
+                res.category = userJson.value("category", "");
+                res.storeAddress = userJson.value("storeAddress", "");
+                res.cookTime = userJson.value("cookTime", "0");
+                res.minOrderAmount = userJson.value("minOrderAmount", "0");
+                res.openTime = userJson.value("openTime", "");
+                res.closeTime = userJson.value("closeTime", "");
+            }
+
+            session->authenticate(res.userId, dbRole);
         }
         else if (resultCode == LoginResult::ID_PASS_WRONG)
         {
             res.status = 401;
-            res.message = "아이디 비밀번호가 틀렸습니다.";
+            res.message = "아이디/비밀번호가 틀렸거나 권한이 맞지 않습니다."; // 메시지 디테일 추가
         }
         else
         {
@@ -81,14 +103,13 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
             res.message = "로그인 처리 중 서버 오류가 발생했습니다.";
         }
 
-        // 🚀 [핵심] 모든 결과 처리가 끝난 후, 여기서 "딱 한 번만" 쏩니다!
-        std::cout << ">>> [DEBUG] 클라이언트로 쏘는 최종 JSON: " << nlohmann::json(res).dump(4) << std::endl;
+        std::cout << ">>> [DEBUG] 클라이언트로 쏘는 최종 JSON: \n"
+                  << nlohmann::json(res).dump(4) << std::endl;
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_LOGIN), res);
     }
     catch (const std::exception &e)
     {
         std::cerr << "[UserHandler] Login Error: " << e.what() << std::endl;
-        // 필요하다면 여기서도 에러 패킷을 쏠 수 있습니다.
     }
 }
 

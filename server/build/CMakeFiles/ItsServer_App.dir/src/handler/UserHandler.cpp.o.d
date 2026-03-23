@@ -321,6 +321,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
  /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
+ /home/lms/Documents/its_server/server/../dto/StoreDetailDTO.h \
  /home/lms/Documents/its_server/server/src/database/UserDAO.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \

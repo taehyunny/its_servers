@@ -90,7 +90,7 @@ bool SearchDAO::applySearchScore(const std::string &keyword)
         // 주의: MENUS 테이블의 메뉴명 컬럼이 'name'이 맞다고 가정합니다! (만약 menu_name이면 수정 필요)
         std::unique_ptr<sql::PreparedStatement> pstmtCategory(conn->prepareStatement(
             "UPDATE CATEGORIES SET popularity_score = popularity_score + 1 "
-            "WHERE menu_name = ("
+            "WHERE name = (" // 👈 menu_name이 아니라 name으로 수정!
             "    SELECT S.category "
             "    FROM MENUS M "
             "    JOIN STORES S ON M.store_id = S.store_id "

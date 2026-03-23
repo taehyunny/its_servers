@@ -149,8 +149,8 @@ bool UserDAO::existsByBizNum(const std::string &businessNum)
     try
     {
         auto conn = DBManager::getInstance().getConnection();
-        // 🚀 USERS 테이블에 business_num 컬럼이 있다고 가정합니다.
-        std::string query = "SELECT COUNT(*) FROM USERS WHERE business_num = ?";
+        // 🚀 OWNERS 테이블에 business_number 컬럼이 있다고 가정합니다.
+        std::string query = "SELECT COUNT(*) FROM OWNERS WHERE business_number = ?";
 
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
         pstmt->setString(1, businessNum);

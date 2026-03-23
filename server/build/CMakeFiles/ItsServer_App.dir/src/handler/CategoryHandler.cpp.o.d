@@ -323,5 +323,6 @@ CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
  /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
+ /home/lms/Documents/its_server/server/../dto/StoreDetailDTO.h \
  /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
  /usr/include/c++/13/iostream
