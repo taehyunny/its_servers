@@ -321,6 +321,30 @@ src/database/ProductDAO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.s
 .PHONY : src/database/ProductDAO.cpp.s
 
+src/database/SearchDAO.o: src/database/SearchDAO.cpp.o
+.PHONY : src/database/SearchDAO.o
+
+# target to build an object file
+src/database/SearchDAO.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/SearchDAO.cpp.o
+.PHONY : src/database/SearchDAO.cpp.o
+
+src/database/SearchDAO.i: src/database/SearchDAO.cpp.i
+.PHONY : src/database/SearchDAO.i
+
+# target to preprocess a source file
+src/database/SearchDAO.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/SearchDAO.cpp.i
+.PHONY : src/database/SearchDAO.cpp.i
+
+src/database/SearchDAO.s: src/database/SearchDAO.cpp.s
+.PHONY : src/database/SearchDAO.s
+
+# target to generate assembly for a file
+src/database/SearchDAO.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/SearchDAO.cpp.s
+.PHONY : src/database/SearchDAO.cpp.s
+
 src/database/StoreDAO.o: src/database/StoreDAO.cpp.o
 .PHONY : src/database/StoreDAO.o
 
@@ -488,6 +512,30 @@ src/handler/OrderHandler.s: src/handler/OrderHandler.cpp.s
 src/handler/OrderHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.s
 .PHONY : src/handler/OrderHandler.cpp.s
+
+src/handler/SearchHandler.o: src/handler/SearchHandler.cpp.o
+.PHONY : src/handler/SearchHandler.o
+
+# target to build an object file
+src/handler/SearchHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o
+.PHONY : src/handler/SearchHandler.cpp.o
+
+src/handler/SearchHandler.i: src/handler/SearchHandler.cpp.i
+.PHONY : src/handler/SearchHandler.i
+
+# target to preprocess a source file
+src/handler/SearchHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.i
+.PHONY : src/handler/SearchHandler.cpp.i
+
+src/handler/SearchHandler.s: src/handler/SearchHandler.cpp.s
+.PHONY : src/handler/SearchHandler.s
+
+# target to generate assembly for a file
+src/handler/SearchHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.s
+.PHONY : src/handler/SearchHandler.cpp.s
 
 src/handler/StoreHandler.o: src/handler/StoreHandler.cpp.o
 .PHONY : src/handler/StoreHandler.o
@@ -810,6 +858,9 @@ help:
 	@echo "... src/database/ProductDAO.o"
 	@echo "... src/database/ProductDAO.i"
 	@echo "... src/database/ProductDAO.s"
+	@echo "... src/database/SearchDAO.o"
+	@echo "... src/database/SearchDAO.i"
+	@echo "... src/database/SearchDAO.s"
 	@echo "... src/database/StoreDAO.o"
 	@echo "... src/database/StoreDAO.i"
 	@echo "... src/database/StoreDAO.s"
@@ -831,6 +882,9 @@ help:
 	@echo "... src/handler/OrderHandler.o"
 	@echo "... src/handler/OrderHandler.i"
 	@echo "... src/handler/OrderHandler.s"
+	@echo "... src/handler/SearchHandler.o"
+	@echo "... src/handler/SearchHandler.i"
+	@echo "... src/handler/SearchHandler.s"
 	@echo "... src/handler/StoreHandler.o"
 	@echo "... src/handler/StoreHandler.i"
 	@echo "... src/handler/StoreHandler.s"

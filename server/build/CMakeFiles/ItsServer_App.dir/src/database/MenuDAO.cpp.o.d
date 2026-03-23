@@ -250,6 +250,7 @@ CMakeFiles/ItsServer_App.dir/src/database/MenuDAO.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/AccountDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
+ /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
  /home/lms/Documents/its_server/server/src/database/DbManager.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \

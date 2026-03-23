@@ -331,4 +331,5 @@ CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/AccountDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
+ /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
  /usr/include/c++/13/iostream
