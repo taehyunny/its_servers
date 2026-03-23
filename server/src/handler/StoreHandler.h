@@ -11,4 +11,5 @@ public:
     static void handleStoreListRequest(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
     static void handleStoreDetailReq(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
     static void handleStoreInfoUpdateReq(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
+    static void handleStoreStatusSet(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
 };

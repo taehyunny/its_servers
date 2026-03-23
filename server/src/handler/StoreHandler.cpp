@@ -196,3 +196,51 @@ void StoreHandler::handleStoreInfoUpdateReq(std::shared_ptr<ClientSession> sessi
         session->sendPacket(static_cast<int>(CmdID::RES_STORE_INFO_UPDATE), res);
     }
 }
+
+void StoreHandler::handleStoreStatusSet(std::shared_ptr<ClientSession> session,
+                                        const std::string &jsonBody)
+{
+    nlohmann::json req = nlohmann::json::parse(jsonBody);
+    nlohmann::json res;
+
+    try
+    {
+        // 1. storeId, status 파싱
+        int storeId = req.value("storeId", 0);
+        int status = req.value("status", -1);
+
+        if (storeId == 0 || status == -1)
+        {
+            res["status"] = 400;
+            res["message"] = "storeId 또는 status가 없습니다.";
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_STORE_STATUS_SET), res);
+            return;
+        }
+
+        // 2. DB UPDATE 실행
+        // UPDATE STORES SET status = ? WHERE store_id = ?
+        std::string query = "UPDATE STORES SET status=? WHERE store_id=?";
+        std::vector<std::string> params = {
+            std::to_string(status),
+            std::to_string(storeId)};
+
+        bool success = UserDAO::getInstance().executeUpdate(query, params);
+
+        // 3. 응답 전송
+        res["status"] = success ? 200 : 500;
+        res["message"] = success ? "영업 상태가 변경되었습니다." : "DB 오류가 발생했습니다.";
+
+        std::cout << "[StoreHandler] 영업상태 변경 - storeId: " << storeId
+                  << ", status: " << status
+                  << ", 결과: " << (success ? "성공" : "실패") << std::endl;
+
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_STORE_STATUS_SET), res);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "[StoreHandler] 오류: " << e.what() << std::endl;
+        res["status"] = 500;
+        res["message"] = "서버 내부 오류";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_STORE_STATUS_SET), res);
+    }
+}

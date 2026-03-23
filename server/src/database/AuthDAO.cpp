@@ -28,7 +28,6 @@ std::pair<LoginResult, nlohmann::json> AuthDAO::validateLogin(const std::string 
             LEFT JOIN STORES S ON U.user_id = S.owner_id
             WHERE U.user_id = ? AND U.role = ?
         )";
-
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
         pstmt->setString(1, inputId);
         pstmt->setInt(2, role);

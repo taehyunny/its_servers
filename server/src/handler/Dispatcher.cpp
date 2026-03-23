@@ -45,7 +45,9 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
     {CmdID::REQ_RESEARCH_ADD, [](auto s, auto b)
      { SearchHandler::handleSearchAddReq(s, b); }},
     {CmdID::REQ_STORE_INFO_UPDATE, [](auto s, auto b)
-     { StoreHandler::handleStoreInfoUpdateReq(s, b); }}
+     { StoreHandler::handleStoreInfoUpdateReq(s, b); }},
+    {CmdID::REQ_STORE_STATUS_SET, [](auto s, auto b)
+     { StoreHandler::handleStoreStatusSet(s, b); }}
 
     // ❌ 주문 거절 (3010) - 나중에 구현할 때 대비해서 미리 등록!
     // {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)
