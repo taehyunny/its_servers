@@ -175,3 +175,17 @@ CREATE TABLE USER_COUPONS (
     used_order_id VARCHAR(50) DEFAULT NULL, -- MUL KEY
     issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
 );
+
+---
+추가해야할 테이블
+
+CREATE TABLE USER_ADDRESSES (
+    address_id   INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id      VARCHAR(50)  NOT NULL,
+    address      VARCHAR(255) NOT NULL,
+    detail       VARCHAR(255) DEFAULT '',      -- 상세주소 (예: 기숙사 1층)
+    guide        VARCHAR(255) DEFAULT '',      -- 길안내 (예: 정문으로 들어오세요)
+    label        VARCHAR(20)  DEFAULT '기타',  -- 집 / 회사 / 기타
+    is_default   TINYINT(1)   DEFAULT 0,       -- 현재 선택된 주소 (1: 선택됨)
+    created_at   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP()
+);

@@ -92,12 +92,16 @@ enum class CmdID : uint16_t
     RES_ORDER_CANCEL = 2053, // 주문 취소 응답
 
     // 주소 관리 (2070 ~ 2079)  ← 기존 번호 유지
-    REQ_ADDRESS_SAVE = 2070,   // 주소 저장 요청 (별칭 포함)
-    RES_ADDRESS_SAVE = 2071,   // 주소 저장 응답
-    REQ_ADDRESS_LIST = 2072,   // 주소 목록 조회 요청
-    RES_ADDRESS_LIST = 2073,   // 주소 목록 조회 응답
-    REQ_ADDRESS_DELETE = 2074, // 주소 삭제 요청
-    RES_ADDRESS_DELETE = 2075, // 주소 삭제 응답
+    REQ_ADDRESS_SAVE   = 2070,
+    RES_ADDRESS_SAVE   = 2071,
+    REQ_ADDRESS_LIST   = 2072,
+    RES_ADDRESS_LIST   = 2073,
+    REQ_ADDRESS_DELETE = 2074,
+    RES_ADDRESS_DELETE = 2075,
+    REQ_ADDRESS_UPDATE = 2076,
+    RES_ADDRESS_UPDATE = 2077,
+    REQ_ADDRESS_DEFAULT = 2078,
+    RES_ADDRESS_DEFAULT = 2079,
 
     // 과거 주문 내역 (2080 ~ 2089)
     REQ_ORDER_HISTORY = 2080,        // 과거 주문 내역 목록 요청 (최근 주문 순 추천 포함)
