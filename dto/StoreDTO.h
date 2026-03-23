@@ -92,20 +92,19 @@ struct MenuUpdateReqDTO
 
 struct TopStoreInfo
 {
-    int storeId;
-    std::string storeName;
-    std::string category;
+    int storeId;              // 매장 ID (검색 결과에서 상세 페이지로 넘어갈 때 필요)
+    std::string storeName;    // 매장 이름
+    std::string category;     // 매장 카테고리
+    double rating;            // 평점
+    int reviewCount;          // 리뷰 수
+    int minOrderPrice;        // 최소 주문 금액
+    std::string deliveryTime; // 배달 시간 (예: "30~40분")
+    int deliveryFee;          // 배달비
     std::string iconPath;
-    std::string deliveryTimeRange;
-    double rating = 0.0;
-    int reviewCount = 0;
-    int minOrderAmount = 0;
-    int deliveryFee = 0;
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(TopStoreInfo, storeId, storeName, category, iconPath,
-                                   deliveryTimeRange, rating, reviewCount, minOrderAmount, deliveryFee)
+    std::string deliveryTimeRange; // 배달 시간 범위 (예: "30~40분")
+    int minOrderAmount;            // 최소 주문 금액
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(TopStoreInfo, storeId, storeName, category, rating, reviewCount, minOrderPrice, deliveryTime, deliveryFee, iconPath, deliveryTimeRange, minOrderAmount)
 };
-
 // 🚀 메인 화면용 '통합' 응답 패킷!
 struct MainHomeResDTO
 {

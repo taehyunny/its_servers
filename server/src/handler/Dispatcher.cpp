@@ -5,6 +5,7 @@
 #include "StoreHandler.h"
 #include "MenuHandler.h"
 #include "CategoryHandler.h"
+#include "SearchHandler.h"
 #include <iostream>
 
 // 핸들러 맵 초기화
@@ -31,6 +32,16 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { OrderHandler::handleOrderCreate(s, b); }},
     {CmdID::REQ_ORDER_ACCEPT, [](auto s, auto b)
      { OrderHandler::handleOrderAccept(s, b); }},
+    {CmdID::REQ_RESEACH_WIDGET, [](auto s, auto b)
+     { SearchHandler::handleSearchWidgetReq(s, b); }},
+    {CmdID::REQ_RESEARCH_DELETE, [](auto s, auto b)
+     { SearchHandler::handleSearchDeleteReq(s, b); }},
+    {CmdID::REQ_RESEARCH_ADD, [](auto s, auto b)
+     { SearchHandler::handleSearchAddReq(s, b); }},
+    {CmdID::REQ_RESEARCH_DEL_ALL, [](auto s, auto b)
+     { SearchHandler::handleSearchDelAllReq(s, b); }},
+    {CmdID::REQ_SEARCH_STORE, [](auto s, auto b)
+     { SearchHandler::handleSearchStoreReq(s, b); }},
 
     // ❌ 주문 거절 (3010) - 나중에 구현할 때 대비해서 미리 등록!
     // {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)

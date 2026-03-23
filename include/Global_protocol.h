@@ -60,7 +60,6 @@ enum class CmdID : uint16_t
     REQ_STORE_DETAIL = 2002,       // 특정 매장 상세 정보 요청 (상호명, 주소, 영업시간, 포장 가능 여부 등)
     RES_STORE_DETAIL = 2003,       // 매장 상세 정보 응답
 
-
     REQ_MENU_LIST = 2010,   // 특정 상점 메뉴 목록 요청 (카테고리별, 품절 여부 포함)
     RES_MENU_LIST = 2011,   // 메뉴 목록 응답
     REQ_MENU_OPTION = 2012, // 특정 메뉴의 추가 선택 옵션 요청 (필수/선택 옵션)
@@ -125,13 +124,15 @@ enum class CmdID : uint16_t
     RES_MAIN_TOP_STORES = 2102,     // 메인 화면 카테고리별 1등 매장 정보 응답 (카테고리명, 매장명, 예상 배달 시간, 아이콘 등)
     REQ_MAIN_TOP_STORES = 2103,     // 메인 화면 카테고리별 1등 매장 정보 요청 (클라이언트에서 최초 1회만 요청)
     REQ_RESEACH_WIDGET = 2108,      // 매장 검색 위젯 요청 (최근 검색어 출력용)
-    RES_RESEACH_WIDGET = 2109,      // 매장 검색 위젯 응답 (최근 검색어 리스트)
+    RES_RESEARCH_WIDGET = 2109,      // 매장 검색 위젯 응답 (최근 검색어 리스트)
     REQ_RESEARCH_DELETE = 2110,     // 매장 검색 위젯 개별 삭제 요청 (최근 검색어 삭제)
     RES_RESEARCH_DELETE = 2111,     // 매장 검색 위젯 개별 삭제 응답
     REQ_RESEARCH_ADD = 2112,        // 매장 검색 위젯 추가 요청 (최근 검색어 추가)
     RES_RESEARCH_ADD = 2113,        // 매장 검색 위젯 추가 응답
     REQ_RESEARCH_DEL_ALL = 2114,    // 매장 검색 위젯 전체 삭제 요청 (최근 검색어 전체 삭제)
     RES_RESEARCH_DEL_ALL = 2115,    // 매장 검색 위젯 전체 삭제 응답
+    REQ_SEARCH_STORE = 2116,        // 매장 검색 요청 (검색어로 매장명·카테고리 검색)
+    RES_SEARCH_STORE = 2117,        // 매장 검색 응답
                                     // ---------------------------------------------------------
                                     // [3000번대] 사장님(Owner) 파트
                                     // ---------------------------------------------------------

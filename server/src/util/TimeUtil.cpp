@@ -1,1 +1,14 @@
-//주문이 생성된 시간, 리뷰 작성 시간, 로그가 찍히는 시간 등 시간 관련 처리를 여기서 모두 통일합니다.
+#include "TimeUtil.h"
+#include <chrono>
+#include <iomanip>
+#include <sstream>
+
+std::string TimeUtil::getCurrentDate()
+{
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+    // 태현님이 원하는 형식대로 ("%Y-%m-%d" 등)
+    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d");
+    return ss.str();
+}

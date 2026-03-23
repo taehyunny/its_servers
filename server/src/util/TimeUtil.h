@@ -1,1 +1,7 @@
-//주문이 생성된 시간, 리뷰 작성 시간, 로그가 찍히는 시간 등 시간 관련 처리를 여기서 모두 통일합니다.
+#pragma once
+#include <string>
+
+class TimeUtil {
+public:
+    static std::string getCurrentDate(); // "YYYY-MM-DD" 반환
+};

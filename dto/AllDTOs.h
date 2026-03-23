@@ -8,3 +8,4 @@
 #include "AccountDTO.h"
 #include "StoreDTO.h"
 #include "OrderDTO.h"
+#include "ResearchDTO.h"

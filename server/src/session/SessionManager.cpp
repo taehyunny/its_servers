@@ -1,4 +1,5 @@
 #include "SessionManager.h"
+#include "ClientSession.h"
 #include <iostream>
 
 void SessionManager::createSession(int fd)
