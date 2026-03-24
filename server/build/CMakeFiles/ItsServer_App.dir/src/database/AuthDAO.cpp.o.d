@@ -334,6 +334,7 @@ CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDetailDTO.h \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
+ /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/src/database/DbManager.h \
  /usr/include/c++/13/queue /usr/include/c++/13/deque \
  /usr/include/c++/13/bits/stl_deque.h /usr/include/c++/13/bits/deque.tcc \

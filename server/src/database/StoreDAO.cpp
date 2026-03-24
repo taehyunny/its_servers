@@ -239,7 +239,7 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
             review.review_id = rsReview->getInt("review_id");
             review.store_id = storeId;
             review.user_id = rsReview->getString("user_id").c_str();
-            review.order_id = rsReview->getInt("order_id");
+            review.order_id = rsReview->getString("order_id").c_str();
             review.rating = rsReview->getInt("rating");
             review.content = rsReview->getString("content").c_str();
             review.created_at = rsReview->getString("created_at").c_str();

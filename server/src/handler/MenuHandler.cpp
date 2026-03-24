@@ -76,14 +76,22 @@ void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const s
         {
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
                 "INSERT INTO MENUS (store_id, menu_name, base_price, "
-                "menu_category, is_popular, description, is_sold_out) "
-                "VALUES (?, ?, ?, ?, ?, ?, 0)"));
+                "menu_category, is_popular, description, is_sold_out, menu_options) " // 🚀 menu_options 추가됨
+                "VALUES (?, ?, ?, ?, ?, ?, 0, ?)"));                                  // 🚀 ? 1개 추가됨
+
             pstmt->setInt(1, storeId);
             pstmt->setString(2, menuData.value("menuName", ""));
             pstmt->setInt(3, menuData.value("basePrice", 0));
             pstmt->setString(4, menuData.value("menuCategory", "기본 메뉴"));
             pstmt->setBoolean(5, menuData.value("isPopular", false));
             pstmt->setString(6, menuData.value("description", ""));
+
+            // 🚀 프론트 요청사항: 옵션 배열 파싱 후 7번째 파라미터로 넣기
+            std::string menuOptionsStr = menuData.contains("menuOptions")
+                                             ? menuData["menuOptions"].dump()
+                                             : "[]";
+            pstmt->setString(7, menuOptionsStr);
+
             pstmt->executeUpdate();
             ok = true;
         }
@@ -92,16 +100,26 @@ void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const s
             int menuId = menuData.value("menuId", 0);
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
                 "UPDATE MENUS SET menu_name=?, base_price=?, "
-                "menu_category=?, is_popular=?, description=?, is_sold_out=? "
+                "menu_category=?, is_popular=?, description=?, is_sold_out=?, menu_options=? " // 🚀 menu_options=? 추가됨
                 "WHERE menu_id=? AND store_id=?"));
+
             pstmt->setString(1, menuData.value("menuName", ""));
             pstmt->setInt(2, menuData.value("basePrice", 0));
             pstmt->setString(3, menuData.value("menuCategory", "기본 메뉴"));
             pstmt->setBoolean(4, menuData.value("isPopular", false));
             pstmt->setString(5, menuData.value("description", ""));
             pstmt->setBoolean(6, menuData.value("isSoldOut", false));
-            pstmt->setInt(7, menuId);
-            pstmt->setInt(8, storeId);
+
+            // 🚀 프론트 요청사항: 7번째 파라미터로 옵션 JSON 문자열 넣기
+            std::string menuOptionsStr = menuData.contains("menuOptions")
+                                             ? menuData["menuOptions"].dump()
+                                             : "[]";
+            pstmt->setString(7, menuOptionsStr);
+
+            // 🚀 기존 7, 8번이었던 파라미터가 8, 9번으로 밀려남
+            pstmt->setInt(8, menuId);
+            pstmt->setInt(9, storeId);
+
             pstmt->executeUpdate();
             ok = true;
         }

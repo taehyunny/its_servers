@@ -49,7 +49,7 @@ struct ReviewDataDTO
     int review_id;
     int store_id;
     std::string user_id;
-    int order_id;
+    std::string order_id;
     int rating;
     std::string content;
     std::string created_at;

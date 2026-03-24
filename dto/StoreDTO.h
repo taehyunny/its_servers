@@ -1,9 +1,13 @@
 #pragma once
 #include <string>
 #include <vector>
-#include "json.hpp"
+#include <nlohmann/json.hpp> // 경로 확인 필수!
 
-// 1. 순서 교정: MenuDTO가 먼저 와야 다른 곳에서 쓸 수 있습니다.
+using json = nlohmann::json;
+
+// 0. CategoryItem 정의 (누락되었던 부분 추가)
+
+// 1. 순서 교정: 하위 항목부터 정의
 struct OptionItem
 {
     int optionId;
@@ -13,6 +17,7 @@ struct OptionItem
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(OptionItem, optionId, optionName, additionalPrice, displayOrder)
 };
+
 // 2. 옵션 카테고리 (큰 틀)
 struct OptionGroup
 {
@@ -21,11 +26,33 @@ struct OptionGroup
     bool isRequired;
     int maxCount;
     int displayOrder;
-    std::vector<OptionItem> options; // 🚀 벡터 구조 완벽합니다!
+    std::vector<OptionItem> options;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OptionGroup, groupId, groupName, isRequired, maxCount, displayOrder, options)
+    // 🚀 [해결책] to_json 추가 (서버 -> 클라이언트로 보낼 때 필요)
+    friend void to_json(nlohmann::json &j, const OptionGroup &dto)
+    {
+        j = nlohmann::json{
+            {"groupId", dto.groupId},
+            {"groupName", dto.groupName},
+            {"isRequired", dto.isRequired},
+            {"maxCount", dto.maxCount},
+            {"displayOrder", dto.displayOrder},
+            {"options", dto.options}};
+    }
+
+    // 🚀 from_json 커스텀 구현 (클라이언트 -> 서버로 받을 때 필요)
+    friend void from_json(const nlohmann::json &j, OptionGroup &dto)
+    {
+        j.at("groupId").get_to(dto.groupId);
+        j.at("groupName").get_to(dto.groupName);
+        dto.isRequired = j.value("isRequired", false);
+        dto.maxCount = j.value("maxCount", 1);
+        dto.displayOrder = j.value("displayOrder", 99);
+        j.at("options").get_to(dto.options);
+    }
 };
 
+// 3. 메뉴 DTO
 struct MenuDTO
 {
     int menuId;
@@ -36,11 +63,8 @@ struct MenuDTO
     std::string imageUrl;
     std::string menuCategory;
     bool isPopular;
+    std::vector<OptionGroup> optionGroups;
 
-    // 🚨 기존에 있던 json menuOptions; 는 과감히 삭제하세요!
-    std::vector<OptionGroup> optionGroups; // 🚀 우리가 만든 벡터 바구니 장착!
-
-    // 매크로에서도 menuOptions를 빼고 optionGroups를 넣습니다.
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuDTO, menuId, menuName, basePrice, isSoldOut, description, imageUrl, menuCategory, isPopular, optionGroups)
 };
 

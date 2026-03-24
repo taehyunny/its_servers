@@ -290,6 +290,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDetailDTO.h \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
+ /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/src/handler/UserHandler.h \
  /home/lms/Documents/its_server/server/src/handler/OrderHandler.h \
  /home/lms/Documents/its_server/server/src/handler/SystemHandler.h \

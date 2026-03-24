@@ -9,15 +9,15 @@ void DBManager::init(const std::string &url, const std::string &user, const std:
 
     try
     {
-        // MariaDB 드라이버 획득
         sql::Driver *driver = sql::mariadb::get_driver_instance();
 
-        // 지정된 개수(poolSize)만큼 커넥션을 미리 생성해서 큐(Queue)에 적재
         for (int i = 0; i < poolSize; ++i)
         {
             sql::SQLString urlStr(dbUrl.c_str());
+            // 🚀 핵심 1: 커넥션 생성 시 자동 재연결 옵션(OPT_RECONNECT) 활성화
             sql::Properties props({{"user", dbUser.c_str()},
-                                   {"password", dbPassword.c_str()}});
+                                   {"password", dbPassword.c_str()},
+                                   {"OPT_RECONNECT", "true"}});
 
             std::unique_ptr<sql::Connection> conn(driver->connect(urlStr, props));
             connectionPool.push(std::move(conn));
@@ -27,7 +27,7 @@ void DBManager::init(const std::string &url, const std::string &user, const std:
     catch (sql::SQLException &e)
     {
         std::cerr << "[FATAL] DB 커넥션 풀 초기화 실패: " << e.what() << std::endl;
-        exit(EXIT_FAILURE); // DB가 죽으면 서버도 켜지지 않게 강제 종료
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -35,21 +35,40 @@ std::shared_ptr<sql::Connection> DBManager::getConnection()
 {
     std::unique_lock<std::mutex> lock(poolMutex);
 
-    // 1. 남은 커넥션이 없으면, 다른 스레드가 반납할 때까지 대기
     poolCondVar.wait(lock, [this]
                      { return !connectionPool.empty(); });
 
-    // 2. 큐에서 커넥션 하나 꺼내기
     std::unique_ptr<sql::Connection> conn = std::move(connectionPool.front());
     connectionPool.pop();
 
-    // 3. 🚀 마법의 Custom Deleter: DAO에서 사용이 끝나면 큐로 자동 복귀
+    // 🚀 핵심 2: 꺼낸 커넥션이 유효한지 검사하고, 죽어있다면 재연결!
+    try
+    {
+        if (conn == nullptr || !conn->isValid())
+        {
+            std::cout << "[DBManager] ⚠️ 끊어진 커넥션 발견! 재연결을 시도합니다..." << std::endl;
+
+            sql::Driver *driver = sql::mariadb::get_driver_instance();
+            sql::SQLString urlStr(dbUrl.c_str());
+            sql::Properties props({{"user", dbUser.c_str()},
+                                   {"password", dbPassword.c_str()},
+                                   {"OPT_RECONNECT", "true"}});
+
+            conn.reset(driver->connect(urlStr, props));
+            std::cout << "[DBManager] ✅ 재연결 성공!" << std::endl;
+        }
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[DBManager] ❌ 재연결 실패: " << e.what() << std::endl;
+        // 실패 시 다시 큐에 넣지 않고 에러 처리를 하거나 새 커넥션을 기다리게 설계 가능
+    }
+
     return std::shared_ptr<sql::Connection>(conn.release(), [this](sql::Connection *c)
                                             {
-                                                std::lock_guard<std::mutex> retLock(poolMutex);
-                                                connectionPool.push(std::unique_ptr<sql::Connection>(c));
-                                                poolCondVar.notify_one(); // 기다리고 있는 다른 스레드를 깨움
-                                            });
+        std::lock_guard<std::mutex> retLock(poolMutex);
+        connectionPool.push(std::unique_ptr<sql::Connection>(c));
+        poolCondVar.notify_one(); });
 }
 
 DBManager::~DBManager()
@@ -57,7 +76,10 @@ DBManager::~DBManager()
     std::lock_guard<std::mutex> lock(poolMutex);
     while (!connectionPool.empty())
     {
-        connectionPool.front()->close();
+        if (connectionPool.front())
+        {
+            connectionPool.front()->close();
+        }
         connectionPool.pop();
     }
 }

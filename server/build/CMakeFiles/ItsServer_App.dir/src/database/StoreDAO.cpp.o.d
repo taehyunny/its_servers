@@ -252,10 +252,12 @@ CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o: \
  /home/lms/Documents/its_server/server/../include/json.hpp \
  /home/lms/Documents/its_server/server/../dto/AccountDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
+ /usr/include/nlohmann/json.hpp \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
  /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDetailDTO.h \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
+ /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/src/database/DbManager.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \
