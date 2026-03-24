@@ -44,6 +44,11 @@ public:
             it->second->sendPacket(cmdId, dto); // jina의 소켓을 찾아서 발사!
         }
     }
+    void removeUser(const std::string &userId)
+    {
+        std::lock_guard<std::mutex> lock(sessionMutex);
+        userMap.erase(userId); // 전화번호부에서 이름만 지우기!
+    }
 
     // 3. [9020번용] 특정 권한(라이더) 전체에게 브로드캐스팅 쏘기
     template <typename T>

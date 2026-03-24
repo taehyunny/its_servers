@@ -8,47 +8,63 @@
 #include "SearchHandler.h"
 #include "AddressHandler.h"
 #include "ReviewHandler.h"
-#include "OrderHandler.h"
+// #include "SalesHandler.h" // 🚀 주석 해제 및 활성화!
 #include <iostream>
 
-// 핸들러 맵 초기화
+// =========================================================
+// 🌐 핸들러 맵 초기화 (도메인별 구역 분리)
+// =========================================================
 const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap = {
+
+    // ── 1. 유저 및 인증 (Auth & User) ──
     {CmdID::REQ_SIGNUP, [](auto s, auto b)
      { UserHandler::handleSignup(s, b); }},
     {CmdID::REQ_LOGIN, [](auto s, auto b)
      { UserHandler::handleLogin(s, b); }},
-    {CmdID::REQ_STORE_LIST, [](auto s, auto b)
-     { StoreHandler::handleStoreListRequest(s, b); }},
-    {CmdID::REQ_MENU_LIST, [](auto s, auto b)
-     { MenuHandler::handleMenuListRequest(s, b); }},
+    {CmdID::REQ_LOGOUT, [](auto s, auto b)
+     { UserHandler::handleLogout(s, b); }}, // 🚀 신규: 로그아웃
     {CmdID::REQ_AUTH_CHECK, [](auto s, auto b)
      { UserHandler::handleAuthCheck(s, b); }},
     {CmdID::REQ_PHONE_CHECK, [](auto s, auto b)
      { UserHandler::handlePhoneCheck(s, b); }},
     {CmdID::REQ_BUISNESS_NUM_CHECK, [](auto s, auto b)
      { UserHandler::handleBizNumCheck(s, b); }},
-    {CmdID::REQ_ORDER_CREATE, [](auto s, auto b)
-     { OrderHandler::handleOrderCreate(s, b); }},
-    {CmdID::REQ_ORDER_ACCEPT, [](auto s, auto b)
-     { OrderHandler::handleOrderAccept(s, b); }},
-    {CmdID::REQ_RESEACH_WIDGET, [](auto s, auto b)
-     { SearchHandler::handleSearchWidgetReq(s, b); }},
-    {CmdID::REQ_RESEARCH_DELETE, [](auto s, auto b)
-     { SearchHandler::handleSearchDeleteReq(s, b); }},
-    {CmdID::REQ_RESEARCH_ADD, [](auto s, auto b)
-     { SearchHandler::handleSearchAddReq(s, b); }},
-    {CmdID::REQ_RESEARCH_DEL_ALL, [](auto s, auto b)
-     { SearchHandler::handleSearchDelAllReq(s, b); }},
-    {CmdID::REQ_SEARCH_STORE, [](auto s, auto b)
-     { SearchHandler::handleSearchStoreReq(s, b); }},
-    {CmdID::REQ_RESEARCH_ADD, [](auto s, auto b)
-     { SearchHandler::handleSearchAddReq(s, b); }},
+
+    // ── 2. 매장 및 메뉴 (Store & Menu) ──
+    {CmdID::REQ_STORE_LIST, [](auto s, auto b)
+     { StoreHandler::handleStoreListRequest(s, b); }},
+    {CmdID::REQ_STORE_DETAIL, [](auto s, auto b)
+     { StoreHandler::handleStoreDetailReq(s, b); }},
+    {CmdID::REQ_MENU_LIST, [](auto s, auto b)
+     { MenuHandler::handleMenuListRequest(s, b); }},
     {CmdID::REQ_STORE_INFO_UPDATE, [](auto s, auto b)
      { StoreHandler::handleStoreInfoUpdateReq(s, b); }},
     {CmdID::REQ_STORE_STATUS_SET, [](auto s, auto b)
      { StoreHandler::handleStoreStatusSet(s, b); }},
-    {CmdID::REQ_STORE_DETAIL, [](auto s, auto b)
-     { StoreHandler::handleStoreDetailReq(s, b); }},
+    {CmdID::REQ_MENU_EDIT, [](auto s, auto b)
+     { MenuHandler::handleMenuEdit(s, b); }},
+    {CmdID::REQ_MENU_SOLD_OUT, [](auto s, auto b)
+     { MenuHandler::handleMenuSoldOut(s, b); }},
+
+    // ── 3. 주문 및 결제 (Order & Payment) ──
+    {CmdID::REQ_CHECKOUT_INFO, [](auto s, auto b)
+     { OrderHandler::handleCheckoutInfo(s, b); }},
+    {CmdID::REQ_ORDER_CREATE, [](auto s, auto b)
+     { OrderHandler::handleOrderCreate(s, b); }},
+    {CmdID::REQ_ORDER_ACCEPT, [](auto s, auto b)
+     { OrderHandler::handleOrderAccept(s, b); }},
+    // {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)
+    //  { OrderHandler::handleOrderReject(s, b); }}, // 🚀 사장님 주문 거절 기능 (구현되어 있다면 활성화)
+
+    // ── 4. 리뷰 및 통계 (Review & Sales) ──
+    {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
+     { ReviewHandler::handleReviewList(s, b); }},
+    {CmdID::REQ_REVIEW_REPLY, [](auto s, auto b)
+     { ReviewHandler::handleReviewReply(s, b); }},
+    // {CmdID::REQ_SALES_STAT, [](auto s, auto b)
+    //  { SalesHandler::handleSalesStat(s, b); }}, // 🚀 신규: 매출 통계
+
+    // ── 5. 주소 관리 (Address) ──
     {CmdID::REQ_ADDRESS_SAVE, [](auto s, auto b)
      { AddressHandler::handleAddressSave(s, b); }},
     {CmdID::REQ_ADDRESS_LIST, [](auto s, auto b)
@@ -59,19 +75,22 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { AddressHandler::handleAddressUpdate(s, b); }},
     {CmdID::REQ_ADDRESS_DEFAULT, [](auto s, auto b)
      { AddressHandler::handleAddressDefault(s, b); }},
-    {CmdID::REQ_MENU_EDIT, [](auto s, auto b)
-     { MenuHandler::handleMenuEdit(s, b); }},
-    {CmdID::REQ_MENU_SOLD_OUT, [](auto s, auto b)
-     { MenuHandler::handleMenuSoldOut(s, b); }},
-    {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
-     { ReviewHandler::handleReviewList(s, b); }},
-    {CmdID::REQ_REVIEW_REPLY, [](auto s, auto b)
-     { ReviewHandler::handleReviewReply(s, b); }},
-    {CmdID::REQ_CHECKOUT_INFO, [](auto s, auto b)
-     { OrderHandler::handleCheckoutInfo(s, b); }},
-};
 
-// 🚀 [2단계] Dispatch 함수 본체 (반복되던 스레드 풀과 try-catch를 하나로 통합!)
+    // ── 6. 검색 (Search) ──
+    {CmdID::REQ_RESEACH_WIDGET, [](auto s, auto b)
+     { SearchHandler::handleSearchWidgetReq(s, b); }},
+    {CmdID::REQ_RESEARCH_ADD, [](auto s, auto b)
+     { SearchHandler::handleSearchAddReq(s, b); }},
+    {CmdID::REQ_RESEARCH_DELETE, [](auto s, auto b)
+     { SearchHandler::handleSearchDeleteReq(s, b); }},
+    {CmdID::REQ_RESEARCH_DEL_ALL, [](auto s, auto b)
+     { SearchHandler::handleSearchDelAllReq(s, b); }},
+    {CmdID::REQ_SEARCH_STORE, [](auto s, auto b)
+     { SearchHandler::handleSearchStoreReq(s, b); }}};
+
+// =========================================================
+// 🚀 [2단계] Dispatch 함수 본체
+// =========================================================
 void Dispatcher::dispatch(std::shared_ptr<ClientSession> session, const PacketHeader &header, const std::string &jsonBody, ThreadPool &pool)
 {
     std::cout << "\n==================================================" << std::endl;

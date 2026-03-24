@@ -152,57 +152,52 @@ std::vector<TopStoreInfo> StoreDAO::getAllStores()
 ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
 {
     ResStoreDetailDTO result;
-    result.status = 404; // 기본값: 매장을 찾을 수 없음 (에러 대비)
+    result.status = 404; // 기본값: 찾지 못함
 
     try
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // ---------------------------------------------------------
-        // 📦 1단계: 상점 기본 정보 조회 (STORES 테이블)
-        // ---------------------------------------------------------
+        // 🚀 [Fact Check] SQL 쿼리에 새로 추가된 3종 세트를 반드시 포함해야 합니다!
         std::unique_ptr<sql::PreparedStatement> pstmtStore(conn->prepareStatement(
-            // 🚀 icon_path를 image_url로 수정!
-            "SELECT store_id, store_name, store_address, open_time, close_time, delivery_fee, "
-            "min_order_amount, rating, review_count, image_url "
-            "FROM STORES WHERE store_id = ?"));
+            "SELECT S.store_id, S.store_name, S.store_address, S.open_time, S.close_time, S.delivery_fee, "
+            "S.min_order_amount, S.rating, S.review_count, S.image_url, "
+            "U.phone_number, U.user_name AS representative_name, O.business_number " // 👈 조인해서 가져올 신규 컬럼들
+            "FROM STORES S "
+            "LEFT JOIN USERS U ON S.owner_id = U.user_id "  // 사장님 전화번호, 이름 가져오기
+            "LEFT JOIN OWNERS O ON S.owner_id = O.user_id " // 사장님 사업자번호 가져오기 (이전 에러 해결 반영!)
+            "WHERE S.store_id = ?"));
+
         pstmtStore->setInt(1, storeId);
         std::unique_ptr<sql::ResultSet> rsStore(pstmtStore->executeQuery());
 
         if (rsStore->next())
         {
-            result.status = 200; // 매장을 찾았으니 200 OK!
-            result.storeData.store_id = rsStore->getInt("store_id");
-            result.storeData.store_name = rsStore->getString("store_name").c_str();
-            result.storeData.store_address = rsStore->getString("store_address").c_str();
-
-            // 🚀 가공 포인트 1: 영업시간 합치기 ("09:00 ~ 21:00")
-            result.storeData.operating_hours = rsStore->getString("open_time").c_str() + std::string(" ~ ") + rsStore->getString("close_time").c_str();
-
-            // 🚀 가공 포인트 2: 배달비 문자열로 만들기 (프론트엔드 팀원 요청: "3000원")
-            result.storeData.delivery_fees = std::to_string(rsStore->getInt("delivery_fee")) + "원";
-
-            result.storeData.is_open = true; // (TODO: TimeUtil을 써서 현재 시간이 영업시간 안인지 체크하는 로직 추가 가능)
-            result.storeData.image_url = rsStore->isNull("image_url") ? "" : rsStore->getString("image_url").c_str();
-            result.storeData.min_order_amount = rsStore->getInt("min_order_amount");
+            result.status = 200;
+            result.storeData.storeId = rsStore->getInt("store_id");
+            result.storeData.storeName = rsStore->getString("store_name").c_str();
+            result.storeData.storeAddress = rsStore->getString("store_address").c_str();
+            result.storeData.operatingHours = rsStore->getString("open_time").c_str() + std::string(" ~ ") + rsStore->getString("close_time").c_str();
+            result.storeData.deliveryFees = std::to_string(rsStore->getInt("delivery_fee")) + "원";
+            result.storeData.isOpen = true; // 실제 로직에선 시간 체크 필요
+            result.storeData.imageUrl = rsStore->isNull("image_url") ? "" : rsStore->getString("image_url").c_str();
+            result.storeData.minOrderAmount = rsStore->getInt("min_order_amount");
             result.storeData.rating = rsStore->getDouble("rating");
-            result.storeData.review_count = rsStore->getInt("review_count");
+            result.storeData.reviewCount = rsStore->getInt("review_count");
+            result.storeData.deliveryTimeRange = "30~45분";
 
-            // (TODO: 배달 예상 시간은 DB 컬럼에 맞게 수정 필요)
-            result.storeData.delivery_time_range = "30~40분";
+            // 🚀 [추가 데이터 3종] DB에서 꺼내서 DTO에 꽂기
+            result.storeData.phoneNumber = rsStore->isNull("phone_number") ? "정보 없음" : rsStore->getString("phone_number").c_str();
+            result.storeData.representativeName = rsStore->isNull("representative_name") ? "정보 없음" : rsStore->getString("representative_name").c_str();
+            result.storeData.businessNumber = rsStore->isNull("business_number") ? "정보 없음" : rsStore->getString("business_number").c_str();
         }
         else
         {
-            // 매장이 없으면 메뉴나 리뷰를 캘 필요도 없이 바로 리턴!
-            return result;
+            return result; // 매장이 없으면 리턴
         }
-
-        // ---------------------------------------------------------
-        // 🍔 2단계: 해당 매장의 메뉴 리스트 싹쓸이 (MENUS 테이블)
-        // ---------------------------------------------------------
+        // 🍔 2. 메뉴 리스트 조회
         std::unique_ptr<sql::PreparedStatement> pstmtMenu(conn->prepareStatement(
-            // 🚀 스키마 완벽 반영: menu_name, base_price, image_url, menu_category
-            "SELECT menu_id, menu_name, base_price, description, image_url, menu_category, is_sold_out, is_popular "
+            "SELECT menu_id, menu_name, base_price, description, image_url, menu_category, is_sold_out, is_popular, menu_options "
             "FROM MENUS WHERE store_id = ?"));
         pstmtMenu->setInt(1, storeId);
         std::unique_ptr<sql::ResultSet> rsMenu(pstmtMenu->executeQuery());
@@ -210,23 +205,31 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
         while (rsMenu->next())
         {
             MenuDataDTO menu;
-            menu.menu_id = rsMenu->getInt("menu_id");
-            menu.store_id = storeId;
-
-            // 🚀 꺼낼 때도 정확한 컬럼명으로!
-            menu.menu_name = rsMenu->getString("menu_name").c_str();
-            menu.base_price = rsMenu->getInt("base_price");
-            menu.is_sold_out = rsMenu->getBoolean("is_sold_out");
+            menu.menuId = rsMenu->getInt("menu_id");
+            menu.storeId = storeId;
+            menu.menuName = rsMenu->getString("menu_name").c_str();
+            menu.basePrice = rsMenu->getInt("base_price");
+            menu.isSoldOut = rsMenu->getBoolean("is_sold_out");
             menu.description = rsMenu->isNull("description") ? "" : rsMenu->getString("description").c_str();
-            menu.image_url = rsMenu->isNull("image_url") ? "" : rsMenu->getString("image_url").c_str();
-            menu.menu_category = rsMenu->isNull("menu_category") ? "기본 메뉴" : rsMenu->getString("menu_category").c_str();
-            menu.is_popular = rsMenu->getBoolean("is_popular");
+            menu.imageUrl = rsMenu->isNull("image_url") ? "" : rsMenu->getString("image_url").c_str();
+            menu.menuCategory = rsMenu->isNull("menu_category") ? "기본 메뉴" : rsMenu->getString("menu_category").c_str();
+            menu.isPopular = rsMenu->getBoolean("is_popular");
+
+            // JSON 옵션 파싱
+            std::string optionsStr = rsMenu->isNull("menu_options") ? "[]" : rsMenu->getString("menu_options").c_str();
+            try
+            {
+                menu.optionGroups = nlohmann::json::parse(optionsStr);
+            }
+            catch (...)
+            {
+                menu.optionGroups = nlohmann::json::array();
+            }
 
             result.menuList.push_back(menu);
         }
-        // ---------------------------------------------------------
-        // ⭐ 3단계: 해당 매장의 리뷰 리스트 싹쓸이 (REVIEWS 테이블)
-        // ---------------------------------------------------------
+
+        // ⭐ 3. 리뷰 리스트 조회
         std::unique_ptr<sql::PreparedStatement> pstmtReview(conn->prepareStatement(
             "SELECT review_id, user_id, order_id, rating, content, image_url, owner_reply, created_at "
             "FROM REVIEWS WHERE store_id = ? ORDER BY created_at DESC"));
@@ -245,17 +248,15 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
             review.imageUrl = rsReview->isNull("image_url") ? "" : rsReview->getString("image_url").c_str();
             review.ownerReply = rsReview->isNull("owner_reply") ? "" : rsReview->getString("owner_reply").c_str();
             review.createdAt = rsReview->getString("created_at").c_str();
-
-            result.reviewList.push_back(review); // 리뷰 상자에 담기
+            result.reviewList.push_back(review);
         }
     }
     catch (sql::SQLException &e)
     {
-        std::cerr << "[StoreDAO] 매장 상세 정보 조회 DB 에러: " << e.what() << std::endl;
-        result.status = 500; // 서버 에러 발생!
+        std::cerr << "🚨 [StoreDAO] getStoreDetail Error: " << e.what() << std::endl;
+        result.status = 500;
     }
-
-    return result; // 꽉 채운 마스터 DTO 반환!
+    return result;
 }
 
 bool StoreDAO::executeUpdate(const std::string &query, const std::vector<std::string> &params)

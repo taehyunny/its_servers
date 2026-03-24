@@ -29,14 +29,14 @@ struct ReqAddressSaveDTO
     std::string detail;  // 상세 주소 (예: "101동 202호")
     std::string guide;  // 길 안내 (예: "정문에서 오른쪽으로 50m")
     std::string label;  // 주소 라벨 (예: "집", "회사", "기타")
+    
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqAddressSaveDTO,
 
                                    userId, address, detail, guide, label)
 };
 
-// [2071] 주소 저장 응답
-
+// 
 struct ResAddressSaveDTO
 {
 

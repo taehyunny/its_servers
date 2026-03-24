@@ -76,6 +76,13 @@ public:
             // 직렬화 실패 등 예외 로깅
         }
     }
+    void clearAuth()
+    {
+        std::lock_guard<std::mutex> lock(sessionMutex);
+        isAuth = false;
+        userId = "";
+        role = 0;
+    }
 
 private:
     int clientFd;

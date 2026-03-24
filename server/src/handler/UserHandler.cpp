@@ -208,3 +208,35 @@ void UserHandler::handleBizNumCheck(std::shared_ptr<ClientSession> session, cons
     }
     session->sendPacket(static_cast<uint16_t>(CmdID::RES_BUISNESS_NUM_CHECK), res);
 }
+
+void UserHandler::handleLogout(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    json res;
+    try
+    {
+        std::string userId = session->getUserId();
+
+        if (!userId.empty())
+        {
+            // 🚀 1. SessionManager의 논리적 망(userMap)에서 유저 삭제
+            // (SessionManager에 removeUser 함수를 하나 만들어주면 좋습니다)
+            SessionManager::getInstance().removeUser(userId);
+
+            // 🚀 2. 현재 소켓 세션의 신원 정보 초기화 (ClientSession에 clearAuth 추가 필요)
+            session->clearAuth();
+
+            std::cout << "[UserHandler] 유저 '" << userId << "' 논리적 로그아웃 완료. (소켓 유지)" << std::endl;
+        }
+
+        // 🚀 3. 클라이언트에게 "로그아웃 성공" 응답 전송
+        res["status"] = 200;
+        res["message"] = "안전하게 로그아웃 되었습니다.";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_LOGOUT), res);
+    }
+    catch (const std::exception &e)
+    {
+        res["status"] = 500;
+        res["message"] = "서버 내부 오류";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_LOGOUT), res);
+    }
+}

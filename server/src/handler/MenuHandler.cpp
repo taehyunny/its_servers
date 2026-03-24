@@ -2,14 +2,14 @@
 #include "ClientSession.h"
 #include "Global_protocol.h"
 #include "DbManager.h"
-#include "StoreDAO.h" // 🚀 UserDAO 대신 안전한 범용 업데이트를 위해 추가
+#include "StoreDAO.h"
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <vector>
 
 using nlohmann::json;
 
-// ① 메뉴 목록 조회
+// ── ① 메뉴 목록 조회 (RES_MENU_LIST = 2011) ──
 void MenuHandler::handleMenuListRequest(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     json req = json::parse(jsonBody);
@@ -21,7 +21,7 @@ void MenuHandler::handleMenuListRequest(std::shared_ptr<ClientSession> session, 
         auto conn = DBManager::getInstance().getConnection();
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "SELECT menu_id, menu_name, base_price, is_sold_out, "
-            "menu_category, is_popular, description, image_url "
+            "menu_category, is_popular, description, image_url, menu_options " // 🚀 menu_options 컬럼 추가
             "FROM MENUS WHERE store_id = ?"));
         pstmt->setInt(1, storeId);
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
@@ -38,6 +38,18 @@ void MenuHandler::handleMenuListRequest(std::shared_ptr<ClientSession> session, 
             menu["isPopular"] = rs->getBoolean("is_popular");
             menu["description"] = rs->isNull("description") ? "" : rs->getString("description").c_str();
             menu["imageUrl"] = rs->isNull("image_url") ? "" : rs->getString("image_url").c_str();
+
+            // 🚀 [수정 사항 1] menuOptions -> optionGroups 키 명칭 변경 및 JSON 파싱
+            std::string menuOptionsStr = rs->isNull("menu_options") ? "[]" : rs->getString("menu_options").c_str();
+            try
+            {
+                menu["optionGroups"] = json::parse(menuOptionsStr);
+            }
+            catch (...)
+            {
+                menu["optionGroups"] = json::array(); // 파싱 실패 시 빈 배열로 안전하게 처리
+            }
+
             menus.push_back(menu);
         }
 
@@ -57,7 +69,7 @@ void MenuHandler::handleMenuListRequest(std::shared_ptr<ClientSession> session, 
     }
 }
 
-// ② 메뉴 추가/수정/삭제
+// ── ② 메뉴 추가/수정/삭제 (RES_MENU_EDIT = 2013) ──
 void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     std::cout << "[MenuEdit Debug] Received JSON: " << jsonBody << std::endl;
@@ -76,8 +88,8 @@ void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const s
         {
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
                 "INSERT INTO MENUS (store_id, menu_name, base_price, "
-                "menu_category, is_popular, description, is_sold_out, menu_options) " // 🚀 menu_options 추가됨
-                "VALUES (?, ?, ?, ?, ?, ?, 0, ?)"));                                  // 🚀 ? 1개 추가됨
+                "menu_category, is_popular, description, is_sold_out, menu_options) "
+                "VALUES (?, ?, ?, ?, ?, ?, 0, ?)"));
 
             pstmt->setInt(1, storeId);
             pstmt->setString(2, menuData.value("menuName", ""));
@@ -86,9 +98,9 @@ void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const s
             pstmt->setBoolean(5, menuData.value("isPopular", false));
             pstmt->setString(6, menuData.value("description", ""));
 
-            // 🚀 프론트 요청사항: 옵션 배열 파싱 후 7번째 파라미터로 넣기
-            std::string menuOptionsStr = menuData.contains("menuOptions")
-                                             ? menuData["menuOptions"].dump()
+            // 🚀 [수정 사항 2] 저장 키 명칭 변경: menuOptions -> optionGroups
+            std::string menuOptionsStr = menuData.contains("optionGroups")
+                                             ? menuData["optionGroups"].dump()
                                              : "[]";
             pstmt->setString(7, menuOptionsStr);
 
@@ -100,7 +112,7 @@ void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const s
             int menuId = menuData.value("menuId", 0);
             std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
                 "UPDATE MENUS SET menu_name=?, base_price=?, "
-                "menu_category=?, is_popular=?, description=?, is_sold_out=?, menu_options=? " // 🚀 menu_options=? 추가됨
+                "menu_category=?, is_popular=?, description=?, is_sold_out=?, menu_options=? "
                 "WHERE menu_id=? AND store_id=?"));
 
             pstmt->setString(1, menuData.value("menuName", ""));
@@ -110,13 +122,12 @@ void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const s
             pstmt->setString(5, menuData.value("description", ""));
             pstmt->setBoolean(6, menuData.value("isSoldOut", false));
 
-            // 🚀 프론트 요청사항: 7번째 파라미터로 옵션 JSON 문자열 넣기
-            std::string menuOptionsStr = menuData.contains("menuOptions")
-                                             ? menuData["menuOptions"].dump()
+            // 🚀 [수정 사항 2] 저장 키 명칭 변경: menuOptions -> optionGroups
+            std::string menuOptionsStr = menuData.contains("optionGroups")
+                                             ? menuData["optionGroups"].dump()
                                              : "[]";
             pstmt->setString(7, menuOptionsStr);
 
-            // 🚀 기존 7, 8번이었던 파라미터가 8, 9번으로 밀려남
             pstmt->setInt(8, menuId);
             pstmt->setInt(9, storeId);
 
@@ -147,7 +158,7 @@ void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const s
     }
 }
 
-// ③ 품절 처리
+// ── ③ 품절 처리 (RES_MENU_SOLD_OUT = 2012) ──
 void MenuHandler::handleMenuSoldOut(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     json req = json::parse(jsonBody);
@@ -162,7 +173,6 @@ void MenuHandler::handleMenuSoldOut(std::shared_ptr<ClientSession> session, cons
             isSoldOut ? "1" : "0",
             std::to_string(menuId)};
 
-        // 🚀 핵심: 팀원분의 UserDAO 오타를 StoreDAO로 교체! (안전한 업데이트)
         bool ok = StoreDAO::getInstance().executeUpdate(query, params);
 
         res["status"] = ok ? 200 : 500;

@@ -3,44 +3,59 @@
 #include <mariadb/conncpp.hpp> // MariaDB 사용 시 필수
 
 // ── 1. 주소 저장 ──────────────────────────────────────
-int AddressDAO::saveAddress(const ReqAddressSaveDTO &req)
+int AddressDAO::saveAddress(const ReqAddressSaveDTO &dto)
 {
+    auto conn = DBManager::getInstance().getConnection();
     try
     {
-        auto conn = DBManager::getInstance().getConnection();
+        conn->setAutoCommit(false); // 트랜잭션 시작
 
-        // 🚀 비즈니스 로직: 무조건 새로 추가하는 주소를 기본 주소(is_default=1)로 만듭니다.
-        // 먼저 이 유저의 기존 주소들을 전부 0으로 강등시킵니다.
-        std::unique_ptr<sql::PreparedStatement> pstmtUpdate(
-            conn->prepareStatement("UPDATE USER_ADDRESSES SET is_default = 0 WHERE user_id = ?"));
-        pstmtUpdate->setString(1, req.userId);
-        pstmtUpdate->executeUpdate();
+        // 🚀 [추가] 0. 기존에 설정된 기본 주소들을 모두 해제 (0으로 초기화)
+        // 한 명의 유저당 '선택됨(1)'은 하나만 존재해야 하니까요!
+        std::unique_ptr<sql::PreparedStatement> pstmtReset(conn->prepareStatement(
+            "UPDATE USER_ADDRESSES SET is_default = 0 WHERE user_id = ?"));
+        pstmtReset->setString(1, dto.userId);
+        pstmtReset->executeUpdate();
 
-        // 그 다음 새 주소를 1(기본)로 INSERT 합니다.
-        std::unique_ptr<sql::PreparedStatement> pstmtInsert(
-            conn->prepareStatement(
-                "INSERT INTO USER_ADDRESSES (user_id, address, detail, guide, label, is_default) "
-                "VALUES (?, ?, ?, ?, ?, 1)"));
-        pstmtInsert->setString(1, req.userId);
-        pstmtInsert->setString(2, req.address);
-        pstmtInsert->setString(3, req.detail);
-        pstmtInsert->setString(4, req.guide);
-        pstmtInsert->setString(5, req.label);
-        pstmtInsert->executeUpdate();
+        // 🚀 1. 새 주소를 '기본 주소(is_default = 1)'로 저장
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "INSERT INTO USER_ADDRESSES (user_id, address, detail, guide, label, is_default) "
+            "VALUES (?, ?, ?, ?, ?, ?)"));
 
-        // 방금 넣은 주소의 ID(PK)를 가져옵니다.
+        pstmt->setString(1, dto.userId);
+        pstmt->setString(2, dto.address);
+        pstmt->setString(3, dto.detail);
+        pstmt->setString(4, dto.guide);
+        pstmt->setString(5, dto.label);
+        pstmt->setInt(6, 1); // 🚀 0에서 1로 변경! (이제 '선택됨'이 뜹니다)
+
+        pstmt->executeUpdate();
+
+        // (이하 ID 가져오기 및 CUSTOMERS 테이블 동기화 로직은 동일...)
+        int newId = 0;
         std::unique_ptr<sql::Statement> stmt(conn->createStatement());
         std::unique_ptr<sql::ResultSet> rs(stmt->executeQuery("SELECT LAST_INSERT_ID()"));
         if (rs->next())
-        {
-            return rs->getInt(1);
-        }
+            newId = rs->getInt(1);
+
+        std::string fullAddr = dto.address + " " + dto.detail;
+        std::unique_ptr<sql::PreparedStatement> pstmtUser(conn->prepareStatement(
+            "UPDATE CUSTOMERS SET address = ? WHERE user_id = ?"));
+        pstmtUser->setString(1, fullAddr);
+        pstmtUser->setString(2, dto.userId);
+        pstmtUser->executeUpdate();
+
+        conn->commit();
+        conn->setAutoCommit(true);
+        return newId;
     }
-    catch (sql::SQLException &e)
+    catch (const std::exception &e)
     {
-        std::cerr << "[AddressDAO] 주소 저장 실패: " << e.what() << std::endl;
+        conn->rollback();
+        conn->setAutoCommit(true);
+        std::cerr << "🚨 [AddressDAO] saveAddress 에러: " << e.what() << std::endl;
+        return -1;
     }
-    return 0;
 }
 
 // ── 2. 주소 목록 조회 ──────────────────────────────────

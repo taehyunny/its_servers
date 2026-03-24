@@ -1,4 +1,5 @@
 #include "StoreHandler.h"
+
 #include "ClientSession.h"
 #include "StoreDAO.h"
 #include "UserDAO.h"
@@ -54,8 +55,9 @@ void StoreHandler::handleStoreDetailReq(std::shared_ptr<ClientSession> session, 
 {
     try
     {
-        json req = json::parse(jsonBody);
-        int storeId = req.value("storeId", 0);
+        // 🚀 1. 새로 만든 Req DTO를 사용하여 안전하게 파싱
+        auto req = nlohmann::json::parse(jsonBody).get<ReqStoreDetailDTO>();
+        int storeId = req.storeId;
 
         if (storeId == 0)
         {
@@ -66,8 +68,10 @@ void StoreHandler::handleStoreDetailReq(std::shared_ptr<ClientSession> session, 
             return;
         }
 
-        auto storeDetailRes = StoreDAO::getInstance().getStoreDetail(storeId);
+        // 🚀 2. DAO에서 '종합 선물 세트(ResStoreDetailDTO)'를 가져옴
+        ResStoreDetailDTO storeDetailRes = StoreDAO::getInstance().getStoreDetail(storeId);
 
+        // 🚀 3. JSON으로 변환하여 전송 (ResStoreDetailDTO에 to_json이 필요할 수 있음)
         nlohmann::json resJson = storeDetailRes;
 
         std::cout << "[StoreHandler] 매장 상세 조회 완료 - storeId: " << storeId << std::endl;
@@ -88,7 +92,10 @@ void StoreHandler::handleStoreInfoUpdateReq(std::shared_ptr<ClientSession> sessi
 {
     try
     {
+        // 🚀 수정: DTO로 바꾸지 말고, 날것의 JSON 객체로 파싱합니다.
         json req = json::parse(jsonBody);
+
+        // 🚀 수정: JSON에서 값을 안전하게 꺼내옵니다.
         int storeId = req.value("storeId", 0);
 
         if (storeId == 0)
@@ -96,7 +103,6 @@ void StoreHandler::handleStoreInfoUpdateReq(std::shared_ptr<ClientSession> sessi
             json res;
             res["status"] = 400;
             res["message"] = "storeId가 없습니다.";
-            // 🚀 수정: int -> uint16_t
             session->sendPacket(static_cast<uint16_t>(CmdID::RES_STORE_INFO_UPDATE), res);
             return;
         }
@@ -105,6 +111,7 @@ void StoreHandler::handleStoreInfoUpdateReq(std::shared_ptr<ClientSession> sessi
         std::string storeClauses;
         std::vector<std::string> storeValues;
 
+        // 🚀 이제 req가 json 객체이므로 contains와 [] 연산자가 완벽하게 동작합니다!
         if (req.contains("storeName"))
         {
             storeClauses += "store_name=?, ";

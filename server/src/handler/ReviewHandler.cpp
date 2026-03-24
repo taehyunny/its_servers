@@ -19,6 +19,8 @@ void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, con
     try
     {
         int storeId = req.value("storeId", 0);
+        int menuId = req.value("menuId", 0); // 🚀 menuId를 가져옵니다.
+
         if (storeId == 0)
         {
             res["status"] = 400;
@@ -29,12 +31,26 @@ void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, con
 
         auto conn = DBManager::getInstance().getConnection();
 
-        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "SELECT review_id, user_id, rating, content, owner_reply, created_at "
-            "FROM REVIEWS WHERE store_id = ? AND menu_id = ? ORDER BY created_at DESC"));
+        // 🚀 1. 동적 쿼리 생성
+        std::string query = "SELECT review_id, user_id, rating, content, owner_reply, created_at "
+                            "FROM REVIEWS WHERE store_id = ? ";
+
+        if (menuId > 0)
+        {
+            query += "AND menu_id = ? "; // menuId가 있을 때만 조건 추가
+        }
+        query += "ORDER BY created_at DESC";
+
+        // 🚀 2. pstmt 생성 (이 부분이 빠져있었습니다!)
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
+
+        // 🚀 3. 파라미터 바인딩
         pstmt->setInt(1, storeId);
-        int menuId = req.value("menuId", 0);
-        pstmt->setInt(2, menuId);
+        if (menuId > 0)
+        {
+            pstmt->setInt(2, menuId); // 쿼리에 두 번째 ?가 있을 때만 세팅
+        }
+
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
         json reviews = json::array();
