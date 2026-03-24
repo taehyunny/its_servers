@@ -86,8 +86,17 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
     {CmdID::REQ_RESEARCH_DEL_ALL, [](auto s, auto b)
      { SearchHandler::handleSearchDelAllReq(s, b); }},
     {CmdID::REQ_SEARCH_STORE, [](auto s, auto b)
-     { SearchHandler::handleSearchStoreReq(s, b); }}};
-
+     { SearchHandler::handleSearchStoreReq(s, b); }},
+    // ── 7. 마이페이지 등 기타 (MyPage & Misc) ──
+    {CmdID::REQ_UPGRADE_NAME, [](auto s, auto b)
+     {
+         UserHandler::handleGradeUpdate(s, b);
+     }},
+    {CmdID::REQ_DOWNGRADE_NAME, [](auto s, auto b)
+     {
+         UserHandler::handleGradeUpdate(s, b);
+     }},
+};
 // =========================================================
 // 🚀 [2단계] Dispatch 함수 본체
 // =========================================================

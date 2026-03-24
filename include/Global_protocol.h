@@ -68,15 +68,15 @@ enum class CmdID : uint16_t
     RES_REVIEW_LIST = 2015, // 리뷰 목록 응답 (주문 메뉴 버튼 포함)
 
     // 주문 / 결제 (2020 ~ 2029)
-    REQ_ORDER_CREATE = 2020, // 장바구니 결제 및 주문 생성 요청
-    RES_ORDER_CREATE = 2021, // 주문 생성 응답
-                             // REQ_COUPON_CHECK = 2022, // 쿠폰 유효성 확인 요청
-                             // RES_COUPON_CHECK = 2023, // 쿠폰 유효성 확인 응답
+    REQ_ORDER_CREATE = 2020,    // 장바구니 결제 및 주문 생성 요청
+    RES_ORDER_CREATE = 2021,    // 주문 생성 응답
+                                // REQ_COUPON_CHECK = 2022, // 쿠폰 유효성 확인 요청
+                                // RES_COUPON_CHECK = 2023, // 쿠폰 유효성 확인 응답
     REQ_PAYMENT_PROCESS = 2024, // 클라이언트 -> 서버: 결제 모듈(PG) 승인 후 결과 전달
     RES_PAYMENT_PROCESS = 2025, // 서버 -> 클라이언트: 결제 완료 및 영수증 ID 반환
     REQ_CHECKOUT_INFO = 2026,   // 클라이언트 -> 서버: 결제 직전 최종 주문 정보 요청 (최종 금액, 예상 배달 시간 등)
     RES_CHECKOUT_INFO = 2027,   // 서버 -> 클라이언트: 결제 직전 최종 주문 정보 응답 (최종 금액, 예상 배달 시간 등)
-    // 리뷰 작성 (2030 ~ 2035)
+                              // 리뷰 작성 (2030 ~ 2035)
     REQ_REVIEW_WRITE = 2030, // 사진 첨부 리뷰 작성 요청 (음식별점, 배달별점, 좋아요/싫어요)
     RES_REVIEW_WRITE = 2031, // 리뷰 작성 응답
 
@@ -123,10 +123,13 @@ enum class CmdID : uint16_t
     RES_CHAT_CONNECT = 2091, // 채팅방 입장 응답
     REQ_CHAT_SEND = 2092,    // 메시지 전송 요청 (WebSocket 방식 검토 필요)
     RES_CHAT_SEND = 2093,    // 메시지 전송 응답
-
-    // 마이페이지 (2100 ~ 2109)
+    REQ_UPGRADE_NAME = 2094,   // 등급 변경 요청
+    RES_UPGRADE_NAME = 2095,   // 등급 변경 응답
+    REQ_DOWNGRADE_NAME = 2096, // 등급 하락 요청
+    RES_DOWNGRADE_NAME = 2097, // 등급 하락 응답
+        // 마이페이지 (2100 ~ 2109)
     REQ_MY_INFO = 2100, // 마이페이지 통합 정보 요청 (리뷰수, 주문수, 즐겨찾기수, 좋아요수)
-    RES_MY_INFO = 2101, // 마이페이지 통합 정보 응답
+    RES_MY_INFO = 2101,     // 마이페이지 통합 정보 응답
 
     REQ_STORE_INFO_UPDATE = 2102,   // 매장 정보 업데이트 요청 (영업시간, 휴무일 등)
     RES_STORE_INFO_UPDATE = 2103,   // 매장 정보 업데이트 응답

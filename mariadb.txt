@@ -43,7 +43,7 @@ CREATE TABLE CUSTOMERS (
     address VARCHAR(255) DEFAULT '주소 미상',
     point INT(11) DEFAULT 0,
     customer_grade VARCHAR(20) DEFAULT '일반'
-        card_number VARCHAR(50) DEFAULT NULL;
+    card_number VARCHAR(50) DEFAULT NULL;
     account_number VARCHAR(50) DEFAULT NULL;
 );
 
@@ -206,4 +206,14 @@ CREATE TABLE PAYMENTS (
     pay_status VARCHAR(20) DEFAULT 'COMPLETED',   -- 결제 상태 (COMPLETED, REFUNDED)
     pg_receipt_url VARCHAR(255) DEFAULT NULL,     -- 외부 영수증 링크
     approved_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+);
+
+-- 19. CREATE TABLE USER_MEMBERSHIPS (
+    membership_id INT AUTO_INCREMENT PRIMARY KEY, -- 결제/구독 고유 번호
+    user_id VARCHAR(50) NOT NULL,                 -- 누구의 구독인가?
+    grade_name VARCHAR(20) NOT NULL,              -- 등급 이름 
+    start_date DATETIME NOT NULL,                 -- 시작일
+    end_date DATETIME NOT NULL,                   -- 만료 예정일 (한 달 뒤)
+    is_active BOOLEAN DEFAULT TRUE,               -- 현재 활성화 상태인지? (1: 유지, 0: 만료/해지)
+    FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id)
 );

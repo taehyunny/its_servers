@@ -14,4 +14,5 @@ public:
     static void handlePhoneCheck(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
     static void handleBizNumCheck(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
     static void handleLogout(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
+    static void handleGradeUpdate(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
 };

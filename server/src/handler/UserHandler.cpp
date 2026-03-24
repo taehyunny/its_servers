@@ -4,6 +4,7 @@
 #include "SessionManager.h"
 #include "UserDAO.h"
 #include "AuthDAO.h"
+#include "MembershipDAO.h"
 #include <iostream>
 
 // 🚀 [수정] ClientSession* -> std::shared_ptr<ClientSession> 으로 변경
@@ -238,5 +239,30 @@ void UserHandler::handleLogout(std::shared_ptr<ClientSession> session, const std
         res["status"] = 500;
         res["message"] = "서버 내부 오류";
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_LOGOUT), res);
+    }
+}
+
+void UserHandler::handleGradeUpdate(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    try
+    {
+        json req = json::parse(jsonBody);
+        std::string userId = req.value("userId", "");
+        std::string targetGrade = req.value("targetGrade", "일반"); // 바꿀 등급 이름
+
+        // DAO 호출
+        bool success = MembershipDAO::getInstance().changeUserGrade(userId, targetGrade);
+
+        json res;
+        res["status"] = success ? 200 : 500;
+        res["message"] = success ? "등급 변경 완료" : "등급 변경 실패";
+        res["currentGrade"] = targetGrade;
+
+        // 업그레이드면 2095, 다운그레이드면 2097로 응답 (요청에 따라 유연하게 처리 가능)
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_UPGRADE_NAME), res);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Handler Error: " << e.what() << std::endl;
     }
 }
