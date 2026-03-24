@@ -289,6 +289,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/OrderDTO.h \
  /home/lms/Documents/its_server/server/../dto/ResearchDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDetailDTO.h \
+ /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
  /home/lms/Documents/its_server/server/src/handler/UserHandler.h \
  /home/lms/Documents/its_server/server/src/handler/OrderHandler.h \
  /home/lms/Documents/its_server/server/src/handler/SystemHandler.h \
@@ -331,4 +332,6 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: \
  /usr/local/include/mariadb/conncpp/SQLString.hpp \
  /usr/local/include/mariadb/conncpp/Exception.hpp \
  /usr/local/include/mariadb/conncpp/jdbccompat.hpp \
+ /home/lms/Documents/its_server/server/src/handler/AddressHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/ReviewHandler.h \
  /usr/include/c++/13/iostream

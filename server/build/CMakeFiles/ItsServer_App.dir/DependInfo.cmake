@@ -9,6 +9,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/main.cpp" "CMakeFiles/ItsServer_App.dir/main.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/main.cpp.o.d"
+  "/home/lms/Documents/its_server/server/src/database/AddressDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/AddressDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/AddressDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/AuthDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/CategoryDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/ConnectionPool.cpp" "CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o.d"
@@ -19,11 +20,13 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/src/database/SearchDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/SearchDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/SearchDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/StoreDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/UserDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o.d"
+  "/home/lms/Documents/its_server/server/src/handler/AddressHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/AddressHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/AddressHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/CategoryHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/ChatHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/Dispatcher.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/MenuHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/OrderHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o.d"
+  "/home/lms/Documents/its_server/server/src/handler/ReviewHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/SearchHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/StoreHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/SystemHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o.d"

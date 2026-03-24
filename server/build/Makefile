@@ -153,6 +153,30 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/main.cpp.s
 .PHONY : main.cpp.s
 
+src/database/AddressDAO.o: src/database/AddressDAO.cpp.o
+.PHONY : src/database/AddressDAO.o
+
+# target to build an object file
+src/database/AddressDAO.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/AddressDAO.cpp.o
+.PHONY : src/database/AddressDAO.cpp.o
+
+src/database/AddressDAO.i: src/database/AddressDAO.cpp.i
+.PHONY : src/database/AddressDAO.i
+
+# target to preprocess a source file
+src/database/AddressDAO.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/AddressDAO.cpp.i
+.PHONY : src/database/AddressDAO.cpp.i
+
+src/database/AddressDAO.s: src/database/AddressDAO.cpp.s
+.PHONY : src/database/AddressDAO.s
+
+# target to generate assembly for a file
+src/database/AddressDAO.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/AddressDAO.cpp.s
+.PHONY : src/database/AddressDAO.cpp.s
+
 src/database/AuthDAO.o: src/database/AuthDAO.cpp.o
 .PHONY : src/database/AuthDAO.o
 
@@ -393,6 +417,30 @@ src/database/UserDAO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.s
 .PHONY : src/database/UserDAO.cpp.s
 
+src/handler/AddressHandler.o: src/handler/AddressHandler.cpp.o
+.PHONY : src/handler/AddressHandler.o
+
+# target to build an object file
+src/handler/AddressHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/AddressHandler.cpp.o
+.PHONY : src/handler/AddressHandler.cpp.o
+
+src/handler/AddressHandler.i: src/handler/AddressHandler.cpp.i
+.PHONY : src/handler/AddressHandler.i
+
+# target to preprocess a source file
+src/handler/AddressHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/AddressHandler.cpp.i
+.PHONY : src/handler/AddressHandler.cpp.i
+
+src/handler/AddressHandler.s: src/handler/AddressHandler.cpp.s
+.PHONY : src/handler/AddressHandler.s
+
+# target to generate assembly for a file
+src/handler/AddressHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/AddressHandler.cpp.s
+.PHONY : src/handler/AddressHandler.cpp.s
+
 src/handler/CategoryHandler.o: src/handler/CategoryHandler.cpp.o
 .PHONY : src/handler/CategoryHandler.o
 
@@ -512,6 +560,30 @@ src/handler/OrderHandler.s: src/handler/OrderHandler.cpp.s
 src/handler/OrderHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.s
 .PHONY : src/handler/OrderHandler.cpp.s
+
+src/handler/ReviewHandler.o: src/handler/ReviewHandler.cpp.o
+.PHONY : src/handler/ReviewHandler.o
+
+# target to build an object file
+src/handler/ReviewHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.o
+.PHONY : src/handler/ReviewHandler.cpp.o
+
+src/handler/ReviewHandler.i: src/handler/ReviewHandler.cpp.i
+.PHONY : src/handler/ReviewHandler.i
+
+# target to preprocess a source file
+src/handler/ReviewHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.i
+.PHONY : src/handler/ReviewHandler.cpp.i
+
+src/handler/ReviewHandler.s: src/handler/ReviewHandler.cpp.s
+.PHONY : src/handler/ReviewHandler.s
+
+# target to generate assembly for a file
+src/handler/ReviewHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.s
+.PHONY : src/handler/ReviewHandler.cpp.s
 
 src/handler/SearchHandler.o: src/handler/SearchHandler.cpp.o
 .PHONY : src/handler/SearchHandler.o
@@ -837,6 +909,9 @@ help:
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
+	@echo "... src/database/AddressDAO.o"
+	@echo "... src/database/AddressDAO.i"
+	@echo "... src/database/AddressDAO.s"
 	@echo "... src/database/AuthDAO.o"
 	@echo "... src/database/AuthDAO.i"
 	@echo "... src/database/AuthDAO.s"
@@ -867,6 +942,9 @@ help:
 	@echo "... src/database/UserDAO.o"
 	@echo "... src/database/UserDAO.i"
 	@echo "... src/database/UserDAO.s"
+	@echo "... src/handler/AddressHandler.o"
+	@echo "... src/handler/AddressHandler.i"
+	@echo "... src/handler/AddressHandler.s"
 	@echo "... src/handler/CategoryHandler.o"
 	@echo "... src/handler/CategoryHandler.i"
 	@echo "... src/handler/CategoryHandler.s"
@@ -882,6 +960,9 @@ help:
 	@echo "... src/handler/OrderHandler.o"
 	@echo "... src/handler/OrderHandler.i"
 	@echo "... src/handler/OrderHandler.s"
+	@echo "... src/handler/ReviewHandler.o"
+	@echo "... src/handler/ReviewHandler.i"
+	@echo "... src/handler/ReviewHandler.s"
 	@echo "... src/handler/SearchHandler.o"
 	@echo "... src/handler/SearchHandler.i"
 	@echo "... src/handler/SearchHandler.s"
