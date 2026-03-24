@@ -9,4 +9,5 @@ public:
     static void handleMenuListRequest(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
     static void handleMenuEdit(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
     static void handleMenuSoldOut(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
+    static void handleMenuOption(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
 };

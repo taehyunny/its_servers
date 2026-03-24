@@ -122,12 +122,18 @@ struct ReviewDTO
     std::string orderId;
     std::string userId;
     int storeId;
+    
+    // 🚀 [구조 변경 핵심] 메뉴 리뷰용 신규 데이터 2종
+    int menuId;            // DB 조회 및 저장용 (어떤 메뉴인가?)
+    std::string menuName;  // 프론트엔드 표시용 (예: "황궁짜장면")
+
     int rating;
     std::string content;
     std::string imageUrl;
     std::string ownerReply;
     std::string createdAt;
 
+    // 🚀 서버 -> 클라이언트 (응답 시 JSON 조립)
     friend void to_json(nlohmann::json &j, const ReviewDTO &dto)
     {
         j = nlohmann::json{
@@ -135,6 +141,8 @@ struct ReviewDTO
             {"orderId", dto.orderId},
             {"userId", dto.userId},
             {"storeId", dto.storeId},
+            {"menuId", dto.menuId},         // 👈 추가
+            {"menuName", dto.menuName},     // 👈 추가
             {"rating", dto.rating},
             {"content", dto.content},
             {"imageUrl", dto.imageUrl},
@@ -142,12 +150,18 @@ struct ReviewDTO
             {"createdAt", dto.createdAt}};
     }
 
+    // 🚀 클라이언트 -> 서버 (요청 시 JSON 파싱 - 뱀처럼 유연한 방패!)
     friend void from_json(const nlohmann::json &j, ReviewDTO &dto)
     {
         dto.reviewId = j.value("reviewId", j.value("review_id", 0));
         dto.orderId = j.value("orderId", j.value("order_id", ""));
         dto.userId = j.value("userId", j.value("user_id", ""));
         dto.storeId = j.value("storeId", j.value("store_id", 0));
+        
+        // 👈 카멜케이스(menuId)와 스네이크케이스(menu_id) 모두 대응!
+        dto.menuId = j.value("menuId", j.value("menu_id", 0));
+        dto.menuName = j.value("menuName", j.value("menu_name", ""));
+        
         dto.rating = j.value("rating", 0);
         dto.content = j.value("content", "");
         dto.imageUrl = j.value("imageUrl", j.value("image_url", ""));

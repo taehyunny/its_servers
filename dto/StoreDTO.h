@@ -8,6 +8,7 @@ using json = nlohmann::json;
 // 0. CategoryItem 정의 (누락되었던 부분 추가)
 
 // 1. 순서 교정: 하위 항목부터 정의
+// 🚀 [2012] 특정 메뉴의 추가 옵션 요청
 struct OptionItem
 {
     int optionId;
@@ -17,8 +18,6 @@ struct OptionItem
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(OptionItem, optionId, optionName, additionalPrice, displayOrder)
 };
-
-// 2. 옵션 카테고리 (큰 틀)
 struct OptionGroup
 {
     int groupId;
@@ -51,6 +50,26 @@ struct OptionGroup
         j.at("options").get_to(dto.options);
     }
 };
+
+
+struct ReqMenuOptionDTO
+{
+    int menuId; // 사용자가 클릭한 메뉴 번호
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqMenuOptionDTO, menuId)
+};
+
+// 🚀 [2013] 메뉴 옵션 응답 (태현님의 OptionGroup 활용!)
+struct ResMenuOptionDTO
+{
+    int status;
+    int menuId;
+    std::vector<OptionGroup> optionGroups; // 👈 통짜 JSON이 아니라 명확한 객체 배열로 담습니다!
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResMenuOptionDTO, status, menuId, optionGroups)
+};
+
+// 2. 옵션 카테고리 (큰 틀)
 
 // 3. 메뉴 DTO
 struct MenuDTO

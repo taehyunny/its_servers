@@ -134,9 +134,10 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
             res["userPoint"] = 0;
         }
 
-        // ── Step 2. 매장 정보 조회 (STORES 테이블) ──
+        // ── Step 2. 매장 정보 조회 (STORES 테이블 - 🚀 포장 주소 추가) ──
+        // 🚀 기존 쿼리에 store_address 컬럼을 추가로 SELECT 합니다!
         std::unique_ptr<sql::PreparedStatement> pstmtStore(conn->prepareStatement(
-            "SELECT min_order_amount, delivery_fee "
+            "SELECT min_order_amount, delivery_fee, store_address "
             "FROM STORES WHERE store_id = ?"));
         pstmtStore->setInt(1, storeId);
         std::unique_ptr<sql::ResultSet> rsStore(pstmtStore->executeQuery());
@@ -145,11 +146,17 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
         {
             res["minOrderAmount"] = rsStore->getInt("min_order_amount");
             res["deliveryFee"] = rsStore->getInt("delivery_fee");
+            
+            // 🚀 프론트엔드 요청 사항 2종 세트 추가!
+            res["storeAddress"] = rsStore->isNull("store_address") ? "" : rsStore->getString("store_address").c_str();
+            res["pickupTime"] = "15~25분 후 방문 포장"; // 우선 기획서에 있는 하드코딩 값으로 세팅합니다.
         }
         else
         {
             res["minOrderAmount"] = 0;
             res["deliveryFee"] = 0;
+            res["storeAddress"] = "";
+            res["pickupTime"] = "";
         }
 
         // ── Step 3. 응답 전송 ──

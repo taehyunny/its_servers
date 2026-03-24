@@ -231,9 +231,16 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
 
         // ⭐ 3. 리뷰 리스트 조회
         std::unique_ptr<sql::PreparedStatement> pstmtReview(conn->prepareStatement(
-            "SELECT review_id, user_id, order_id, rating, content, image_url, owner_reply, created_at "
-            "FROM REVIEWS WHERE store_id = ? ORDER BY created_at DESC"));
-        pstmtReview->setInt(1, storeId);
+            // 🚀 핵심: REVIEWS 테이블(R)과 MENUS 테이블(M)을 조인해서 menu_name까지 가져옵니다!
+            "SELECT R.review_id, R.user_id, R.order_id, R.rating, R.content, R.image_url, R.owner_reply, R.created_at, "
+            "R.menu_id, M.menu_name "
+            "FROM REVIEWS R "
+            "LEFT JOIN MENUS M ON R.menu_id = M.menu_id " // 메뉴 정보를 연결하는 연결 고리
+            "WHERE R.store_id = ? "
+            "ORDER BY R.created_at DESC"
+        ));
+        
+        pstmtReview->setInt(1, storeId); // 매장 ID 바인딩 (이전에 수정한 하드코딩 방어!)
         std::unique_ptr<sql::ResultSet> rsReview(pstmtReview->executeQuery());
 
         while (rsReview->next())
@@ -248,13 +255,18 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
             review.imageUrl = rsReview->isNull("image_url") ? "" : rsReview->getString("image_url").c_str();
             review.ownerReply = rsReview->isNull("owner_reply") ? "" : rsReview->getString("owner_reply").c_str();
             review.createdAt = rsReview->getString("created_at").c_str();
+
+            // 🚀 [추가된 로직] DB에서 방금 가져온 메뉴 ID와 메뉴 이름을 DTO에 꽂아줍니다!
+            review.menuId = rsReview->getInt("menu_id");
+            // 만약 메뉴가 삭제되었거나 조인이 실패할 경우를 대비한 널(Null) 방어 코드
+            review.menuName = rsReview->isNull("menu_name") ? "알 수 없는 메뉴" : rsReview->getString("menu_name").c_str();
+
             result.reviewList.push_back(review);
         }
     }
     catch (sql::SQLException &e)
     {
-        std::cerr << "🚨 [StoreDAO] getStoreDetail Error: " << e.what() << std::endl;
-        result.status = 500;
+        std::cerr << "[StoreDAO] 매장 상세 조회 실패: " << e.what() << std::endl;
     }
     return result;
 }

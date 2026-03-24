@@ -98,20 +98,30 @@ struct ReqCheckoutInfoDTO
 };
 
 // 🚀 [2027] 결제 화면 정보 응답 DTO
+// 🚀 [2027] 결제 화면 정보 응답 DTO (완전판)
 struct ResCheckoutInfoDTO
 {
     int status;
 
     // --- 유저 정보 (CUSTOMERS 테이블) ---
     std::string customerGrade; // "일반" or "와우"
-    std::string cardNumber;    // "1234-5678-****-****" (없으면 빈 문자열)
-    std::string accountNumber; // "국민 123-456-789" (없으면 빈 문자열)
-    int userPoint;             // (보너스) 보유 포인트도 보여주면 좋겠죠?
+    std::string cardNumber;    // "1234-5678-****-****"
+    std::string accountNumber; // "국민 123-456-789"
+    int userPoint;             // 보유 포인트
+    std::string userAddress;   // 🚀 고객 주소 (배달용)
 
     // --- 매장 정보 (STORES 테이블) ---
     int minOrderAmount; // 최소주문금액
-    int deliveryFee;    // 배달비 (와우회원이면 프론트에서 0원으로 처리 가능!)
+    int deliveryFee;    // 배달비 (포장일 땐 0원, 와우일 땐 0원 처리)
+    
+    // 🚀 [클라이언트 요청 사항] 포장용 필드 추가
+    std::string storeAddress;  // 매장의 실제 주소
+    std::string pickupTime;    // 예: "15~25분 후 방문 포장"
+    
+    // (보너스) 총 주문 금액도 내려주면 프론트가 편해집니다
+    int totalPrice; 
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResCheckoutInfoDTO,
-                                   status, customerGrade, cardNumber, accountNumber, userPoint, minOrderAmount, deliveryFee)
+                                   status, customerGrade, cardNumber, accountNumber, userPoint, userAddress,
+                                   minOrderAmount, deliveryFee, storeAddress, pickupTime, totalPrice)
 };

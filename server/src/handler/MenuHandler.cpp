@@ -3,6 +3,8 @@
 #include "Global_protocol.h"
 #include "DbManager.h"
 #include "StoreDAO.h"
+#include "MenuDAO.h" // 메뉴 관련 DB 작업을 위한 DAO
+#include "AllDTOs.h" // 요청/응답 DTO 정의
 #include <nlohmann/json.hpp>
 #include <iostream>
 #include <vector>
@@ -185,5 +187,33 @@ void MenuHandler::handleMenuSoldOut(std::shared_ptr<ClientSession> session, cons
         res["status"] = 500;
         res["message"] = "서버 내부 오류";
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_SOLD_OUT), res);
+    }
+}
+void MenuHandler::handleMenuOption(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    try
+    {
+        // 1. 클라이언트 요청 파싱 (menuId 추출)
+        auto req = nlohmann::json::parse(jsonBody).get<ReqMenuOptionDTO>();
+        
+        // 2. DAO를 통해 파싱된 옵션 객체 배열 가져오기
+        std::vector<OptionGroup> groups = MenuDAO::getInstance().getMenuOptionsParsed(req.menuId);
+
+        // 3. 응답 DTO 세팅
+        ResMenuOptionDTO res;
+        res.status = 200;
+        res.menuId = req.menuId;
+        res.optionGroups = groups;
+
+        // 4. 전송! (태현님이 짜둔 to_json이 알아서 JSON으로 예쁘게 바꿔줍니다)
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_OPTION), nlohmann::json(res));
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [MenuHandler] handleMenuOption 에러: " << e.what() << std::endl;
+        ResMenuOptionDTO errRes;
+        errRes.status = 500;
+        errRes.menuId = 0;
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_OPTION), nlohmann::json(errRes));
     }
 }

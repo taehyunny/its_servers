@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
     std::cout << "===========================================" << std::endl;
 
     try
-    {
+    {   // 1. DB 커넥션 풀 초기화
         DBManager::getInstance().init("jdbc:mariadb://localhost:3306/its_bedalyo", "bedalyo", "1234", threadCount);
 
         // 2. [오늘의 성과] 데이터 로드 테스트 (서버 부팅 시 콘솔 출력용)

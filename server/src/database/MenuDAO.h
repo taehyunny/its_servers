@@ -26,7 +26,7 @@ public:
     // 특정 상점(storeId)의 메뉴 목록만 DB에서 가져오는 함수
     std::vector<MenuDTO> getMenusByStoreId(int storeId);          // 메뉴 목록 가져오기
     std::vector<OptionGroup> getOptionGroupsByMenuId(int menuId); // 메뉴별 옵션 그룹 가져오기
-
+    std::vector<OptionGroup> getMenuOptionsParsed(int menuId);    // 메뉴 옵션 JSON 파싱 후 반환
 private:
     MenuDAO() = default;
     ~MenuDAO() = default;
