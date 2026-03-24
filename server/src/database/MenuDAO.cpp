@@ -1,31 +1,29 @@
 #include "MenuDAO.h"
 #include "DbManager.h"
 #include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm> // 🚀 std::sort를 위해 필수
 #include <mariadb/conncpp.hpp>
 
+// ── 1. 특정 상점의 메뉴 목록 조회 ──────────────────────────────────
 std::vector<MenuDTO> MenuDAO::getMenusByStoreId(int storeId)
 {
     std::vector<MenuDTO> menuList;
 
     try
     {
-        // 1. 커넥션 풀에서 DB 연결 빌려오기
         auto conn = DBManager::getInstance().getConnection();
 
-        // 2. PreparedStatement 준비 (SQL 인젝션 해킹 방지 및 성능 향상)
-        // ? 자리에 나중에 storeId가 쏙 들어갑니다.
+        // 🚀 SQL 쿼리에서 더 이상 menu_options(JSON)를 읽지 않고 개별 테이블을 활용합니다.
         std::unique_ptr<sql::PreparedStatement> pstmt(
-            conn->prepareStatement("SELECT menu_id, menu_name, base_price, menu_options, "
-                                   "is_sold_out, description, image_url, menu_category, is_popular "
+            conn->prepareStatement("SELECT menu_id, menu_name, base_price, is_sold_out, "
+                                   "description, image_url, menu_category, is_popular "
                                    "FROM MENUS WHERE store_id = ?"));
 
-        // ? 에 storeId 값을 세팅 (인덱스는 1부터 시작)
         pstmt->setInt(1, storeId);
-
-        // 3. 쿼리 실행
         std::unique_ptr<sql::ResultSet> res(pstmt->executeQuery());
 
-        // 4. 결과를 MenuDTO 벡터에 차곡차곡 담기
         while (res->next())
         {
             MenuDTO menu;
@@ -33,41 +31,81 @@ std::vector<MenuDTO> MenuDAO::getMenusByStoreId(int storeId)
             menu.menuName = res->getString("menu_name").c_str();
             menu.basePrice = res->getInt("base_price");
             menu.isSoldOut = res->getInt("is_sold_out");
-
-            // 🚀 누락되었던 인기 메뉴 여부 추가! (boolean 매핑)
             menu.isPopular = res->getBoolean("is_popular");
-
-            // 🚀 Nullable(YES) 컬럼들에 대한 완벽한 안전장치 (중복 제거 완료!)
             menu.description = res->isNull("description") ? "" : res->getString("description").c_str();
             menu.imageUrl = res->isNull("image_url") ? "" : res->getString("image_url").c_str();
             menu.menuCategory = res->isNull("menu_category") ? "기본 메뉴" : res->getString("menu_category").c_str();
 
-            // 옵션 처리도 Null 체크 먼저!
-            std::string optionsStr = res->isNull("menu_options") ? "" : res->getString("menu_options").c_str();
-            if (!optionsStr.empty())
-            {
-                try
-                {
-                    menu.menuOptions = nlohmann::json::parse(optionsStr);
-                }
-                catch (...)
-                {
-                    menu.menuOptions = nlohmann::json::object();
-                }
-            }
-            else
-            {
-                menu.menuOptions = nlohmann::json::object();
-            }
+            // 🚀 핵심: 기존 JSON 파싱 대신, 아래에 만든 계층형 로드 함수를 호출합니다!
+            menu.optionGroups = getOptionGroupsByMenuId(menu.menuId);
 
             menuList.push_back(menu);
         }
-        std::cout << "[MenuDAO] 상점 ID " << storeId << "의 메뉴 " << menuList.size() << "개를 로드했습니다." << std::endl;
     }
     catch (sql::SQLException &e)
     {
-        std::cerr << "[FATAL] MenuDAO::getMenusByStoreId DB 에러: " << e.what() << std::endl;
+        std::cerr << "[MenuDAO] getMenusByStoreId 에러: " << e.what() << std::endl;
     }
 
     return menuList;
+}
+
+// ── 2. 메뉴별 옵션 그룹 및 세부 항목 로드 (계층형 + 정렬) ────────────
+std::vector<OptionGroup> MenuDAO::getOptionGroupsByMenuId(int menuId)
+{
+    std::vector<OptionGroup> groupList;
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+
+        // [Step 1] 옵션 그룹(큰 틀) 조회
+        std::unique_ptr<sql::PreparedStatement> pstmtGroup(conn->prepareStatement(
+            "SELECT group_id, group_name, is_required, max_count, display_order "
+            "FROM MENU_OPTION_GROUPS WHERE menu_id = ?"));
+        pstmtGroup->setInt(1, menuId);
+        std::unique_ptr<sql::ResultSet> rsGroup(pstmtGroup->executeQuery());
+
+        while (rsGroup->next())
+        {
+            OptionGroup group;
+            group.groupId = rsGroup->getInt("group_id");
+            group.groupName = rsGroup->getString("group_name").c_str();
+            group.isRequired = rsGroup->getBoolean("is_required"); // 🚀 필수 선택 여부
+            group.maxCount = rsGroup->getInt("max_count");
+            group.displayOrder = rsGroup->getInt("display_order");
+
+            // [Step 2] 각 그룹에 속한 세부 옵션 항목(작은 틀) 조회
+            std::unique_ptr<sql::PreparedStatement> pstmtItem(conn->prepareStatement(
+                "SELECT option_id, option_name, additional_price, display_order "
+                "FROM MENU_OPTIONS WHERE group_id = ?"));
+            pstmtItem->setInt(1, group.groupId);
+            std::unique_ptr<sql::ResultSet> rsItem(pstmtItem->executeQuery());
+
+            while (rsItem->next())
+            {
+                OptionItem item;
+                item.optionId = rsItem->getInt("option_id");
+                item.optionName = rsItem->getString("option_name").c_str();
+                item.additionalPrice = rsItem->getInt("additional_price");
+                item.displayOrder = rsItem->getInt("display_order");
+
+                group.options.push_back(item); // 🚀 하위 벡터에 추가
+            }
+
+            // [Step 3] 🚀 정렬 알고리즘 적용: 그룹 내 옵션들을 display_order 순으로 정렬
+            std::sort(group.options.begin(), group.options.end(), [](const OptionItem &a, const OptionItem &b)
+                      { return a.displayOrder < b.displayOrder; });
+
+            groupList.push_back(group);
+        }
+
+        // [Step 4] 🚀 정렬 알고리즘 적용: 옵션 그룹들 자체를 display_order 순으로 정렬
+        std::sort(groupList.begin(), groupList.end(), [](const OptionGroup &a, const OptionGroup &b)
+                  { return a.displayOrder < b.displayOrder; });
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[MenuDAO] getOptionGroupsByMenuId 에러: " << e.what() << std::endl;
+    }
+    return groupList;
 }

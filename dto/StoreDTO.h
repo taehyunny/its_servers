@@ -4,22 +4,44 @@
 #include "json.hpp"
 
 // 1. 순서 교정: MenuDTO가 먼저 와야 다른 곳에서 쓸 수 있습니다.
+struct OptionItem
+{
+    int optionId;
+    std::string optionName;
+    int additionalPrice;
+    int displayOrder;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OptionItem, optionId, optionName, additionalPrice, displayOrder)
+};
+// 2. 옵션 카테고리 (큰 틀)
+struct OptionGroup
+{
+    int groupId;
+    std::string groupName;
+    bool isRequired;
+    int maxCount;
+    int displayOrder;
+    std::vector<OptionItem> options; // 🚀 벡터 구조 완벽합니다!
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OptionGroup, groupId, groupName, isRequired, maxCount, displayOrder, options)
+};
+
 struct MenuDTO
 {
     int menuId;
     std::string menuName;
     int basePrice;
-
-    // 🚀 int 대신 bool로 통일! (클라이언트에서도 true/false로 받는 게 편합니다)
     bool isSoldOut;
-
-    nlohmann::json menuOptions;
     std::string description;
     std::string imageUrl;
     std::string menuCategory;
     bool isPopular;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuDTO, menuId, menuName, basePrice, isSoldOut, menuOptions, description, imageUrl, menuCategory, isPopular)
+    // 🚨 기존에 있던 json menuOptions; 는 과감히 삭제하세요!
+    std::vector<OptionGroup> optionGroups; // 🚀 우리가 만든 벡터 바구니 장착!
+
+    // 매크로에서도 menuOptions를 빼고 optionGroups를 넣습니다.
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuDTO, menuId, menuName, basePrice, isSoldOut, description, imageUrl, menuCategory, isPopular, optionGroups)
 };
 
 struct MenuListReqDTO // 클라이언트 -> 서버: "이 가게 메뉴 다 주세요!" 요청 DTO
@@ -148,3 +170,5 @@ struct BizNumCheckResDTO
     std::string message;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(BizNumCheckResDTO, status, isAvailable, message)
 };
+
+// 1. 개별 옵션 항목 (작은 틀)

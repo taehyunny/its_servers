@@ -7,6 +7,7 @@
 #include "CategoryHandler.h"
 #include "SearchHandler.h"
 #include "AddressHandler.h"
+#include "ReviewHandler.h"
 #include <iostream>
 
 // 핸들러 맵 초기화
@@ -49,13 +50,28 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { StoreHandler::handleStoreInfoUpdateReq(s, b); }},
     {CmdID::REQ_STORE_STATUS_SET, [](auto s, auto b)
      { StoreHandler::handleStoreStatusSet(s, b); }},
-    {CmdID::REQ_STORE_DETAIL, [](auto s, auto b) { StoreHandler::handleStoreDetailReq(s, b); }},
-    {CmdID::REQ_STORE_STATUS_SET, [](auto s, auto b) { StoreHandler::handleStoreStatusSet(s, b); }},
-    {CmdID::REQ_ADDRESS_SAVE, [](auto s, auto b) { AddressHandler::handleAddressSave(s, b); }},
-    {CmdID::REQ_ADDRESS_LIST, [](auto s, auto b) { AddressHandler::handleAddressList(s, b); }},
-    {CmdID::REQ_ADDRESS_DELETE, [](auto s, auto b) { AddressHandler::handleAddressDelete(s, b); }},
-    {CmdID::REQ_ADDRESS_UPDATE, [](auto s, auto b) { AddressHandler::handleAddressUpdate(s, b); }},
-    {CmdID::REQ_ADDRESS_DEFAULT, [](auto s, auto b) { AddressHandler::handleAddressDefault(s, b); }},
+    {CmdID::REQ_STORE_DETAIL, [](auto s, auto b)
+     { StoreHandler::handleStoreDetailReq(s, b); }},
+    {CmdID::REQ_STORE_STATUS_SET, [](auto s, auto b)
+     { StoreHandler::handleStoreStatusSet(s, b); }},
+    {CmdID::REQ_ADDRESS_SAVE, [](auto s, auto b)
+     { AddressHandler::handleAddressSave(s, b); }},
+    {CmdID::REQ_ADDRESS_LIST, [](auto s, auto b)
+     { AddressHandler::handleAddressList(s, b); }},
+    {CmdID::REQ_ADDRESS_DELETE, [](auto s, auto b)
+     { AddressHandler::handleAddressDelete(s, b); }},
+    {CmdID::REQ_ADDRESS_UPDATE, [](auto s, auto b)
+     { AddressHandler::handleAddressUpdate(s, b); }},
+    {CmdID::REQ_ADDRESS_DEFAULT, [](auto s, auto b)
+     { AddressHandler::handleAddressDefault(s, b); }},
+    {CmdID::REQ_MENU_EDIT, [](auto s, auto b)
+     { MenuHandler::handleMenuEdit(s, b); }},
+    {CmdID::REQ_MENU_SOLD_OUT, [](auto s, auto b)
+     { MenuHandler::handleMenuSoldOut(s, b); }},
+    {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
+     { ReviewHandler::handleReviewList(s, b); }},
+    {CmdID::REQ_REVIEW_REPLY, [](auto s, auto b)
+     { ReviewHandler::handleReviewReply(s, b); }},
 };
 
 // 🚀 [2단계] Dispatch 함수 본체 (반복되던 스레드 풀과 try-catch를 하나로 통합!)

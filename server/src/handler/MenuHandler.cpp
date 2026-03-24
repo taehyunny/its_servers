@@ -1,51 +1,160 @@
 #include "MenuHandler.h"
-#include "MenuDAO.h"
-#include "AllDTOs.h"
+#include "ClientSession.h"
 #include "Global_protocol.h"
+#include "DbManager.h"
+#include "StoreDAO.h" // 🚀 UserDAO 대신 안전한 범용 업데이트를 위해 추가
+#include <nlohmann/json.hpp>
 #include <iostream>
+#include <vector>
 
+using nlohmann::json;
+
+// ① 메뉴 목록 조회
 void MenuHandler::handleMenuListRequest(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
+    json req = json::parse(jsonBody);
+    json res;
     try
     {
-        // 1. 클라이언트의 요청 파싱 (storeId 추출)
-        auto req = nlohmann::json::parse(jsonBody).get<MenuListReqDTO>();
-        int targetStoreId = req.storeId;
+        int storeId = req.value("storeId", 0);
 
-        std::cout << "[MenuHandler] 클라이언트가 매장 ID " << targetStoreId << "의 메뉴 리스트를 요청했습니다." << std::endl;
+        auto conn = DBManager::getInstance().getConnection();
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT menu_id, menu_name, base_price, is_sold_out, "
+            "menu_category, is_popular, description, image_url "
+            "FROM MENUS WHERE store_id = ?"));
+        pstmt->setInt(1, storeId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
-        // 2. 응답 DTO 준비
-        MenuListResDTO res;
-
-        // 🚀 3. 태현님이 만든 완벽한 DAO 호출!
-        res.menus = MenuDAO::getInstance().getMenusByStoreId(targetStoreId);
-
-        // 결과에 따른 상태 코드 및 메시지 세팅
-        if (res.menus.empty())
+        json menus = json::array();
+        while (rs->next())
         {
-            res.status = 404; // 데이터가 없으면 404 Not Found
-            res.message = "등록된 메뉴가 없습니다.";
-        }
-        else
-        {
-            res.status = 200;
-            res.message = "메뉴 목록 조회 성공";
+            json menu;
+            menu["menuId"] = rs->getInt("menu_id");
+            menu["menuName"] = rs->getString("menu_name").c_str();
+            menu["basePrice"] = rs->getInt("base_price");
+            menu["isSoldOut"] = rs->getBoolean("is_sold_out");
+            menu["menuCategory"] = rs->getString("menu_category").c_str();
+            menu["isPopular"] = rs->getBoolean("is_popular");
+            menu["description"] = rs->isNull("description") ? "" : rs->getString("description").c_str();
+            menu["imageUrl"] = rs->isNull("image_url") ? "" : rs->getString("image_url").c_str();
+            menus.push_back(menu);
         }
 
-        // 4. 클라이언트로 패킷 발사 (RES_MENU_LIST = 2011)
+        res["status"] = 200;
+        res["message"] = "조회 성공";
+        res["storeId"] = storeId;
+        res["menus"] = menus;
+
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_LIST), res);
-
-        std::cout << "[MenuHandler] 매장 ID " << targetStoreId << "의 메뉴 " << res.menus.size() << "개 전송 완료!" << std::endl;
     }
     catch (const std::exception &e)
     {
-        std::cerr << "[MenuHandler] 에러 발생: " << e.what() << std::endl;
+        std::cerr << "[MenuHandler] List Error: " << e.what() << std::endl;
+        res["status"] = 500;
+        res["message"] = "서버 내부 오류";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_LIST), res);
+    }
+}
 
-        // 에러 발생 시 클라이언트에게 에러 패킷 전송
-        MenuListResDTO errorRes;
-        errorRes.status = 500;
-        errorRes.message = "서버 내부 오류로 메뉴를 불러오지 못했습니다.";
+// ② 메뉴 추가/수정/삭제
+void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    json req = json::parse(jsonBody);
+    json res;
+    try
+    {
+        int storeId = req.value("storeId", 0);
+        int actionType = req.value("actionType", -1);
+        auto menuData = req["menuData"];
 
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_LIST), errorRes);
+        bool ok = false;
+        auto conn = DBManager::getInstance().getConnection();
+
+        if (actionType == 0) // ── 추가 ──
+        {
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "INSERT INTO MENUS (store_id, menu_name, base_price, "
+                "menu_category, is_popular, description, is_sold_out) "
+                "VALUES (?, ?, ?, ?, ?, ?, 0)"));
+            pstmt->setInt(1, storeId);
+            pstmt->setString(2, menuData.value("menuName", ""));
+            pstmt->setInt(3, menuData.value("basePrice", 0));
+            pstmt->setString(4, menuData.value("menuCategory", "기본 메뉴"));
+            pstmt->setBoolean(5, menuData.value("isPopular", false));
+            pstmt->setString(6, menuData.value("description", ""));
+            pstmt->executeUpdate();
+            ok = true;
+        }
+        else if (actionType == 1) // ── 수정 ──
+        {
+            int menuId = menuData.value("menuId", 0);
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "UPDATE MENUS SET menu_name=?, base_price=?, "
+                "menu_category=?, is_popular=?, description=?, is_sold_out=? "
+                "WHERE menu_id=? AND store_id=?"));
+            pstmt->setString(1, menuData.value("menuName", ""));
+            pstmt->setInt(2, menuData.value("basePrice", 0));
+            pstmt->setString(3, menuData.value("menuCategory", "기본 메뉴"));
+            pstmt->setBoolean(4, menuData.value("isPopular", false));
+            pstmt->setString(5, menuData.value("description", ""));
+            pstmt->setBoolean(6, menuData.value("isSoldOut", false));
+            pstmt->setInt(7, menuId);
+            pstmt->setInt(8, storeId);
+            pstmt->executeUpdate();
+            ok = true;
+        }
+        else if (actionType == 2) // ── 삭제 ──
+        {
+            int menuId = menuData.value("menuId", 0);
+            std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+                "DELETE FROM MENUS WHERE menu_id=? AND store_id=?"));
+            pstmt->setInt(1, menuId);
+            pstmt->setInt(2, storeId);
+            pstmt->executeUpdate();
+            ok = true;
+        }
+
+        res["status"] = ok ? 200 : 400;
+        res["message"] = ok ? "메뉴 변경 완료" : "잘못된 actionType";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_EDIT), res);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "[MenuHandler] Edit Error: " << e.what() << std::endl;
+        res["status"] = 500;
+        res["message"] = "서버 내부 오류";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_EDIT), res);
+    }
+}
+
+// ③ 품절 처리
+void MenuHandler::handleMenuSoldOut(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    json req = json::parse(jsonBody);
+    json res;
+    try
+    {
+        int menuId = req.value("menuId", 0);
+        bool isSoldOut = req.value("isSoldOut", false);
+
+        std::string query = "UPDATE MENUS SET is_sold_out=? WHERE menu_id=?";
+        std::vector<std::string> params = {
+            isSoldOut ? "1" : "0",
+            std::to_string(menuId)};
+
+        // 🚀 핵심: 팀원분의 UserDAO 오타를 StoreDAO로 교체! (안전한 업데이트)
+        bool ok = StoreDAO::getInstance().executeUpdate(query, params);
+
+        res["status"] = ok ? 200 : 500;
+        res["message"] = ok ? "품절 상태 변경 완료" : "DB 오류";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_SOLD_OUT), res);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "[MenuHandler] SoldOut Error: " << e.what() << std::endl;
+        res["status"] = 500;
+        res["message"] = "서버 내부 오류";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_SOLD_OUT), res);
     }
 }
