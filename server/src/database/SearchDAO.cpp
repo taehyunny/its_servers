@@ -13,16 +13,11 @@ std::vector<PopularKeyword> SearchDAO::getPopularCategories(int limit)
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 핵심: SEARCH_HISTORY와 CATEGORIES를 JOIN해서 '진짜 카테고리 이름'을 가져옵니다!
-        // 조건: 1시간 이내 데이터 + 카테고리 ID가 존재하는(매칭에 성공한) 검색어만 집계
+        // 🚀 핵심: 복잡한 조인을 버리고, 이미 점수가 매겨진 CATEGORIES 테이블에서 1등부터 줄을 세웁니다!
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "SELECT C.name AS category_name, COUNT(SH.category_id) as hit_count "
-            "FROM SEARCH_HISTORY SH "
-            "JOIN CATEGORIES C ON SH.category_id = C.category_id "
-            "WHERE SH.search_date >= DATE_SUB(NOW(), INTERVAL 1 HOUR) "
-            "AND SH.category_id IS NOT NULL "
-            "GROUP BY C.category_id, C.name "
-            "ORDER BY hit_count DESC "
+            "SELECT name AS category_name, popularity_score "
+            "FROM CATEGORIES "
+            "ORDER BY popularity_score DESC "
             "LIMIT ?"));
 
         pstmt->setInt(1, limit);
@@ -33,14 +28,16 @@ std::vector<PopularKeyword> SearchDAO::getPopularCategories(int limit)
         {
             PopularKeyword pk;
             pk.rank = currentRank++;
-            // 🚀 keyword DTO 필드에 날것의 단어가 아닌 '정제된 카테고리 이름'을 꽂아줍니다.
+
+            // 🚀 DTO의 'keyword' 변수에 진짜 카테고리 이름(예: 분식, 중식)을 담아서 프론트에 보냅니다.
             pk.keyword = rs->getString("category_name").c_str();
+
             result.push_back(pk);
         }
     }
     catch (sql::SQLException &e)
     {
-        std::cerr << "[SearchDAO] 1시간 실시간 인기 카테고리 조회 실패: " << e.what() << std::endl;
+        std::cerr << "[SearchDAO] 인기 카테고리 조회 실패: " << e.what() << std::endl;
     }
     return result;
 }

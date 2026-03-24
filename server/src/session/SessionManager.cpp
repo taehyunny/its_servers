@@ -47,3 +47,15 @@ void SessionManager::removeSession(int fd)
         std::cout << "[SessionManager] 소켓 " << fd << " 물리적 세션 제거 완료." << std::endl;
     }
 }
+std::shared_ptr<ClientSession> SessionManager::getSessionByUserId(const std::string &userId)
+{
+    std::lock_guard<std::mutex> lock(sessionMutex); // 🚀 안전제일! 자물쇠 잠그기
+
+    auto it = userMap.find(userId);
+    if (it != userMap.end())
+    {
+        return it->second; // 🚀 사장님이 접속 중이면 세션 리턴!
+    }
+
+    return nullptr; // 🚀 사장님이 앱을 끄고 오프라인 상태라면 nullptr 리턴
+}

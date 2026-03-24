@@ -228,21 +228,23 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
         // ⭐ 3단계: 해당 매장의 리뷰 리스트 싹쓸이 (REVIEWS 테이블)
         // ---------------------------------------------------------
         std::unique_ptr<sql::PreparedStatement> pstmtReview(conn->prepareStatement(
-            "SELECT review_id, user_id, order_id, rating, content, created_at "
+            "SELECT review_id, user_id, order_id, rating, content, image_url, owner_reply, created_at "
             "FROM REVIEWS WHERE store_id = ? ORDER BY created_at DESC"));
         pstmtReview->setInt(1, storeId);
         std::unique_ptr<sql::ResultSet> rsReview(pstmtReview->executeQuery());
 
         while (rsReview->next())
         {
-            ReviewDataDTO review;
-            review.review_id = rsReview->getInt("review_id");
-            review.store_id = storeId;
-            review.user_id = rsReview->getString("user_id").c_str();
-            review.order_id = rsReview->getString("order_id").c_str();
+            ReviewDTO review;
+            review.reviewId = rsReview->getInt("review_id");
+            review.storeId = storeId;
+            review.userId = rsReview->getString("user_id").c_str();
+            review.orderId = rsReview->getString("order_id").c_str();
             review.rating = rsReview->getInt("rating");
             review.content = rsReview->getString("content").c_str();
-            review.created_at = rsReview->getString("created_at").c_str();
+            review.imageUrl = rsReview->isNull("image_url") ? "" : rsReview->getString("image_url").c_str();
+            review.ownerReply = rsReview->isNull("owner_reply") ? "" : rsReview->getString("owner_reply").c_str();
+            review.createdAt = rsReview->getString("created_at").c_str();
 
             result.reviewList.push_back(review); // 리뷰 상자에 담기
         }

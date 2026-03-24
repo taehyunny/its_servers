@@ -44,18 +44,20 @@ struct MenuDataDTO
 };
 
 // 3. 단일 리뷰 정보
-struct ReviewDataDTO
+struct ReviewDTO
 {
-    int review_id;
-    int store_id;
-    std::string user_id;
-    std::string order_id;
-    int rating;
+    int reviewId;
+    std::string orderId;
+    std::string userId;
+    int storeId;
+    int rating; // 🚀 1~5 사이의 정수
     std::string content;
-    std::string created_at;
+    std::string imageUrl;
+    std::string ownerReply; // 사장님 답글
+    std::string createdAt;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReviewDataDTO,
-                                   review_id, store_id, user_id, order_id, rating, content, created_at)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReviewDTO,
+                                   reviewId, orderId, userId, storeId, rating, content, imageUrl, ownerReply, createdAt)
 };
 
 // =========================================================
@@ -63,10 +65,10 @@ struct ReviewDataDTO
 // =========================================================
 struct ResStoreDetailDTO
 {
-    int status;                            // 200: 성공
-    StoreDataDTO storeData;                // 매장 기본 정보 (1개)
-    std::vector<MenuDataDTO> menuList;     // 메뉴 리스트 (여러 개)
-    std::vector<ReviewDataDTO> reviewList; // 리뷰 리스트 (여러 개)
+    int status;                        // 200: 성공
+    StoreDataDTO storeData;            // 매장 기본 정보 (1개)
+    std::vector<MenuDataDTO> menuList; // 메뉴 리스트 (여러 개)
+    std::vector<ReviewDTO> reviewList; // 리뷰 리스트 (여러 개)
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResStoreDetailDTO, status, storeData, menuList, reviewList)
 };

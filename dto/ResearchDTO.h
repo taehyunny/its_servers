@@ -26,23 +26,6 @@ struct RecentSearch
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(RecentSearch, historyId, keyword, searchDate)
 };
 
-// 3. 매장 검색 결과 (기존에 있으시면 안 넣으셔도 됩니다!)
-// struct TopStoreInfo
-// {
-//     int storeId;     // 매장 ID (검색 결과에서 상세 페이지로 넘어갈 때 필요)
-//     std::string storeName;  // 매장 이름
-//     std::string category;  // 매장 카테고리
-//     double rating;           // 평점
-//     int reviewCount;      // 리뷰 수
-//     int minOrderPrice;    // 최소 주문 금액
-//     std::string deliveryTime;    // 배달 시간 (예: "30~40분")
-//     int deliveryFee;      // 배달비
-//     std::string iconPath;
-//     std::string deliveryTimeRange;  // 배달 시간 범위 (예: "30~40분")
-//     int minOrderAmount;  // 최소 주문 금액
-//     NLOHMANN_DEFINE_TYPE_INTRUSIVE(TopStoreInfo, storeId, storeName, category, rating, reviewCount, minOrderPrice, deliveryTime, deliveryFee, iconPath, deliveryTimeRange, minOrderAmount)
-// };
-
 // =========================================================
 // [프로토콜 매칭 DTO] 클라이언트 <-> 서버 통신용 구조체
 // =========================================================

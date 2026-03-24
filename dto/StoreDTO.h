@@ -102,8 +102,6 @@ struct MenuDTO
             j.at("optionGroups").get_to(dto.optionGroups);
         }
     }
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuDTO, menuId, menuName, basePrice, isSoldOut, description, imageUrl, menuCategory, isPopular, optionGroups)
 };
 
 struct MenuListReqDTO // 클라이언트 -> 서버: "이 가게 메뉴 다 주세요!" 요청 DTO

@@ -18,6 +18,8 @@ public:
     // [기존 물리적 관리] 소켓(fd) 기반 연결/해제
     void createSession(int fd);
     std::shared_ptr<ClientSession> getSession(int fd);
+    // 🚀 유저 ID로 특정 세션 찾기 (사장님 푸시 알림용)
+    std::shared_ptr<ClientSession> getSessionByUserId(const std::string &userId);
     void removeSession(int fd); // 🚨 주의: 여기서 userMap의 데이터도 같이 지워야 합니다!
 
     // ==========================================================
@@ -67,6 +69,6 @@ private:
     // 물리적 소켓 연결망 (네트워크 끊김 대비용)
     std::unordered_map<int, std::shared_ptr<ClientSession>> sessionMap;
 
-    //논리적 아이디 연결망 (알림 쏠 때 이름으로 찾기용)
+    // 논리적 아이디 연결망 (알림 쏠 때 이름으로 찾기용)
     std::unordered_map<std::string, std::shared_ptr<ClientSession>> userMap;
 };

@@ -158,3 +158,21 @@ int MenuDAO::getOptionPrice(int optionId)
     }
     return price;
 }
+int MenuDAO::getMenuBasePrice(int menuId)
+{
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT base_price FROM MENUS WHERE menu_id = ?"));
+        pstmt->setInt(1, menuId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+            return rs->getInt("base_price");
+    }
+    catch (...)
+    {
+    }
+    return -1; // 실패 시 -1 반환
+}

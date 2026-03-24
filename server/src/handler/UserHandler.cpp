@@ -1,6 +1,7 @@
 #include "UserHandler.h"
 #include "AllDTOs.h"       // 1. DTO 정의(및 매크로)를 먼저 읽어야 함
 #include "ClientSession.h" // 2. 그 다음 세션(템플릿 사용처)을 읽어야 함
+#include "SessionManager.h"
 #include "UserDAO.h"
 #include "AuthDAO.h"
 #include <iostream>
@@ -91,6 +92,8 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
             }
 
             session->authenticate(res.userId, dbRole);
+            SessionManager::getInstance().authenticateUser(res.userId, session);
+            std::cout << "[UserHandler] 로그인 성공! 유저 '" << res.userId << "' 세션 맵 등록 완료." << std::endl;
         }
         else if (resultCode == LoginResult::ID_PASS_WRONG)
         {
