@@ -37,12 +37,14 @@ CREATE TABLE COUPON_MASTER (
 );
 
 -- 5. CUSTOMERS (고객 부가 정보)
--- USERS 테이블과 1:1 또는 1:N 관계로 추정됨
+
 CREATE TABLE CUSTOMERS (
     user_id VARCHAR(50) NOT NULL PRIMARY KEY,
     address VARCHAR(255) DEFAULT '주소 미상',
     point INT(11) DEFAULT 0,
     customer_grade VARCHAR(20) DEFAULT '일반'
+        card_number VARCHAR(50) DEFAULT NULL;
+    account_number VARCHAR(50) DEFAULT NULL;
 );
 
 -- 6. DELIVERIES (배달 정보)

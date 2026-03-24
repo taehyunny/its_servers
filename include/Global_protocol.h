@@ -70,9 +70,12 @@ enum class CmdID : uint16_t
     // 주문 / 결제 (2020 ~ 2029)
     REQ_ORDER_CREATE = 2020, // 장바구니 결제 및 주문 생성 요청
     RES_ORDER_CREATE = 2021, // 주문 생성 응답
-    REQ_COUPON_CHECK = 2022, // 쿠폰 유효성 확인 요청
-    RES_COUPON_CHECK = 2023, // 쿠폰 유효성 확인 응답
-
+                             // REQ_COUPON_CHECK = 2022, // 쿠폰 유효성 확인 요청
+                             // RES_COUPON_CHECK = 2023, // 쿠폰 유효성 확인 응답
+    REQ_PAYMENT_PROCESS = 2024, // 클라이언트 -> 서버: 결제 모듈(PG) 승인 후 결과 전달
+    RES_PAYMENT_PROCESS = 2025, // 서버 -> 클라이언트: 결제 완료 및 영수증 ID 반환
+    REQ_CHECKOUT_INFO = 2026,   // 클라이언트 -> 서버: 결제 직전 최종 주문 정보 요청 (최종 금액, 예상 배달 시간 등)
+    RES_CHECKOUT_INFO = 2027,   // 서버 -> 클라이언트: 결제 직전 최종 주문 정보 응답 (최종 금액, 예상 배달 시간 등)
     // 리뷰 작성 (2030 ~ 2035)
     REQ_REVIEW_WRITE = 2030, // 사진 첨부 리뷰 작성 요청 (음식별점, 배달별점, 좋아요/싫어요)
     RES_REVIEW_WRITE = 2031, // 리뷰 작성 응답
@@ -92,10 +95,10 @@ enum class CmdID : uint16_t
     RES_ORDER_CANCEL = 2053, // 주문 취소 응답
 
     // 주소 관리 (2070 ~ 2079)  ← 기존 번호 유지
-    REQ_ADDRESS_SAVE   = 2070,
-    RES_ADDRESS_SAVE   = 2071,
-    REQ_ADDRESS_LIST   = 2072,
-    RES_ADDRESS_LIST   = 2073,
+    REQ_ADDRESS_SAVE = 2070,
+    RES_ADDRESS_SAVE = 2071,
+    REQ_ADDRESS_LIST = 2072,
+    RES_ADDRESS_LIST = 2073,
     REQ_ADDRESS_DELETE = 2074,
     RES_ADDRESS_DELETE = 2075,
     REQ_ADDRESS_UPDATE = 2076,
@@ -125,8 +128,8 @@ enum class CmdID : uint16_t
     REQ_MY_INFO = 2100, // 마이페이지 통합 정보 요청 (리뷰수, 주문수, 즐겨찾기수, 좋아요수)
     RES_MY_INFO = 2101, // 마이페이지 통합 정보 응답
 
-    REQ_STORE_INFO_UPDATE = 2102,      // 매장 정보 업데이트 요청 (영업시간, 휴무일 등)
-    RES_STORE_INFO_UPDATE = 2103,    // 매장 정보 업데이트 응답
+    REQ_STORE_INFO_UPDATE = 2102,   // 매장 정보 업데이트 요청 (영업시간, 휴무일 등)
+    RES_STORE_INFO_UPDATE = 2103,   // 매장 정보 업데이트 응답
     REQ_RESEACH_WIDGET = 2108,      // 매장 검색 위젯 요청 (최근 검색어 출력용)
     RES_RESEARCH_WIDGET = 2109,     // 매장 검색 위젯 응답 (최근 검색어 리스트)
     REQ_RESEARCH_DELETE = 2110,     // 매장 검색 위젯 개별 삭제 요청 (최근 검색어 삭제)

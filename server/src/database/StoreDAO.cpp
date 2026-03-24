@@ -25,6 +25,7 @@ std::vector<TopStoreInfo> StoreDAO::getTopStoresByCategory()
             ) as S
             JOIN CATEGORIES C ON S.category = C.name
             WHERE S.rnk = 1
+            ORDER BY S.total_sales DESC -- 🚀 범인 검거! 최종 결과도 매출순으로 줄을 세웁니다.
         )";
 
         std::unique_ptr<sql::Statement> stmt(conn->createStatement());
@@ -227,7 +228,7 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
         // ⭐ 3단계: 해당 매장의 리뷰 리스트 싹쓸이 (REVIEWS 테이블)
         // ---------------------------------------------------------
         std::unique_ptr<sql::PreparedStatement> pstmtReview(conn->prepareStatement(
-            "SELECT review_id, user_id, order_id, rating, comment, created_at "
+            "SELECT review_id, user_id, order_id, rating, content, created_at "
             "FROM REVIEWS WHERE store_id = ? ORDER BY created_at DESC"));
         pstmtReview->setInt(1, storeId);
         std::unique_ptr<sql::ResultSet> rsReview(pstmtReview->executeQuery());
@@ -240,7 +241,7 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
             review.user_id = rsReview->getString("user_id").c_str();
             review.order_id = rsReview->getInt("order_id");
             review.rating = rsReview->getInt("rating");
-            review.comment = rsReview->getString("comment").c_str();
+            review.content = rsReview->getString("content").c_str();
             review.created_at = rsReview->getString("created_at").c_str();
 
             result.reviewList.push_back(review); // 리뷰 상자에 담기

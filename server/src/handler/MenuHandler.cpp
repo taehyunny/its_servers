@@ -60,6 +60,7 @@ void MenuHandler::handleMenuListRequest(std::shared_ptr<ClientSession> session, 
 // ② 메뉴 추가/수정/삭제
 void MenuHandler::handleMenuEdit(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
+    std::cout << "[MenuEdit Debug] Received JSON: " << jsonBody << std::endl;
     json req = json::parse(jsonBody);
     json res;
     try

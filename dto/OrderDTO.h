@@ -49,32 +49,36 @@ struct OrderCreateResDTO
 };
 
 // 🧑‍🍳 1. 사장님의 주문 수락 요청 (REQ_ORDER_ACCEPT = 3000)
-struct OrderAcceptReqDTO {
-    std::string orderId;   // 수락할 주문번호 (예: "ORD-1710992345678")
-    int estimatedTime;     // 예상 조리 시간 (분 단위, 예: 40)
+struct OrderAcceptReqDTO
+{
+    std::string orderId; // 수락할 주문번호 (예: "ORD-1710992345678")
+    int estimatedTime;   // 예상 조리 시간 (분 단위, 예: 40)
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderAcceptReqDTO, orderId, estimatedTime)
 };
 
 // 🧑‍🍳 2. 서버 -> 사장님 수락 결과 응답 (RES_ORDER_ACCEPT = 3001)
-struct OrderAcceptResDTO {
-    int status;            // 0: 성공, 1: 실패 (DB 에러 등)
-    std::string message;   // "주문이 성공적으로 수락되었습니다."
+struct OrderAcceptResDTO
+{
+    int status;          // 0: 성공, 1: 실패 (DB 에러 등)
+    std::string message; // "주문이 성공적으로 수락되었습니다."
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderAcceptResDTO, status, message)
 };
 
 // 🙋‍♂️ 3. 서버 -> 고객 실시간 상태 푸시 (NOTIFY_ORDER_STATE = 9010)
-struct NotifyOrderStateDTO {
-    std::string orderId;   // 상태가 변경된 주문번호
-    int state;             // 1: 조리중, 2: 조리완료, 3: 배달중 등 상태 코드
-    std::string message;   // 고객 폰에 띄울 팝업 메시지 ("사장님이 조리를 시작했습니다!")
+struct NotifyOrderStateDTO
+{
+    std::string orderId; // 상태가 변경된 주문번호
+    int state;           // 1: 조리중, 2: 조리완료, 3: 배달중 등 상태 코드
+    std::string message; // 고객 폰에 띄울 팝업 메시지 ("사장님이 조리를 시작했습니다!")
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(NotifyOrderStateDTO, orderId, state, message)
 };
 
 // 🏍️ 4. 서버 -> 라이더들 실시간 콜 브로드캐스트 (NOTIFY_DELIVERY_CALL = 9020)
-struct NotifyDeliveryCallDTO {
+struct NotifyDeliveryCallDTO
+{
     std::string orderId;         // 배달할 주문번호
     std::string pickupAddress;   // 픽업지 (황궁짜장 주소)
     std::string deliveryAddress; // 도착지 (고객 주소)
@@ -82,4 +86,32 @@ struct NotifyDeliveryCallDTO {
 
     // (참고: 나중에 메뉴 요약 정보 "짜장면 외 1건" 같은 걸 추가해도 좋습니다!)
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(NotifyDeliveryCallDTO, orderId, pickupAddress, deliveryAddress, deliveryFee)
+};
+
+// 🚀 [2026] 결제 화면 정보 요청 DTO
+struct ReqCheckoutInfoDTO
+{
+    std::string userId;
+    int storeId;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqCheckoutInfoDTO, userId, storeId)
+};
+
+// 🚀 [2027] 결제 화면 정보 응답 DTO
+struct ResCheckoutInfoDTO
+{
+    int status;
+
+    // --- 유저 정보 (CUSTOMERS 테이블) ---
+    std::string customerGrade; // "일반" or "와우"
+    std::string cardNumber;    // "1234-5678-****-****" (없으면 빈 문자열)
+    std::string accountNumber; // "국민 123-456-789" (없으면 빈 문자열)
+    int userPoint;             // (보너스) 보유 포인트도 보여주면 좋겠죠?
+
+    // --- 매장 정보 (STORES 테이블) ---
+    int minOrderAmount; // 최소주문금액
+    int deliveryFee;    // 배달비 (와우회원이면 프론트에서 0원으로 처리 가능!)
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResCheckoutInfoDTO,
+                                   status, customerGrade, cardNumber, accountNumber, userPoint, minOrderAmount, deliveryFee)
 };

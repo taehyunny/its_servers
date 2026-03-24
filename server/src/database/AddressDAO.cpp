@@ -44,9 +44,9 @@ int AddressDAO::saveAddress(const ReqAddressSaveDTO &req)
 }
 
 // ── 2. 주소 목록 조회 ──────────────────────────────────
-std::vector<AddressItem> AddressDAO::getAddressList(const std::string &userId)
+std::vector<AddressItemDTO> AddressDAO::getAddressList(const std::string &userId)
 {
-    std::vector<AddressItem> list;
+    std::vector<AddressItemDTO> list;
     try
     {
         auto conn = DBManager::getInstance().getConnection();
@@ -60,7 +60,7 @@ std::vector<AddressItem> AddressDAO::getAddressList(const std::string &userId)
 
         while (rs->next())
         {
-            AddressItem item;
+            AddressItemDTO item;
             item.addressId = rs->getInt("address_id");
             item.address = rs->getString("address").c_str();
             item.detail = rs->getString("detail").c_str();
@@ -125,8 +125,10 @@ bool AddressDAO::setDefaultAddress(const std::string &userId, int addressId)
 {
     try
     {
+        // 🚀 0. DB 연결 가져오기 (이게 빠져서 에러가 났던 겁니다!)
         auto conn = DBManager::getInstance().getConnection();
 
+        // ─── [원래 있던 핵심 로직] ──────────────────────────
         // 1. 기존에 1이었던 애들을 전부 0으로 강등
         std::unique_ptr<sql::PreparedStatement> pstmtReset(
             conn->prepareStatement("UPDATE USER_ADDRESSES SET is_default = 0 WHERE user_id = ?"));
@@ -139,6 +141,31 @@ bool AddressDAO::setDefaultAddress(const std::string &userId, int addressId)
         pstmtSet->setString(1, userId);
         pstmtSet->setInt(2, addressId);
         int rows = pstmtSet->executeUpdate();
+        // ────────────────────────────────────────────────────
+
+        // ─── [새로 추가된 CUSTOMERS 동기화 로직] ────────────
+        if (rows > 0)
+        {
+            // 3. 방금 is_default = 1로 바꾼 주소의 실제 문자열(address)을 알아냅니다.
+            std::unique_ptr<sql::PreparedStatement> pstmtGetAddr(
+                conn->prepareStatement("SELECT address FROM USER_ADDRESSES WHERE address_id = ?"));
+            pstmtGetAddr->setInt(1, addressId);
+            std::unique_ptr<sql::ResultSet> rs(pstmtGetAddr->executeQuery());
+
+            std::string newDefaultAddress = "";
+            if (rs->next())
+            {
+                newDefaultAddress = rs->getString("address").c_str();
+            }
+
+            // 4. 알아낸 주소로 CUSTOMERS 테이블을 업데이트 (동기화) 합니다.
+            std::unique_ptr<sql::PreparedStatement> pstmtSync(
+                conn->prepareStatement("UPDATE CUSTOMERS SET address = ? WHERE user_id = ?"));
+            pstmtSync->setString(1, newDefaultAddress);
+            pstmtSync->setString(2, userId);
+            pstmtSync->executeUpdate();
+        }
+        // ────────────────────────────────────────────────────
 
         return rows > 0;
     }

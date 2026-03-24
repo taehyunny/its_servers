@@ -31,8 +31,10 @@ void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, con
 
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "SELECT review_id, user_id, rating, content, owner_reply, created_at "
-            "FROM REVIEWS WHERE store_id = ? ORDER BY created_at DESC"));
+            "FROM REVIEWS WHERE store_id = ? AND menu_id = ? ORDER BY created_at DESC"));
         pstmt->setInt(1, storeId);
+        int menuId = req.value("menuId", 0);
+        pstmt->setInt(2, menuId);
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
         json reviews = json::array();

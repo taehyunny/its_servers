@@ -22,7 +22,7 @@ public:
     int saveAddress(const ReqAddressSaveDTO &req);
 
     // 2. 주소 목록 조회
-    std::vector<AddressItem> getAddressList(const std::string &userId);
+    std::vector<AddressItemDTO> getAddressList(const std::string &userId);
 
     // 3. 주소 삭제 (기본 주소는 삭제 불가)
     bool deleteAddress(const std::string &userId, int addressId);

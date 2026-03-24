@@ -109,3 +109,52 @@ std::vector<OptionGroup> MenuDAO::getOptionGroupsByMenuId(int menuId)
     }
     return groupList;
 }
+
+// ── 🛡️ [검증용 1] 메뉴 원가 및 상점 ID 조회 ──────────────────────────
+MenuBasicInfo MenuDAO::getMenuBasicInfo(int menuId)
+{
+    MenuBasicInfo info;
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            conn->prepareStatement("SELECT store_id, base_price FROM MENUS WHERE menu_id = ?"));
+        pstmt->setInt(1, menuId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            info.storeId = rs->getInt("store_id");
+            info.basePrice = rs->getInt("base_price");
+        }
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[MenuDAO] MenuBasicInfo 조회 실패: " << e.what() << std::endl;
+    }
+    return info;
+}
+
+// ── 🛡️ [검증용 2] 개별 옵션 가격 조회 ──────────────────────────────
+int MenuDAO::getOptionPrice(int optionId)
+{
+    int price = 0;
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+        std::unique_ptr<sql::PreparedStatement> pstmt(
+            conn->prepareStatement("SELECT additional_price FROM MENU_OPTIONS WHERE option_id = ?"));
+        pstmt->setInt(1, optionId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            price = rs->getInt("additional_price");
+        }
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "[MenuDAO] OptionPrice 조회 실패: " << e.what() << std::endl;
+    }
+    return price;
+}

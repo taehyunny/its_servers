@@ -6,18 +6,16 @@
 
 // 주소 목록 아이템 (조회 응답에서 사용)
 
-struct AddressItem
+// 🚀 이름을 AddressItemDTO로 통일!
+struct AddressItemDTO
 {
-
     int addressId = 0;
     std::string address;
     std::string detail;
     std::string guide;
     std::string label = "기타";
     bool isDefault = false;
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AddressItem,
-
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(AddressItemDTO,
                                    addressId, address, detail, guide, label, isDefault)
 };
 
@@ -26,11 +24,11 @@ struct AddressItem
 struct ReqAddressSaveDTO
 {
 
-    std::string userId;
-    std::string address;
-    std::string detail;
-    std::string guide;
-    std::string label;
+    std::string userId;     // 유저 ID (누락 방지 위해 필수)
+    std::string address;   // 도로명 주소 (예: "서울특별시 강남구 테헤란로 123")
+    std::string detail;  // 상세 주소 (예: "101동 202호")
+    std::string guide;  // 길 안내 (예: "정문에서 오른쪽으로 50m")
+    std::string label;  // 주소 라벨 (예: "집", "회사", "기타")
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqAddressSaveDTO,
 
@@ -42,7 +40,7 @@ struct ReqAddressSaveDTO
 struct ResAddressSaveDTO
 {
 
-    int status = 200;
+    int status = 200;   
     int addressId = 0;
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResAddressSaveDTO, status, addressId)
@@ -63,7 +61,7 @@ struct ResAddressListDTO
 {
 
     int status = 200;
-    std::vector<AddressItem> addresses;
+    std::vector<AddressItemDTO> addresses;
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResAddressListDTO, status, addresses)
 };
@@ -94,11 +92,11 @@ struct ResAddressDeleteDTO
 struct ReqAddressUpdateDTO
 {
 
-    std::string userId;
-    int addressId = 0;
-    std::string detail;
-    std::string guide;
-    std::string label;
+    std::string userId;  // 유저 ID (누락 방지 위해 필수)
+    int addressId = 0;  // 수정할 주소 ID (누락 방지 위해 필수)
+    std::string detail; // 상세 주소 (예: "101동 202호")
+    std::string guide;  // 길 안내 (예: "정문에서 오른쪽으로 50m")
+    std::string label;  // 주소 라벨 (예: "집", "회사", "기타")
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqAddressUpdateDTO,
 
@@ -120,7 +118,7 @@ struct ResAddressUpdateDTO
 struct ReqAddressDefaultDTO
 {
 
-    std::string userId;
+    std::string userId;  // 유저 ID (누락 방지 위해 필수)
 
     int addressId = 0;
 

@@ -51,11 +51,11 @@ struct ReviewDataDTO
     std::string user_id;
     int order_id;
     int rating;
-    std::string comment;
+    std::string content;
     std::string created_at;
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReviewDataDTO,
-                                   review_id, store_id, user_id, order_id, rating, comment, created_at)
+                                   review_id, store_id, user_id, order_id, rating, content, created_at)
 };
 
 // =========================================================

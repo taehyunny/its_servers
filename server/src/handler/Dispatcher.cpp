@@ -8,6 +8,7 @@
 #include "SearchHandler.h"
 #include "AddressHandler.h"
 #include "ReviewHandler.h"
+#include "OrderHandler.h"
 #include <iostream>
 
 // 핸들러 맵 초기화
@@ -26,10 +27,6 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { UserHandler::handlePhoneCheck(s, b); }},
     {CmdID::REQ_BUISNESS_NUM_CHECK, [](auto s, auto b)
      { UserHandler::handleBizNumCheck(s, b); }},
-    {CmdID::REQ_ORDER_CREATE, [](auto s, auto b)
-     { OrderHandler::handleOrderCreate(s, b); }},
-    {CmdID::REQ_MENU_LIST, [](auto s, auto b)
-     { MenuHandler::handleMenuListRequest(s, b); }},
     {CmdID::REQ_ORDER_CREATE, [](auto s, auto b)
      { OrderHandler::handleOrderCreate(s, b); }},
     {CmdID::REQ_ORDER_ACCEPT, [](auto s, auto b)
@@ -52,8 +49,6 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { StoreHandler::handleStoreStatusSet(s, b); }},
     {CmdID::REQ_STORE_DETAIL, [](auto s, auto b)
      { StoreHandler::handleStoreDetailReq(s, b); }},
-    {CmdID::REQ_STORE_STATUS_SET, [](auto s, auto b)
-     { StoreHandler::handleStoreStatusSet(s, b); }},
     {CmdID::REQ_ADDRESS_SAVE, [](auto s, auto b)
      { AddressHandler::handleAddressSave(s, b); }},
     {CmdID::REQ_ADDRESS_LIST, [](auto s, auto b)
@@ -72,6 +67,8 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { ReviewHandler::handleReviewList(s, b); }},
     {CmdID::REQ_REVIEW_REPLY, [](auto s, auto b)
      { ReviewHandler::handleReviewReply(s, b); }},
+    {CmdID::REQ_CHECKOUT_INFO, [](auto s, auto b)
+     { OrderHandler::handleCheckoutInfo(s, b); }},
 };
 
 // 🚀 [2단계] Dispatch 함수 본체 (반복되던 스레드 풀과 try-catch를 하나로 통합!)

@@ -11,3 +11,4 @@
 #include "ResearchDTO.h"
 #include "StoreDetailDTO.h"
 #include "AddressDTO.h"
+#include "PaymentDTO.h"
