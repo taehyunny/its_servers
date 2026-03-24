@@ -64,6 +64,44 @@ struct MenuDTO
     std::string menuCategory;
     bool isPopular;
     std::vector<OptionGroup> optionGroups;
+    // 🚀 1. to_json: 서버 -> 클라이언트로 보낼 때 (DB 데이터를 JSON으로 변환)
+    friend void to_json(nlohmann::json &j, const MenuDTO &dto)
+    {
+        j = nlohmann::json{
+            {"menuId", dto.menuId},
+            {"menuName", dto.menuName},
+            {"basePrice", dto.basePrice},
+            {"isSoldOut", dto.isSoldOut},
+            {"isPopular", dto.isPopular},
+            {"description", dto.description},
+            {"imageUrl", dto.imageUrl},
+            {"menuCategory", dto.menuCategory},
+            // 🚀 핵심: 하위 배열인 OptionGroup도 연쇄적으로 자동 직렬화됩니다!
+            {"optionGroups", dto.optionGroups}};
+    }
+
+    // 🚀 2. from_json: 클라이언트 -> 서버로 받을 때 (JSON을 C++ 구조체로 변환)
+    friend void from_json(const nlohmann::json &j, MenuDTO &dto)
+    {
+        // 필수로 들어와야 하는 값들은 예외를 던지도록 at() 사용 (옵션)
+        // 하지만 서버가 죽는 걸 막으려면 가급적 value()를 쓰는 것이 좋습니다.
+        dto.menuId = j.value("menuId", 0);
+        dto.menuName = j.value("menuName", "");
+        dto.basePrice = j.value("basePrice", 0);
+
+        // 프론트에서 값이 안 들어오면 안전하게 기본값 세팅
+        dto.isSoldOut = j.value("isSoldOut", false);
+        dto.isPopular = j.value("isPopular", false);
+        dto.description = j.value("description", "");
+        dto.imageUrl = j.value("imageUrl", "");
+        dto.menuCategory = j.value("menuCategory", "기본 메뉴");
+
+        // 🚀 방어 로직: optionGroups 배열이 통째로 빠져있어도 서버가 터지지 않게 방어!
+        if (j.contains("optionGroups") && j.at("optionGroups").is_array())
+        {
+            j.at("optionGroups").get_to(dto.optionGroups);
+        }
+    }
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(MenuDTO, menuId, menuName, basePrice, isSoldOut, description, imageUrl, menuCategory, isPopular, optionGroups)
 };
