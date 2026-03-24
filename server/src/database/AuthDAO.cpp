@@ -60,6 +60,7 @@ std::pair<LoginResult, nlohmann::json> AuthDAO::validateLogin(const std::string 
         userInfo["status"] = 200;
         userInfo["message"] = "로그인 성공";
 
+        userInfo["address"] = ""; // 기본값 세팅 (주소는 role에 따라 다르게 채워질 예정)
         // 🚀 4. 일반 고객(role == 0) 데이터 세팅
         if (rs->getInt("role") == 0)
         {
