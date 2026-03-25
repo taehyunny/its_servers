@@ -144,3 +144,74 @@ std::string OrderDAO::getCustomerIdByOrderId(const std::string &orderId)
     }
     return ""; // 못 찾으면 빈 문자열
 }
+
+std::vector<OrderHistoryItemDTO> OrderDAO::getOrderHistory(const std::string &userId, const std::string &keyword)
+{
+    std::vector<OrderHistoryItemDTO> historyList;
+    auto conn = DBManager::getInstance().getConnection();
+
+    try
+    {
+        // 🚀 1. 기본 뼈대 쿼리 (JOIN과 서브쿼리로 매장명, 메뉴 요약 한 번에 뽑기!)
+        std::string sql =
+            "SELECT O.order_id, O.store_id, S.store_name, O.total_price, O.order_status, O.created_at, "
+            "(SELECT GROUP_CONCAT(M.menu_name SEPARATOR ' / ') "
+            " FROM ORDER_ITEMS OI JOIN MENUS M ON OI.menu_id = M.menu_id "
+            " WHERE OI.order_id = O.order_id) AS menu_summary "
+            "FROM ORDERS O "
+            "JOIN STORES S ON O.store_id = S.store_id "
+            "WHERE O.user_id = ? ";
+
+        // 🚀 2. 검색어가 있다면? WHERE 절에 조건 블록 조립하기
+        if (!keyword.empty())
+        {
+            // 매장명에 포함되거나, 주문한 메뉴 중 하나라도 검색어가 포함되어 있으면(EXISTS) 가져옵니다.
+            sql += "AND (S.store_name LIKE ? OR "
+                   "     EXISTS (SELECT 1 FROM ORDER_ITEMS OI JOIN MENUS M ON OI.menu_id = M.menu_id "
+                   "             WHERE OI.order_id = O.order_id AND M.menu_name LIKE ?)) ";
+        }
+
+        // 🚀 3. 정렬 조건 (최신 주문이 무조건 맨 위로!)
+        sql += "ORDER BY O.created_at DESC";
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(sql));
+        pstmt->setString(1, userId);
+
+        // 검색어가 있을 경우 파라미터 세팅 (2번, 3번 물음표)
+        if (!keyword.empty())
+        {
+            std::string searchPattern = "%" + keyword + "%";
+            pstmt->setString(2, searchPattern);
+            pstmt->setString(3, searchPattern);
+        }
+
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        // 🚀 4. 결과 파싱 및 DTO 변환
+        while (rs->next())
+        {
+            OrderHistoryItemDTO item;
+            item.orderId = rs->getString("order_id").c_str();
+            item.storeId = rs->getInt("store_id");
+            item.storeName = rs->getString("store_name").c_str();
+            item.totalPrice = rs->getInt("total_price");
+            item.status = rs->getInt("order_status");
+            item.createdAt = rs->getString("created_at").c_str();
+
+            // 메뉴가 비어있을 경우 방어 코드
+            item.menuSummary = rs->isNull("menu_summary") ? "메뉴 정보 없음" : rs->getString("menu_summary").c_str();
+
+            // 💡 배달 사진/영수증 URL (아직 DB에 컬럼이 없다면 빈 문자열로 처리, 나중에 추가하세요!)
+            item.deliveryPhotoUrl = "";
+
+            historyList.push_back(item);
+        }
+    }
+    catch (const sql::SQLException &e)
+    {
+        std::cerr << "🚨 [OrderDAO] 주문 내역 조회 SQL 에러: " << e.what() << std::endl;
+        throw; // 핸들러로 에러 던지기
+    }
+
+    return historyList;
+}

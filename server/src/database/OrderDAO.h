@@ -28,6 +28,7 @@ public:
 
     // 🚀 주문번호로 고객 ID 찾아오기 (알림 대상 식별용)
     std::string getCustomerIdByOrderId(const std::string &orderId);
+    std::vector<OrderHistoryItemDTO> getOrderHistory(const std::string &userId, const std::string &keyword);
 
 private:
     OrderDAO() = default;

@@ -152,6 +152,9 @@ enum class CmdID : uint16_t
     RES_ORDER_REJECT = 3011,        // 주문 거절 응답
     REQ_COOK_TIME_SET = 3020,       // 조리 시간 재설정 요청
     RES_COOK_TIME_SET = 3021,       // 조리 시간 설정 응답
+    REQ_CHANGE_ORDER_STATE = 3022,    // 주문 상태 변경 요청 (조리 시작, 조리 완료, 배달 출발 등)
+    RES_CHANGE_ORDER_STATE = 3023,    // 주문 상태 변경 응답 (조리 시작, 조리 완료, 배달 출발 등)
+
     REQ_STORE_STATUS_SET = 3030,    // 영업 상태 수정 요청
     RES_STORE_STATUS_SET = 3031,    // 영업 상태 응답
     REQ_DELIVERY_POLICY_SET = 3040, // 배달 반경 및 배달료 수정 요청

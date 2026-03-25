@@ -31,6 +31,8 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { UserHandler::handleBizNumCheck(s, b); }},
 
     // ── 2. 매장 및 메뉴 (Store & Menu) ──
+    {CmdID::REQ_ORDER_LIST, [](auto s, auto b)
+     { OrderHandler::handleOrderList(s, b); }},
     {CmdID::REQ_STORE_LIST, [](auto s, auto b)
      { StoreHandler::handleStoreListRequest(s, b); }},
     {CmdID::REQ_STORE_DETAIL, [](auto s, auto b)
@@ -55,8 +57,14 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { OrderHandler::handleOrderAccept(s, b); }},
     {CmdID::REQ_MENU_OPTION, [](auto s, auto b)
      { MenuHandler::handleMenuOption(s, b); }},
-    // {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)
-    //  { OrderHandler::handleOrderReject(s, b); }}, // 🚀 사장님 주문 거절 기능 (구현되어 있다면 활성화)
+    {CmdID::REQ_CHANGE_ORDER_STATE, [](auto s, auto b)
+     { OrderHandler::handleChangeOrderState(s, b); }},
+    {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)
+     { OrderHandler::handleOrderReject(s, b); }}, // 🚀 사장님 주문 거절 기능 (구현되어 있다면 활성화)
+    {CmdID::REQ_ORDER_HISTORY, [](auto s, auto b)
+     { OrderHandler::handleOrderList(s, b); }}, // 주문 내역 조회 (고객용)
+    {CmdID::REQ_ORDER_HISTORY_SEARCH, [](auto s, auto b)
+     { OrderHandler::handleOrderHistorySearch(s, b); }}, // 주문 내역 검색 (고객용)
 
     // ── 4. 리뷰 및 통계 (Review & Sales) ──
     {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
@@ -91,13 +99,13 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { SearchHandler::handleSearchStoreReq(s, b); }},
     // ── 7. 마이페이지 등 기타 (MyPage & Misc) ──
     {CmdID::REQ_UPGRADE_NAME, [](auto s, auto b)
-     {
-         UserHandler::handleGradeUpdate(s, b);
-     }},
+     {UserHandler::handleGradeUpdate(s, b);}},
     {CmdID::REQ_DOWNGRADE_NAME, [](auto s, auto b)
-     {
-         UserHandler::handleGradeUpdate(s, b);
-     }},
+     {UserHandler::handleGradeUpdate(s, b);}},
+    {CmdID::REQ_ORDER_HISTORY, [](auto s, auto b)
+     {OrderHandler::handleOrderList(s, b); }}, // 주문 내역 조회 (고객용)
+    {CmdID::REQ_ORDER_HISTORY_SEARCH, [](auto s, auto b)
+     {OrderHandler::handleOrderHistorySearch(s, b); }}, // 주문 내역 검색 (고객용)
 
 };
 // =========================================================
