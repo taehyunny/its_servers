@@ -231,35 +231,36 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
 
         // ⭐ 3. 리뷰 리스트 조회
         std::unique_ptr<sql::PreparedStatement> pstmtReview(conn->prepareStatement(
-            // 🚀 핵심: REVIEWS 테이블(R)과 MENUS 테이블(M)을 조인해서 menu_name까지 가져옵니다!
-            "SELECT R.review_id, R.user_id, R.order_id, R.rating, R.content, R.image_url, R.owner_reply, R.created_at, "
-            "R.menu_id, M.menu_name "
+            // 🚀 핵심: REVIEWS(R) 테이블과 MENUS(M) 테이블을 조인해서 메뉴 이름까지 가져옵니다!
+            "SELECT R.review_id, R.order_id, R.user_id, R.store_id, R.menu_id, R.rating, "
+            "R.content, R.image_url, R.owner_reply, R.created_at, M.menu_name "
             "FROM REVIEWS R "
-            "LEFT JOIN MENUS M ON R.menu_id = M.menu_id " // 메뉴 정보를 연결하는 연결 고리
+            "LEFT JOIN MENUS M ON R.menu_id = M.menu_id "
             "WHERE R.store_id = ? "
-            "ORDER BY R.created_at DESC"
-        ));
-        
-        pstmtReview->setInt(1, storeId); // 매장 ID 바인딩 (이전에 수정한 하드코딩 방어!)
+            "ORDER BY R.created_at DESC"));
+
+        pstmtReview->setInt(1, storeId); // 조회할 매장 번호
         std::unique_ptr<sql::ResultSet> rsReview(pstmtReview->executeQuery());
 
         while (rsReview->next())
         {
             ReviewDTO review;
             review.reviewId = rsReview->getInt("review_id");
-            review.storeId = storeId;
-            review.userId = rsReview->getString("user_id").c_str();
             review.orderId = rsReview->getString("order_id").c_str();
+            review.userId = rsReview->getString("user_id").c_str();
+            review.storeId = rsReview->getInt("store_id");
             review.rating = rsReview->getInt("rating");
             review.content = rsReview->getString("content").c_str();
+
+            // NULL 처리 (이미지나 사장님 댓글이 없을 수도 있으니까요!)
             review.imageUrl = rsReview->isNull("image_url") ? "" : rsReview->getString("image_url").c_str();
             review.ownerReply = rsReview->isNull("owner_reply") ? "" : rsReview->getString("owner_reply").c_str();
             review.createdAt = rsReview->getString("created_at").c_str();
 
-            // 🚀 [추가된 로직] DB에서 방금 가져온 메뉴 ID와 메뉴 이름을 DTO에 꽂아줍니다!
+            // 🚀 [사유하는 개발자의 디테일] DB에서 가져온 메뉴 정보 세팅
             review.menuId = rsReview->getInt("menu_id");
-            // 만약 메뉴가 삭제되었거나 조인이 실패할 경우를 대비한 널(Null) 방어 코드
-            review.menuName = rsReview->isNull("menu_name") ? "알 수 없는 메뉴" : rsReview->getString("menu_name").c_str();
+            // 만약 사장님이 메뉴를 삭제해서 MENUS 테이블에 없더라도, 리뷰는 보여야 하므로 방어 코드 작성!
+            review.menuName = rsReview->isNull("menu_name") ? "삭제된 메뉴" : rsReview->getString("menu_name").c_str();
 
             result.reviewList.push_back(review);
         }

@@ -8,7 +8,7 @@
 #include "SearchHandler.h"
 #include "AddressHandler.h"
 #include "ReviewHandler.h"
-// #include "SalesHandler.h" // 🚀 주석 해제 및 활성화!
+#include "SalesHandler.h" // 🚀 주석 해제 및 활성화!
 #include <iostream>
 
 // =========================================================
@@ -53,6 +53,8 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { OrderHandler::handleOrderCreate(s, b); }},
     {CmdID::REQ_ORDER_ACCEPT, [](auto s, auto b)
      { OrderHandler::handleOrderAccept(s, b); }},
+    {CmdID::REQ_MENU_OPTION, [](auto s, auto b)
+     { MenuHandler::handleMenuOption(s, b); }},
     // {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)
     //  { OrderHandler::handleOrderReject(s, b); }}, // 🚀 사장님 주문 거절 기능 (구현되어 있다면 활성화)
 
@@ -61,8 +63,8 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { ReviewHandler::handleReviewList(s, b); }},
     {CmdID::REQ_REVIEW_REPLY, [](auto s, auto b)
      { ReviewHandler::handleReviewReply(s, b); }},
-    // {CmdID::REQ_SALES_STAT, [](auto s, auto b)
-    //  { SalesHandler::handleSalesStat(s, b); }}, // 🚀 신규: 매출 통계
+    {CmdID::REQ_SALES_STAT, [](auto s, auto b)
+     { SalesHandler::handleSalesStat(s, b); }}, // 🚀 신규: 매출 통계
 
     // ── 5. 주소 관리 (Address) ──
     {CmdID::REQ_ADDRESS_SAVE, [](auto s, auto b)
@@ -96,6 +98,7 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      {
          UserHandler::handleGradeUpdate(s, b);
      }},
+
 };
 // =========================================================
 // 🚀 [2단계] Dispatch 함수 본체

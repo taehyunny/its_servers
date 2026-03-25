@@ -90,6 +90,7 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
                 res.minOrderAmount = userJson.value("minOrderAmount", "0");
                 res.openTime = userJson.value("openTime", "");
                 res.closeTime = userJson.value("closeTime", "");
+                res.deliveryFee = userJson.value("deliveryFee", 0);
             }
 
             session->authenticate(res.userId, dbRole);

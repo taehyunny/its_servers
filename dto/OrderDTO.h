@@ -125,3 +125,20 @@ struct ResCheckoutInfoDTO
                                    status, customerGrade, cardNumber, accountNumber, userPoint, userAddress,
                                    minOrderAmount, deliveryFee, storeAddress, pickupTime, totalPrice)
 };
+// 🧑‍🍳 [추가 제안] 만능 주문 상태 변경 요청 (예: REQ_CHANGE_ORDER_STATE = 3020)
+struct ReqChangeOrderStateDTO
+{
+    std::string orderId; // 상태를 바꿀 주문번호
+    int newState;        // 변경할 상태값 (예: 2=조리완료, 3=배달출발, 4=배달완료)
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqChangeOrderStateDTO, orderId, newState)
+};
+
+// 🧑‍🍳 [추가 제안] 만능 상태 변경 응답
+struct ResChangeOrderStateDTO
+{
+    int status;
+    std::string message;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResChangeOrderStateDTO, status, message)
+};

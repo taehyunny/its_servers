@@ -152,40 +152,13 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: \
  /usr/include/c++/13/bits/basic_string.tcc \
  /usr/include/c++/13/bits/memory_resource.h /usr/include/c++/13/cstddef \
  /usr/include/c++/13/bits/uses_allocator_args.h \
- /home/lms/Documents/its_server/server/src/session/ClientSession.h \
+ /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
  /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_vector.h \
  /usr/include/c++/13/bits/stl_bvector.h \
- /usr/include/c++/13/bits/vector.tcc /usr/include/c++/13/mutex \
- /usr/include/c++/13/bits/chrono.h /usr/include/c++/13/ratio \
- /usr/include/c++/13/cstdint /usr/include/c++/13/limits \
- /usr/include/c++/13/ctime /usr/include/c++/13/bits/parse_numbers.h \
- /usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h \
- /usr/include/c++/13/bits/std_mutex.h \
- /usr/include/c++/13/bits/unique_lock.h /usr/include/unistd.h \
- /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
- /usr/include/x86_64-linux-gnu/bits/environments.h \
- /usr/include/x86_64-linux-gnu/bits/confname.h \
- /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
- /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
- /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
- /usr/include/linux/close_range.h /usr/include/arpa/inet.h \
- /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/sys/socket.h \
- /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
- /usr/include/x86_64-linux-gnu/bits/socket.h \
- /usr/include/x86_64-linux-gnu/bits/socket_type.h \
- /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
- /usr/include/x86_64-linux-gnu/asm/socket.h \
- /usr/include/asm-generic/socket.h /usr/include/linux/posix_types.h \
- /usr/include/linux/stddef.h \
- /usr/include/x86_64-linux-gnu/asm/posix_types.h \
- /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
- /usr/include/asm-generic/posix_types.h \
- /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
- /usr/include/asm-generic/bitsperlong.h \
- /usr/include/x86_64-linux-gnu/asm/sockios.h \
- /usr/include/asm-generic/sockios.h \
- /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
- /usr/include/x86_64-linux-gnu/bits/in.h /usr/include/nlohmann/json.hpp \
+ /usr/include/c++/13/bits/vector.tcc \
+ /home/lms/Documents/its_server/server/../dto/AllDTOs.h \
+ /home/lms/Documents/its_server/server/../dto/BaseDTO.h \
+ /home/lms/Documents/its_server/server/../include/json.hpp \
  /usr/include/c++/13/algorithm /usr/include/c++/13/bits/stl_algo.h \
  /usr/include/c++/13/bits/algorithmfwd.h \
  /usr/include/c++/13/bits/stl_heap.h \
@@ -205,12 +178,10 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: \
  /usr/include/c++/13/streambuf /usr/include/c++/13/bits/ios_base.h \
  /usr/include/c++/13/bits/locale_classes.h \
  /usr/include/c++/13/bits/locale_classes.tcc \
- /usr/include/c++/13/system_error /usr/include/c++/13/stdexcept \
- /usr/include/c++/13/bits/streambuf.tcc /usr/include/c++/13/utility \
- /usr/include/c++/13/bits/stl_relops.h \
- /usr/include/nlohmann/adl_serializer.hpp \
- /usr/include/nlohmann/detail/abi_macros.hpp \
- /usr/include/nlohmann/detail/conversions/from_json.hpp \
+ /usr/include/c++/13/system_error \
+ /usr/include/x86_64-linux-gnu/c++/13/bits/error_constants.h \
+ /usr/include/c++/13/stdexcept /usr/include/c++/13/bits/streambuf.tcc \
+ /usr/include/c++/13/utility /usr/include/c++/13/bits/stl_relops.h \
  /usr/include/c++/13/forward_list /usr/include/c++/13/bits/forward_list.h \
  /usr/include/c++/13/bits/forward_list.tcc /usr/include/c++/13/map \
  /usr/include/c++/13/bits/stl_tree.h /usr/include/c++/13/bits/stl_map.h \
@@ -225,7 +196,8 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
- /usr/include/c++/13/bits/specfun.h /usr/include/c++/13/tr1/gamma.tcc \
+ /usr/include/c++/13/bits/specfun.h /usr/include/c++/13/limits \
+ /usr/include/c++/13/tr1/gamma.tcc \
  /usr/include/c++/13/tr1/special_function_util.h \
  /usr/include/c++/13/tr1/bessel_function.tcc \
  /usr/include/c++/13/tr1/beta_function.tcc \
@@ -245,27 +217,13 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: \
  /usr/include/c++/13/bits/gslice.h \
  /usr/include/c++/13/bits/gslice_array.h \
  /usr/include/c++/13/bits/mask_array.h \
- /usr/include/c++/13/bits/indirect_array.h \
- /usr/include/nlohmann/detail/exceptions.hpp \
- /usr/include/nlohmann/detail/value_t.hpp \
- /usr/include/nlohmann/detail/macro_scope.hpp \
- /usr/include/nlohmann/detail/meta/detected.hpp \
- /usr/include/nlohmann/detail/meta/void_t.hpp \
- /usr/include/nlohmann/thirdparty/hedley/hedley.hpp \
+ /usr/include/c++/13/bits/indirect_array.h /usr/include/c++/13/cstdint \
  /usr/include/c++/13/version /usr/include/c++/13/cassert \
- /usr/include/assert.h /usr/include/nlohmann/detail/string_escape.hpp \
- /usr/include/nlohmann/detail/input/position_t.hpp \
- /usr/include/nlohmann/detail/meta/cpp_future.hpp \
- /usr/include/nlohmann/detail/meta/type_traits.hpp \
- /usr/include/nlohmann/detail/iterators/iterator_traits.hpp \
- /usr/include/nlohmann/detail/meta/call_std/begin.hpp \
- /usr/include/nlohmann/detail/meta/call_std/end.hpp \
- /usr/include/nlohmann/json_fwd.hpp \
- /usr/include/nlohmann/detail/string_concat.hpp \
- /usr/include/c++/13/cstring /usr/include/string.h /usr/include/strings.h \
- /usr/include/nlohmann/detail/meta/identity_tag.hpp \
- /usr/include/nlohmann/detail/meta/std_fs.hpp \
- /usr/include/c++/13/filesystem /usr/include/c++/13/bits/fs_fwd.h \
+ /usr/include/assert.h /usr/include/c++/13/cstring /usr/include/string.h \
+ /usr/include/strings.h /usr/include/c++/13/filesystem \
+ /usr/include/c++/13/bits/fs_fwd.h /usr/include/c++/13/bits/chrono.h \
+ /usr/include/c++/13/ratio /usr/include/c++/13/ctime \
+ /usr/include/c++/13/bits/parse_numbers.h \
  /usr/include/c++/13/bits/fs_path.h /usr/include/c++/13/locale \
  /usr/include/c++/13/bits/locale_facets.h /usr/include/c++/13/cwctype \
  /usr/include/wctype.h /usr/include/x86_64-linux-gnu/bits/wctype-wchar.h \
@@ -286,37 +244,10 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: \
  /usr/include/c++/13/bits/istream.tcc \
  /usr/include/c++/13/bits/sstream.tcc /usr/include/c++/13/codecvt \
  /usr/include/c++/13/bits/fs_dir.h /usr/include/c++/13/bits/fs_ops.h \
- /usr/include/nlohmann/detail/conversions/to_json.hpp \
- /usr/include/nlohmann/detail/iterators/iteration_proxy.hpp \
- /usr/include/nlohmann/byte_container_with_subtype.hpp \
- /usr/include/nlohmann/detail/hash.hpp \
- /usr/include/nlohmann/detail/input/binary_reader.hpp \
- /usr/include/nlohmann/detail/input/input_adapters.hpp \
- /usr/include/c++/13/numeric /usr/include/c++/13/bits/stl_numeric.h \
- /usr/include/c++/13/pstl/glue_numeric_defs.h \
- /usr/include/nlohmann/detail/input/json_sax.hpp \
- /usr/include/nlohmann/detail/input/lexer.hpp \
- /usr/include/nlohmann/detail/meta/is_sax.hpp \
- /usr/include/nlohmann/detail/input/parser.hpp \
- /usr/include/nlohmann/detail/iterators/internal_iterator.hpp \
- /usr/include/nlohmann/detail/iterators/primitive_iterator.hpp \
- /usr/include/nlohmann/detail/iterators/iter_impl.hpp \
- /usr/include/nlohmann/detail/iterators/json_reverse_iterator.hpp \
- /usr/include/nlohmann/detail/json_custom_base_class.hpp \
- /usr/include/nlohmann/detail/json_pointer.hpp \
- /usr/include/nlohmann/detail/json_ref.hpp \
- /usr/include/nlohmann/detail/output/binary_writer.hpp \
- /usr/include/nlohmann/detail/output/output_adapters.hpp \
- /usr/include/nlohmann/detail/output/serializer.hpp \
- /usr/include/nlohmann/detail/conversions/to_chars.hpp \
- /usr/include/nlohmann/ordered_map.hpp /usr/include/c++/13/any \
- /usr/include/nlohmann/detail/macro_unscope.hpp \
- /usr/include/nlohmann/thirdparty/hedley/hedley_undef.hpp \
+ /usr/include/c++/13/optional /usr/include/c++/13/numeric \
+ /usr/include/c++/13/bits/stl_numeric.h \
+ /usr/include/c++/13/pstl/glue_numeric_defs.h /usr/include/c++/13/any \
  /home/lms/Documents/its_server/server/../include/Global_protocol.h \
- /home/lms/Documents/its_server/server/../include/json.hpp \
- /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
- /home/lms/Documents/its_server/server/../dto/AllDTOs.h \
- /home/lms/Documents/its_server/server/../dto/BaseDTO.h \
  /home/lms/Documents/its_server/server/../include/json.hpp \
  /home/lms/Documents/its_server/server/../dto/AccountDTO.h \
  /home/lms/Documents/its_server/server/../dto/StoreDTO.h \
@@ -360,4 +291,31 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: \
  /usr/local/include/mariadb/conncpp/SQLString.hpp \
  /usr/local/include/mariadb/conncpp/Exception.hpp \
  /usr/local/include/mariadb/conncpp/jdbccompat.hpp \
+ /home/lms/Documents/its_server/server/src/session/ClientSession.h \
+ /usr/include/c++/13/mutex /usr/include/c++/13/bits/std_mutex.h \
+ /usr/include/c++/13/bits/unique_lock.h /usr/include/unistd.h \
+ /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
+ /usr/include/x86_64-linux-gnu/bits/environments.h \
+ /usr/include/x86_64-linux-gnu/bits/confname.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+ /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
+ /usr/include/x86_64-linux-gnu/bits/unistd_ext.h \
+ /usr/include/linux/close_range.h /usr/include/arpa/inet.h \
+ /usr/include/netinet/in.h /usr/include/x86_64-linux-gnu/sys/socket.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
+ /usr/include/x86_64-linux-gnu/bits/socket.h \
+ /usr/include/x86_64-linux-gnu/bits/socket_type.h \
+ /usr/include/x86_64-linux-gnu/bits/sockaddr.h \
+ /usr/include/x86_64-linux-gnu/asm/socket.h \
+ /usr/include/asm-generic/socket.h /usr/include/linux/posix_types.h \
+ /usr/include/linux/stddef.h \
+ /usr/include/x86_64-linux-gnu/asm/posix_types.h \
+ /usr/include/x86_64-linux-gnu/asm/posix_types_64.h \
+ /usr/include/asm-generic/posix_types.h \
+ /usr/include/x86_64-linux-gnu/asm/bitsperlong.h \
+ /usr/include/asm-generic/bitsperlong.h \
+ /usr/include/x86_64-linux-gnu/asm/sockios.h \
+ /usr/include/asm-generic/sockios.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
+ /usr/include/x86_64-linux-gnu/bits/in.h /usr/include/nlohmann/json.hpp \
  /usr/include/c++/13/iostream

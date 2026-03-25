@@ -226,11 +226,3 @@ CREATE TABLE ORDER_DETAILS (
     price INT(11) NOT NULL           -- 14000원
 );
 
--- 1. 한 주문당 리뷰를 1개만 쓰게 막았던 족쇄(UNIQUE)를 끊어냅니다.
-ALTER TABLE REVIEWS DROP INDEX order_id;
-
--- 2. 이 리뷰가 어떤 메뉴에 대한 것인지 식별할 menu_id 컬럼을 추가합니다.
-ALTER TABLE REVIEWS ADD COLUMN menu_id INT(11) NOT NULL AFTER order_id;
-
--- 3. (안전장치) "같은 주문번호(order_id)로 같은 메뉴(menu_id)에 리뷰를 2번 쓰는 것"만 막아줍니다.
-ALTER TABLE REVIEWS ADD UNIQUE KEY unique_order_menu (order_id, menu_id);

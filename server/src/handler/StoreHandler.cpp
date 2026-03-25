@@ -1,9 +1,8 @@
 #include "StoreHandler.h"
-
-#include "ClientSession.h"
 #include "StoreDAO.h"
 #include "UserDAO.h"
 #include "AllDTOs.h"
+#include "ClientSession.h"
 #include "Global_protocol.h"
 #include <nlohmann/json.hpp>
 #include <iostream>
@@ -131,6 +130,11 @@ void StoreHandler::handleStoreInfoUpdateReq(std::shared_ptr<ClientSession> sessi
         {
             storeClauses += "cook_time=?, ";
             storeValues.push_back(req["cookTime"].get<std::string>());
+        }
+        if (req.contains("deliveryFee"))
+        {
+            storeClauses += "delivery_fee=?, ";
+            storeValues.push_back(std::to_string(req["deliveryFee"].get<int>()));
         }
 
         // 🚀 방어 로직: 숫자로 오든, 문자로 오든 안전하게 문자열로 변환하여 쿼리에 바인딩

@@ -361,4 +361,5 @@ CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o: \
  /usr/local/include/mariadb/conncpp/Exception.hpp \
  /usr/local/include/mariadb/conncpp/jdbccompat.hpp \
  /home/lms/Documents/its_server/server/src/database/AuthDAO.h \
+ /home/lms/Documents/its_server/server/src/database/MembershipDAO.h \
  /usr/include/c++/13/iostream

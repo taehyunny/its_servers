@@ -225,30 +225,6 @@ src/database/CategoryDAO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.s
 .PHONY : src/database/CategoryDAO.cpp.s
 
-src/database/ConnectionPool.o: src/database/ConnectionPool.cpp.o
-.PHONY : src/database/ConnectionPool.o
-
-# target to build an object file
-src/database/ConnectionPool.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.o
-.PHONY : src/database/ConnectionPool.cpp.o
-
-src/database/ConnectionPool.i: src/database/ConnectionPool.cpp.i
-.PHONY : src/database/ConnectionPool.i
-
-# target to preprocess a source file
-src/database/ConnectionPool.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.i
-.PHONY : src/database/ConnectionPool.cpp.i
-
-src/database/ConnectionPool.s: src/database/ConnectionPool.cpp.s
-.PHONY : src/database/ConnectionPool.s
-
-# target to generate assembly for a file
-src/database/ConnectionPool.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ConnectionPool.cpp.s
-.PHONY : src/database/ConnectionPool.cpp.s
-
 src/database/DbManager.o: src/database/DbManager.cpp.o
 .PHONY : src/database/DbManager.o
 
@@ -272,6 +248,30 @@ src/database/DbManager.s: src/database/DbManager.cpp.s
 src/database/DbManager.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.s
 .PHONY : src/database/DbManager.cpp.s
+
+src/database/MembershipDAO.o: src/database/MembershipDAO.cpp.o
+.PHONY : src/database/MembershipDAO.o
+
+# target to build an object file
+src/database/MembershipDAO.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/MembershipDAO.cpp.o
+.PHONY : src/database/MembershipDAO.cpp.o
+
+src/database/MembershipDAO.i: src/database/MembershipDAO.cpp.i
+.PHONY : src/database/MembershipDAO.i
+
+# target to preprocess a source file
+src/database/MembershipDAO.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/MembershipDAO.cpp.i
+.PHONY : src/database/MembershipDAO.cpp.i
+
+src/database/MembershipDAO.s: src/database/MembershipDAO.cpp.s
+.PHONY : src/database/MembershipDAO.s
+
+# target to generate assembly for a file
+src/database/MembershipDAO.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/MembershipDAO.cpp.s
+.PHONY : src/database/MembershipDAO.cpp.s
 
 src/database/MenuDAO.o: src/database/MenuDAO.cpp.o
 .PHONY : src/database/MenuDAO.o
@@ -320,30 +320,6 @@ src/database/OrderDAO.s: src/database/OrderDAO.cpp.s
 src/database/OrderDAO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/OrderDAO.cpp.s
 .PHONY : src/database/OrderDAO.cpp.s
-
-src/database/ProductDAO.o: src/database/ProductDAO.cpp.o
-.PHONY : src/database/ProductDAO.o
-
-# target to build an object file
-src/database/ProductDAO.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.o
-.PHONY : src/database/ProductDAO.cpp.o
-
-src/database/ProductDAO.i: src/database/ProductDAO.cpp.i
-.PHONY : src/database/ProductDAO.i
-
-# target to preprocess a source file
-src/database/ProductDAO.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.i
-.PHONY : src/database/ProductDAO.cpp.i
-
-src/database/ProductDAO.s: src/database/ProductDAO.cpp.s
-.PHONY : src/database/ProductDAO.s
-
-# target to generate assembly for a file
-src/database/ProductDAO.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/ProductDAO.cpp.s
-.PHONY : src/database/ProductDAO.cpp.s
 
 src/database/SearchDAO.o: src/database/SearchDAO.cpp.o
 .PHONY : src/database/SearchDAO.o
@@ -584,6 +560,30 @@ src/handler/ReviewHandler.s: src/handler/ReviewHandler.cpp.s
 src/handler/ReviewHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.s
 .PHONY : src/handler/ReviewHandler.cpp.s
+
+src/handler/SalesHandler.o: src/handler/SalesHandler.cpp.o
+.PHONY : src/handler/SalesHandler.o
+
+# target to build an object file
+src/handler/SalesHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o
+.PHONY : src/handler/SalesHandler.cpp.o
+
+src/handler/SalesHandler.i: src/handler/SalesHandler.cpp.i
+.PHONY : src/handler/SalesHandler.i
+
+# target to preprocess a source file
+src/handler/SalesHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.i
+.PHONY : src/handler/SalesHandler.cpp.i
+
+src/handler/SalesHandler.s: src/handler/SalesHandler.cpp.s
+.PHONY : src/handler/SalesHandler.s
+
+# target to generate assembly for a file
+src/handler/SalesHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.s
+.PHONY : src/handler/SalesHandler.cpp.s
 
 src/handler/SearchHandler.o: src/handler/SearchHandler.cpp.o
 .PHONY : src/handler/SearchHandler.o
@@ -918,21 +918,18 @@ help:
 	@echo "... src/database/CategoryDAO.o"
 	@echo "... src/database/CategoryDAO.i"
 	@echo "... src/database/CategoryDAO.s"
-	@echo "... src/database/ConnectionPool.o"
-	@echo "... src/database/ConnectionPool.i"
-	@echo "... src/database/ConnectionPool.s"
 	@echo "... src/database/DbManager.o"
 	@echo "... src/database/DbManager.i"
 	@echo "... src/database/DbManager.s"
+	@echo "... src/database/MembershipDAO.o"
+	@echo "... src/database/MembershipDAO.i"
+	@echo "... src/database/MembershipDAO.s"
 	@echo "... src/database/MenuDAO.o"
 	@echo "... src/database/MenuDAO.i"
 	@echo "... src/database/MenuDAO.s"
 	@echo "... src/database/OrderDAO.o"
 	@echo "... src/database/OrderDAO.i"
 	@echo "... src/database/OrderDAO.s"
-	@echo "... src/database/ProductDAO.o"
-	@echo "... src/database/ProductDAO.i"
-	@echo "... src/database/ProductDAO.s"
 	@echo "... src/database/SearchDAO.o"
 	@echo "... src/database/SearchDAO.i"
 	@echo "... src/database/SearchDAO.s"
@@ -963,6 +960,9 @@ help:
 	@echo "... src/handler/ReviewHandler.o"
 	@echo "... src/handler/ReviewHandler.i"
 	@echo "... src/handler/ReviewHandler.s"
+	@echo "... src/handler/SalesHandler.o"
+	@echo "... src/handler/SalesHandler.i"
+	@echo "... src/handler/SalesHandler.s"
 	@echo "... src/handler/SearchHandler.o"
 	@echo "... src/handler/SearchHandler.i"
 	@echo "... src/handler/SearchHandler.s"

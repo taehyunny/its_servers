@@ -21,20 +21,20 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
     try
     {
         auto req = nlohmann::json::parse(jsonBody).get<OrderAcceptReqDTO>();
-        std::cout << "[OrderHandler] 🧑‍🍳 사장님 주문 수락 요청 수신 (ID: " << req.orderId << ")" << std::endl;
+        std::cout << "[OrderHandler] 🧑🍳 사장님 주문 수락 요청 수신 (ID: " << req.orderId << ")" << std::endl;
 
-        // 🚀 [Step 1] 트랜잭션 시작: 자동 커밋 해제
+        // Step 1: 트랜잭션 시작
         conn->setAutoCommit(false);
 
-        // 🚀 [Step 2] 주문 상태 업데이트 (수락: 1)
-        std::unique_ptr<sql::PreparedStatement> pstmtStatus(conn->prepareStatement(
+        // Step 2: 주문 상태 업데이트 (수락: 1)
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "UPDATE ORDERS SET order_status = 1 WHERE order_id = ?"));
-        pstmtStatus->setString(1, req.orderId);
-        int affected = pstmtStatus->executeUpdate();
+        pstmt->setString(1, req.orderId); // ✅ orderId → req.orderId
+        int affected = pstmt->executeUpdate();
 
         if (affected > 0)
         {
-            // 🚀 [Step 3] STORES 테이블 매출(total_sales) 누적
+            // Step 3: STORES 테이블 매출(total_sales) 누적
             std::unique_ptr<sql::PreparedStatement> pstmtSales(conn->prepareStatement(
                 "UPDATE STORES S "
                 "JOIN ORDERS O ON O.store_id = S.store_id "
@@ -43,15 +43,15 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
             pstmtSales->setString(1, req.orderId);
             pstmtSales->executeUpdate();
 
-            // 🚀 [Step 4] 커밋 확정: 모든 작업 성공 시 실제 반영
+            // Step 4: 커밋
             conn->commit();
             conn->setAutoCommit(true);
 
-            // ── 액션 1: 사장님에게 성공 응답 ──
+            // 액션 1: 사장님에게 성공 응답
             OrderAcceptResDTO res = {200, "주문 수락 및 매출 기록이 완료되었습니다."};
             session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), res);
 
-            // ── 액션 2: 고객 푸시 알림 ──
+            // 액션 2: 고객 푸시 알림
             std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
             if (!customerId.empty())
             {
@@ -59,20 +59,25 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
                 notifyCustomer.orderId = req.orderId;
                 notifyCustomer.state = 1;
                 notifyCustomer.message = "사장님이 조리를 시작했습니다! (" + std::to_string(req.estimatedTime) + "분 소요 예정)";
-                SessionManager::getInstance().sendToUser(customerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notifyCustomer);
+                SessionManager::getInstance().sendToUser(
+                    customerId,
+                    static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE),
+                    notifyCustomer);
             }
 
-            // ── 액션 3: 라이더 브로드캐스트 (배달 콜 생성) ──
-            // 실무 팁: 실제로는 DB에서 매장 주소를 긁어와야 하지만, 우선 구조를 유지합니다.
+            // 액션 3: 라이더 브로드캐스트
             NotifyDeliveryCallDTO notifyRiders;
             notifyRiders.orderId = req.orderId;
             notifyRiders.pickupAddress = "매장 주소 (DB 조회 권장)";
             notifyRiders.deliveryAddress = "고객 배달 주소";
 
-            int ROLE_RIDER = 2; // 라이더 권한 번호
-            SessionManager::getInstance().broadcastToRole(ROLE_RIDER, static_cast<uint16_t>(CmdID::NOTIFY_DELIVERY_CALL), notifyRiders);
+            int ROLE_RIDER = 2;
+            SessionManager::getInstance().broadcastToRole(
+                ROLE_RIDER,
+                static_cast<uint16_t>(CmdID::NOTIFY_DELIVERY_CALL),
+                notifyRiders);
 
-            std::cout << "[OrderHandler] ✅ 주문 수락 처리 완료 - 고객 알림 및 라이더 호출 완료" << std::endl;
+            std::cout << "[OrderHandler] ✅ 주문 수락 처리 완료" << std::endl;
         }
         else
         {
@@ -81,11 +86,12 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
     }
     catch (const std::exception &e)
     {
-        // 🚨 실패 시 롤백: 돈만 쌓이거나 상태만 바뀌는 참사 방지
         conn->rollback();
         conn->setAutoCommit(true);
 
-        std::cerr << "🚨 [OrderHandler] 주문 수락 중 에러 (Rollback 실행): " << e.what() << std::endl;
+        std::cerr << "🚨 [OrderHandler] 주문 수락 중 에러 (Rollback 실행): "
+                  << e.what() << std::endl;
+
         OrderAcceptResDTO res = {500, "서버 내부 오류로 주문 수락에 실패했습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), res);
     }
@@ -146,7 +152,7 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
         {
             res["minOrderAmount"] = rsStore->getInt("min_order_amount");
             res["deliveryFee"] = rsStore->getInt("delivery_fee");
-            
+
             // 🚀 프론트엔드 요청 사항 2종 세트 추가!
             res["storeAddress"] = rsStore->isNull("store_address") ? "" : rsStore->getString("store_address").c_str();
             res["pickupTime"] = "15~25분 후 방문 포장"; // 우선 기획서에 있는 하드코딩 값으로 세팅합니다.

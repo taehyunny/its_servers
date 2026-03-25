@@ -335,4 +335,5 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: \
  /usr/local/include/mariadb/conncpp/jdbccompat.hpp \
  /home/lms/Documents/its_server/server/src/handler/AddressHandler.h \
  /home/lms/Documents/its_server/server/src/handler/ReviewHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/SalesHandler.h \
  /usr/include/c++/13/iostream
