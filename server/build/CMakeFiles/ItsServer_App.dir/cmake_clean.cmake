@@ -35,6 +35,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o.d"
   "CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.o"
   "CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.o.d"
+  "CMakeFiles/ItsServer_App.dir/src/handler/RiderHandler.cpp.o"
+  "CMakeFiles/ItsServer_App.dir/src/handler/RiderHandler.cpp.o.d"
   "CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o"
   "CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o.d"
   "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o"

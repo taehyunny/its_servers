@@ -71,11 +71,46 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
             }
 
             // 액션 3: 라이더 브로드캐스트
+            // 액션 3: 라이더 브로드캐스트 (명세서 반영하여 추가 정보 채우기)
             NotifyDeliveryCallDTO notifyRiders;
             notifyRiders.orderId = req.orderId;
-            notifyRiders.pickupAddress = StoreDAO::getInstance().getStoreDetail(OrderDAO::getInstance().getStoreIdByOrderId(req.orderId)).storeAddress; // 픽업지는 매장 주소로 세팅
-            notifyRiders.deliveryAddress = OrderDAO::getInstance().getDeliveryAddressByOrderId(req.orderId);                                            // 고객 배달 주소
+            notifyRiders.pickupAddress = StoreDAO::getInstance().getStoreDetail(OrderDAO::getInstance().getStoreIdByOrderId(req.orderId)).storeAddress;
+            notifyRiders.deliveryAddress = OrderDAO::getInstance().getDeliveryAddressByOrderId(req.orderId);
+            notifyRiders.deliveryFee = 3500; // 하드코딩 또는 DB 연동
 
+            // 🚀 라이더 앱 리스트에 띄워줄 상세 정보 조회 로직 추가!
+            std::unique_ptr<sql::PreparedStatement> pRiderInfo(conn->prepareStatement(
+                "SELECT total_price, created_at FROM ORDERS WHERE order_id = ?"));
+            pRiderInfo->setString(1, req.orderId);
+            std::unique_ptr<sql::ResultSet> rsRiderInfo(pRiderInfo->executeQuery());
+            if (rsRiderInfo->next())
+            {
+                notifyRiders.totalPrice = rsRiderInfo->getInt("total_price");
+                notifyRiders.createdAt = rsRiderInfo->getString("created_at").c_str();
+            }
+
+            // 메뉴 요약 정보 (떡볶이 외 1건)
+            std::unique_ptr<sql::PreparedStatement> pMenuSummary(conn->prepareStatement(
+                "SELECT M.menu_name FROM ORDER_ITEMS OI JOIN MENUS M ON OI.menu_id = M.menu_id WHERE OI.order_id = ? LIMIT 1"));
+            pMenuSummary->setString(1, req.orderId);
+            std::unique_ptr<sql::ResultSet> rsMenuSummary(pMenuSummary->executeQuery());
+
+            std::unique_ptr<sql::PreparedStatement> pMenuCount(conn->prepareStatement("SELECT COUNT(*) as cnt FROM ORDER_ITEMS WHERE order_id = ?"));
+            pMenuCount->setString(1, req.orderId);
+            std::unique_ptr<sql::ResultSet> rsMenuCount(pMenuCount->executeQuery());
+
+            std::string summary = "메뉴";
+            if (rsMenuSummary->next())
+            {
+                summary = rsMenuSummary->getString("menu_name").c_str();
+                if (rsMenuCount->next() && rsMenuCount->getInt("cnt") > 1)
+                {
+                    summary += " 외 " + std::to_string(rsMenuCount->getInt("cnt") - 1) + "건";
+                }
+            }
+            notifyRiders.menuSummary = summary;
+
+            // 라이더(ROLE 2) 전체에게 브로드캐스트 쏘기!
             int ROLE_RIDER = 2;
             SessionManager::getInstance().broadcastToRole(
                 ROLE_RIDER,

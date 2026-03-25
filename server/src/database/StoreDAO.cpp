@@ -322,8 +322,7 @@ std::string StoreDAO::getOwnerIdByStoreId(int storeId)
 {
     auto conn = DBManager::getInstance().getConnection();
     std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-        "SELECT owner_id FROM STORES WHERE store_id = ?"
-        ));
+        "SELECT owner_id FROM STORES WHERE store_id = ?"));
     pstmt->setInt(1, storeId);
     std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
     if (rs->next())

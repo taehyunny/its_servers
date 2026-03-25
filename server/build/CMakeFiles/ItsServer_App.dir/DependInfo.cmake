@@ -26,6 +26,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/src/handler/MenuHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/MenuHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/OrderHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/ReviewHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.o.d"
+  "/home/lms/Documents/its_server/server/src/handler/RiderHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/RiderHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/RiderHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/SalesHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/SearchHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/StoreHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o.d"

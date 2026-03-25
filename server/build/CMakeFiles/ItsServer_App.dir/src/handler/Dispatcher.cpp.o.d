@@ -337,4 +337,5 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: \
  /home/lms/Documents/its_server/server/src/handler/ReviewHandler.h \
  /home/lms/Documents/its_server/server/src/handler/SalesHandler.h \
  /home/lms/Documents/its_server/server/src/handler/ChatHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/RiderHandler.h \
  /usr/include/c++/13/iostream

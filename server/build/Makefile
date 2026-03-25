@@ -561,6 +561,30 @@ src/handler/ReviewHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.s
 .PHONY : src/handler/ReviewHandler.cpp.s
 
+src/handler/RiderHandler.o: src/handler/RiderHandler.cpp.o
+.PHONY : src/handler/RiderHandler.o
+
+# target to build an object file
+src/handler/RiderHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/RiderHandler.cpp.o
+.PHONY : src/handler/RiderHandler.cpp.o
+
+src/handler/RiderHandler.i: src/handler/RiderHandler.cpp.i
+.PHONY : src/handler/RiderHandler.i
+
+# target to preprocess a source file
+src/handler/RiderHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/RiderHandler.cpp.i
+.PHONY : src/handler/RiderHandler.cpp.i
+
+src/handler/RiderHandler.s: src/handler/RiderHandler.cpp.s
+.PHONY : src/handler/RiderHandler.s
+
+# target to generate assembly for a file
+src/handler/RiderHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/RiderHandler.cpp.s
+.PHONY : src/handler/RiderHandler.cpp.s
+
 src/handler/SalesHandler.o: src/handler/SalesHandler.cpp.o
 .PHONY : src/handler/SalesHandler.o
 
@@ -912,6 +936,9 @@ help:
 	@echo "... src/handler/ReviewHandler.o"
 	@echo "... src/handler/ReviewHandler.i"
 	@echo "... src/handler/ReviewHandler.s"
+	@echo "... src/handler/RiderHandler.o"
+	@echo "... src/handler/RiderHandler.i"
+	@echo "... src/handler/RiderHandler.s"
 	@echo "... src/handler/SalesHandler.o"
 	@echo "... src/handler/SalesHandler.i"
 	@echo "... src/handler/SalesHandler.s"

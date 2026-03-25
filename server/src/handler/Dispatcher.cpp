@@ -9,6 +9,8 @@
 #include "ReviewHandler.h"
 #include "SalesHandler.h" // 🚀 주석 해제 및 활성화!
 #include "ChatHandler.h"  // 🚀 신규: 채팅 상담 핸들러
+#include "RiderHandler.h" // 🚀 신규: 라이더 관련 핸들러
+#include "AdminHandler.h" // 🚀 신규: 관리자 관련 핸들러
 #include <iostream>
 
 // =========================================================
@@ -87,7 +89,7 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { AddressHandler::handleAddressDefault(s, b); }},
 
     // ── 6. 검색 (Search) ──
-    {CmdID::REQ_RESEACH_WIDGET, [](auto s, auto b)
+    {CmdID::REQ_RESEARCH_WIDGET, [](auto s, auto b)
      { SearchHandler::handleSearchWidgetReq(s, b); }},
     {CmdID::REQ_RESEARCH_ADD, [](auto s, auto b)
      { SearchHandler::handleSearchAddReq(s, b); }},
@@ -112,6 +114,21 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { ChatHandler::handleChatConnect(s, b); }},
     {CmdID::REQ_CHAT_SEND, [](auto s, auto b)
      { ChatHandler::handleChatSend(s, b); }},
+
+    // ── 9. 라이더 관련 (Rider) ──
+    {CmdID::REQ_RIDER_ORDER_LIST, [](auto s, auto b)
+     { RiderHandler::handleRiderOrderList(s, b); }},
+    {CmdID::REQ_DELIVERY_COMPLETE, [](auto s, auto b)
+     { RiderHandler::handleDeliveryComplete(s, b); }},
+
+    // ── 10. 관리자 관련 (Admin) ──
+    {CmdID::REQ_ADMIN_ORDER_LIST, [](auto s, auto b)
+     { AdminHandler::handleAdminOrderList(s, b); }},
+    {CmdID::RES_REQUEST_OK, [](auto s, auto b)
+     { ChatHandler::handleAdminChatAccept(s, b); }},
+    {CmdID::RES_REQUEST_NO, [](auto s, auto b)
+     { ChatHandler::handleAdminChatReject(s, b); }},
+
 };
 // =========================================================
 // 🚀 [2단계] Dispatch 함수 본체
