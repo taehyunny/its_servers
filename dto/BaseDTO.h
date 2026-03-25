@@ -31,3 +31,18 @@ struct CategoryListResDTO
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(CategoryListResDTO, status, categories)
 };
 
+// 🙋‍♂️ 등급 변경 요청 (REQ_UPGRADE_NAME / REQ_DOWNGRADE_NAME)
+struct ReqGradeUpdateDTO {
+    std::string userId;
+    std::string targetGrade; // 변경할 등급 (예: "VIP", "프리미엄", "일반")
+    
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqGradeUpdateDTO, userId, targetGrade)
+};
+
+// 🙋‍♂️ 등급 변경 응답
+struct ResGradeUpdateDTO {
+    int status;          // 0: 성공, 1: 실패
+    std::string message; 
+    
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResGradeUpdateDTO, status, message)
+};

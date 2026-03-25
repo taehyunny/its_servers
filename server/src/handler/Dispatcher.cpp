@@ -1,7 +1,6 @@
 #include "Dispatcher.h"
 #include "UserHandler.h"
 #include "OrderHandler.h"
-#include "SystemHandler.h"
 #include "StoreHandler.h"
 #include "MenuHandler.h"
 #include "CategoryHandler.h"
@@ -9,6 +8,7 @@
 #include "AddressHandler.h"
 #include "ReviewHandler.h"
 #include "SalesHandler.h" // 🚀 주석 해제 및 활성화!
+#include "ChatHandler.h"  // 🚀 신규: 채팅 상담 핸들러
 #include <iostream>
 
 // =========================================================
@@ -29,6 +29,10 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { UserHandler::handlePhoneCheck(s, b); }},
     {CmdID::REQ_BUISNESS_NUM_CHECK, [](auto s, auto b)
      { UserHandler::handleBizNumCheck(s, b); }},
+    {CmdID::REQ_UPGRADE_NAME, [](auto s, auto b)
+     { UserHandler::handleGradeUpdate(s, b); }},
+    {CmdID::REQ_DOWNGRADE_NAME, [](auto s, auto b)
+     { UserHandler::handleGradeUpdate(s, b); }},
 
     // ── 2. 매장 및 메뉴 (Store & Menu) ──
     {CmdID::REQ_ORDER_LIST, [](auto s, auto b)
@@ -112,8 +116,6 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { ChatHandler::handleChatConnect(s, b); }},
     {CmdID::REQ_CHAT_SEND, [](auto s, auto b)
      { ChatHandler::handleChatSend(s, b); }},
-     {C}
-
 };
 // =========================================================
 // 🚀 [2단계] Dispatch 함수 본체

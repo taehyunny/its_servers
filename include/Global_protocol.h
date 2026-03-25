@@ -76,9 +76,9 @@ enum class CmdID : uint16_t
     RES_PAYMENT_PROCESS = 2025, // 서버 -> 클라이언트: 결제 완료 및 영수증 ID 반환
     REQ_CHECKOUT_INFO = 2026,   // 클라이언트 -> 서버: 결제 직전 최종 주문 정보 요청 (최종 금액, 예상 배달 시간 등)
     RES_CHECKOUT_INFO = 2027,   // 서버 -> 클라이언트: 결제 직전 최종 주문 정보 응답 (최종 금액, 예상 배달 시간 등)
-                              // 리뷰 작성 (2030 ~ 2035)
-    REQ_REVIEW_WRITE = 2030, // 사진 첨부 리뷰 작성 요청 (음식별점, 배달별점, 좋아요/싫어요)
-    RES_REVIEW_WRITE = 2031, // 리뷰 작성 응답
+                                // 리뷰 작성 (2030 ~ 2035)
+    REQ_REVIEW_WRITE = 2030,    // 사진 첨부 리뷰 작성 요청 (음식별점, 배달별점, 좋아요/싫어요)
+    RES_REVIEW_WRITE = 2031,    // 리뷰 작성 응답
 
     // 즐겨찾기 (2040 ~ 2049)
     REQ_FAVORITE_ADD = 2040,    // 즐겨찾기 추가 요청
@@ -119,41 +119,40 @@ enum class CmdID : uint16_t
     RES_ORDER_DELETE = 2089,         // 주문 내역 삭제 응답
 
     // 채팅 상담 (2090 ~ 2095)
-    REQ_CHAT_CONNECT = 2090, // 관리자 1:1 채팅방 입장 요청
-    RES_CHAT_CONNECT = 2091, // 채팅방 입장 응답
-    REQ_CHAT_SEND = 2092,    // 메시지 전송 요청 (WebSocket 방식 검토 필요)
-    RES_CHAT_SEND = 2093,    // 메시지 전송 응답
+    REQ_CHAT_CONNECT = 2090,   // 관리자 1:1 채팅방 입장 요청
+    RES_CHAT_CONNECT = 2091,   // 채팅방 입장 응답
+    REQ_CHAT_SEND = 2092,      // 메시지 전송 요청 (WebSocket 방식 검토 필요)
+    RES_CHAT_SEND = 2093,      // 메시지 전송 응답
     REQ_UPGRADE_NAME = 2094,   // 등급 변경 요청
-    RES_UPGRADE_NAME = 2095,   // 등급 변경 응답
     REQ_DOWNGRADE_NAME = 2096, // 등급 하락 요청
-    RES_DOWNGRADE_NAME = 2097, // 등급 하락 응답
-        // 마이페이지 (2100 ~ 2109)
+    RES_GRADE_UPDATE = 2095,   // 등급 변경 응답 (업그레이드/다운그레이드 구분 없이 같은 CmdID로 처리)
+                             // 마이페이지 (2100 ~ 2109)
     REQ_MY_INFO = 2100, // 마이페이지 통합 정보 요청 (리뷰수, 주문수, 즐겨찾기수, 좋아요수)
-    RES_MY_INFO = 2101,     // 마이페이지 통합 정보 응답
+    RES_MY_INFO = 2101, // 마이페이지 통합 정보 응답
 
-    REQ_STORE_INFO_UPDATE = 2102,   // 매장 정보 업데이트 요청 (영업시간, 휴무일 등)
-    RES_STORE_INFO_UPDATE = 2103,   // 매장 정보 업데이트 응답
-    REQ_RESEACH_WIDGET = 2108,      // 매장 검색 위젯 요청 (최근 검색어 출력용)
-    RES_RESEARCH_WIDGET = 2109,     // 매장 검색 위젯 응답 (최근 검색어 리스트)
-    REQ_RESEARCH_DELETE = 2110,     // 매장 검색 위젯 개별 삭제 요청 (최근 검색어 삭제)
-    RES_RESEARCH_DELETE = 2111,     // 매장 검색 위젯 개별 삭제 응답
-    REQ_RESEARCH_ADD = 2112,        // 매장 검색 위젯 추가 요청 (최근 검색어 추가)
-    RES_RESEARCH_ADD = 2113,        // 매장 검색 위젯 추가 응답
-    REQ_RESEARCH_DEL_ALL = 2114,    // 매장 검색 위젯 전체 삭제 요청 (최근 검색어 전체 삭제)
-    RES_RESEARCH_DEL_ALL = 2115,    // 매장 검색 위젯 전체 삭제 응답
-    REQ_SEARCH_STORE = 2116,        // 매장 검색 요청 (검색어로 매장명·카테고리 검색)
-    RES_SEARCH_STORE = 2117,        // 매장 검색 응답
-                                    // ---------------------------------------------------------
-                                    // [3000번대] 사장님(Owner) 파트
-                                    // ---------------------------------------------------------
-    REQ_ORDER_ACCEPT = 3000,        // 주문 수락 및 조리 시작 요청 (예상 시간 포함)
-    RES_ORDER_ACCEPT = 3001,        // 주문 수락 응답
-    REQ_ORDER_REJECT = 3010,        // 주문 거절 요청 (품절 등 사유 포함)
-    RES_ORDER_REJECT = 3011,        // 주문 거절 응답
-    REQ_COOK_TIME_SET = 3020,       // 조리 시간 재설정 요청
-    RES_COOK_TIME_SET = 3021,       // 조리 시간 설정 응답
-    REQ_CHANGE_ORDER_STATE = 3022,    // 주문 상태 변경 요청 (조리 시작, 조리 완료, 배달 출발 등)
-    RES_CHANGE_ORDER_STATE = 3023,    // 주문 상태 변경 응답 (조리 시작, 조리 완료, 배달 출발 등)
+    REQ_STORE_INFO_UPDATE = 2102,  // 매장 정보 업데이트 요청 (영업시간, 휴무일 등)
+    RES_STORE_INFO_UPDATE = 2103,  // 매장 정보 업데이트 응답
+    REQ_RESEACH_WIDGET = 2108,     // 매장 검색 위젯 요청 (최근 검색어 출력용)
+    RES_RESEARCH_WIDGET = 2109,    // 매장 검색 위젯 응답 (최근 검색어 리스트)
+    REQ_RESEARCH_DELETE = 2110,    // 매장 검색 위젯 개별 삭제 요청 (최근 검색어 삭제)
+    RES_RESEARCH_DELETE = 2111,    // 매장 검색 위젯 개별 삭제 응답
+    REQ_RESEARCH_ADD = 2112,       // 매장 검색 위젯 추가 요청 (최근 검색어 추가)
+    RES_RESEARCH_ADD = 2113,       // 매장 검색 위젯 추가 응답
+    REQ_RESEARCH_DEL_ALL = 2114,   // 매장 검색 위젯 전체 삭제 요청 (최근 검색어 전체 삭제)
+    RES_RESEARCH_DEL_ALL = 2115,   // 매장 검색 위젯 전체 삭제 응답
+    REQ_SEARCH_STORE = 2116,       // 매장 검색 요청 (검색어로 매장명·카테고리 검색)
+    RES_SEARCH_STORE = 2117,       // 매장 검색 응답
+                                   // ---------------------------------------------------------
+                                   // [3000번대] 사장님(Owner) 파트
+                                   // ---------------------------------------------------------
+    REQ_ORDER_ACCEPT = 3000,       // 주문 수락 및 조리 시작 요청 (예상 시간 포함)
+    RES_ORDER_ACCEPT = 3001,       // 주문 수락 응답
+    REQ_ORDER_REJECT = 3010,       // 주문 거절 요청 (품절 등 사유 포함)
+    RES_ORDER_REJECT = 3011,       // 주문 거절 응답
+    REQ_COOK_TIME_SET = 3020,      // 조리 시간 재설정 요청
+    RES_COOK_TIME_SET = 3021,      // 조리 시간 설정 응답
+    REQ_CHANGE_ORDER_STATE = 3022, // 주문 상태 변경 요청 (조리 시작, 조리 완료, 배달 출발 등)
+    RES_CHANGE_ORDER_STATE = 3023, // 주문 상태 변경 응답 (조리 시작, 조리 완료, 배달 출발 등)
 
     REQ_STORE_STATUS_SET = 3030,    // 영업 상태 수정 요청
     RES_STORE_STATUS_SET = 3031,    // 영업 상태 응답
