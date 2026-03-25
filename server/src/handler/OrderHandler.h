@@ -16,4 +16,5 @@ public:
     static void handleOrderReject(std::shared_ptr<ClientSession> session, const std::string &jsonBody); // 🚀 사장님 주문 거절 기능 (3004)
     static void handleOrderHistory(std::shared_ptr<ClientSession> session, const std::string &jsonBody); // 주문 내역 조회 (고객용) (3080)
     static void handleOrderHistorySearch(std::shared_ptr<ClientSession> session, const std::string &jsonBody); // 주문 내역 검색 (고객용) (3083)
+    static void handleCreateOrder(std::shared_ptr<ClientSession> session, const std::string &jsonBody); // 테스트용 주문 생성 (3100)
 };

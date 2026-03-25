@@ -31,4 +31,5 @@ public:
     // 4. 삭제 로직
     bool deleteRecentSearch(const std::string &userId, int historyId);
     bool deleteAllRecentSearches(const std::string &userId);
+
 };

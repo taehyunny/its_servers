@@ -35,10 +35,10 @@ struct OrderCreateReqDTO
     std::string deliveryAddress;     // 배달 주소 (고객이 입력한 대로)
     int couponId;                    // 쿠폰 ID (쿠폰이 적용된 경우, 아니면 -1)
     std::vector<OrderItemDTO> items; // 주문 아이템 목록
+    std::string storeRequest; 
+    std::string riderRequest;
 
-    
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderCreateReqDTO, userId, storeId, totalPrice, deliveryAddress, couponId, items)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderCreateReqDTO, userId, storeId, totalPrice, deliveryAddress, couponId, items, storeRequest, riderRequest)
 };
 
 struct OrderCreateResDTO
@@ -65,7 +65,7 @@ struct OrderAcceptResDTO
     int status;          // 0: 성공, 1: 실패 (DB 에러 등)
     std::string message; // "주문이 성공적으로 수락되었습니다."
     std::string orderId; // 수락된 주문번호 (클라이언트가 어떤 주문이 수락됐는지 알 수 있도록)
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderAcceptResDTO, status, message)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderAcceptResDTO, status, message, orderId)
 };
 
 // 🙋‍♂️ 3. 서버 -> 고객 실시간 상태 푸시 (NOTIFY_ORDER_STATE = 9010)

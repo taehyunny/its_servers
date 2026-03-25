@@ -323,4 +323,6 @@ CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: \
  /usr/include/c++/13/queue /usr/include/c++/13/deque \
  /usr/include/c++/13/bits/stl_deque.h /usr/include/c++/13/bits/deque.tcc \
  /usr/include/c++/13/bits/stl_queue.h \
- /usr/include/c++/13/condition_variable /usr/include/c++/13/iostream
+ /usr/include/c++/13/condition_variable \
+ /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
+ /usr/include/c++/13/iostream

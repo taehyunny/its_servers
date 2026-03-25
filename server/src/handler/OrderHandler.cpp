@@ -6,9 +6,13 @@
 #include "ClientSession.h"
 #include "SessionManager.h"
 #include "DbManager.h" // DB 연결을 위한 매니저 클래스
+#include "StoreDAO.h"
+#include "MenuDAO.h"
 #include <iostream>
 #include <mariadb/conncpp.hpp>
 #include <nlohmann/json.hpp>
+#include <ctime>
+#include <iomanip>
 
 using nlohmann::json;
 
@@ -69,8 +73,8 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
             // 액션 3: 라이더 브로드캐스트
             NotifyDeliveryCallDTO notifyRiders;
             notifyRiders.orderId = req.orderId;
-            notifyRiders.pickupAddress = "매장 주소 (DB 조회 권장)";
-            notifyRiders.deliveryAddress = "고객 배달 주소";
+            notifyRiders.pickupAddress = StoreDAO::getInstance().getStoreDetail(OrderDAO::getInstance().getStoreIdByOrderId(req.orderId)).storeAddress; // 픽업지는 매장 주소로 세팅
+            notifyRiders.deliveryAddress = OrderDAO::getInstance().getDeliveryAddressByOrderId(req.orderId);                                            // 고객 배달 주소
 
             int ROLE_RIDER = 2;
             SessionManager::getInstance().broadcastToRole(
@@ -651,5 +655,94 @@ void OrderHandler::handleOrderHistorySearch(std::shared_ptr<ClientSession> sessi
         std::cerr << "🚨 [OrderHandler] 주문 내역 검색 에러: " << e.what() << std::endl;
         ResOrderHistoryDTO res = {500, {}};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_HISTORY_SEARCH), nlohmann::json(res));
+    }
+}
+void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    auto conn = DBManager::getInstance().getConnection();
+    try
+    {
+        // 1. 클라이언트 요청 DTO 파싱
+        auto req = nlohmann::json::parse(jsonBody).get<OrderCreateReqDTO>();
+        std::cout << "[OrderHandler] 📦 신규 주문 생성 요청 (UserID: " << req.userId << ", StoreID: " << req.storeId << ")" << std::endl;
+
+        // 2. 금액 위변조 검증 (방어 로직)
+        int itemSum = 0;
+        for (const auto &item : req.items)
+        {
+            itemSum += (item.unitPrice * item.quantity);
+        }
+
+        // 💡 StoreDAO에서 해당 매장의 배달비를 가져옵니다. (구현되어 있다고 가정)
+        int deliveryFee = StoreDAO::getInstance().getDeliveryFee(req.storeId);
+
+        if (itemSum + deliveryFee != req.totalPrice)
+        {
+            std::cerr << "🚨 [OrderHandler] 금액 위변조 의심! (메뉴합계+배달비: " << (itemSum + deliveryFee) << ", 수신된 총액: " << req.totalPrice << ")" << std::endl;
+            throw std::runtime_error("결제 금액 검증에 실패했습니다.");
+        }
+
+        // 3. 트랜잭션 시작 (여기서부터는 실패하면 전부 무효화!)
+        conn->setAutoCommit(false);
+
+        // 4. 고유 주문번호 생성 (예: ORD-20260325143000-user1)
+        time_t now = time(nullptr);
+        char timeBuf[80];
+        strftime(timeBuf, sizeof(timeBuf), "%Y%m%d%H%M%S", localtime(&now));
+        std::string newOrderId = "ORD-" + std::string(timeBuf) + "-" + req.userId;
+
+        // 5. ORDERS 테이블 INSERT (마스터 데이터)
+        std::unique_ptr<sql::PreparedStatement> pstmtOrder(conn->prepareStatement(
+            "INSERT INTO ORDERS (order_id, user_id, store_id, total_price, delivery_address, store_request, rider_request, order_status, created_at) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, 0, NOW())"));
+        pstmtOrder->setString(1, newOrderId);
+        pstmtOrder->setString(2, req.userId);
+        pstmtOrder->setInt(3, req.storeId);
+        pstmtOrder->setInt(4, req.totalPrice);
+        pstmtOrder->setString(5, req.deliveryAddress);
+        pstmtOrder->setString(6, req.storeRequest); // 사장님께
+        pstmtOrder->setString(7, req.riderRequest); // 라이더님께
+        pstmtOrder->executeUpdate();
+
+        // 6. ORDER_DETAILS 테이블 INSERT (상세 메뉴들)
+        std::unique_ptr<sql::PreparedStatement> pstmtItems(conn->prepareStatement(
+            "INSERT INTO ORDER_DETAILS (order_id, menu_id, menu_name, quantity, price) VALUES (?, ?, ?, ?, ?)"));
+
+        for (const auto &item : req.items)
+        {
+            // 💡 아까 에러 났던 'menu_name'을 넣기 위해 DB에서 메뉴 이름을 조회해 옵니다.
+            std::string menuName = MenuDAO::getInstance().getMenuName(item.menuId);
+            if (menuName.empty())
+                menuName = "알 수 없는 메뉴"; // 방어 코드
+
+            pstmtItems->setString(1, newOrderId);
+            pstmtItems->setInt(2, item.menuId);
+            pstmtItems->setString(3, menuName);
+            pstmtItems->setInt(4, item.quantity);
+            pstmtItems->setInt(5, item.unitPrice);
+            pstmtItems->executeUpdate();
+        }
+
+        // 7. 모든 쿼리가 성공하면 DB에 영구 반영 (Commit)
+        conn->commit();
+        conn->setAutoCommit(true);
+        std::cout << "[OrderHandler] ✅ 주문 생성 완벽 성공! (OrderID: " << newOrderId << ")" << std::endl;
+
+        // 8. 클라이언트에게 성공 응답 전송
+        OrderCreateResDTO res = {0, "주문이 성공적으로 생성되었습니다.", newOrderId};
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_CREATE), nlohmann::json(res));
+
+        // 🚀 (보너스) 여기서 사장님한테 "새 주문 들어왔어요~" 푸시 알림(9000번)을 쏘면 완벽합니다!
+    }
+    catch (const std::exception &e) // SQL 에러 및 일반 에러 모두 포착
+    {
+        std::cerr << "🚨 [OrderHandler] 주문 생성 실패 (Rollback 실행): " << e.what() << std::endl;
+        if (conn)
+        {
+            conn->rollback(); // 싹 다 없던 일로 되돌림
+            conn->setAutoCommit(true);
+        }
+        OrderCreateResDTO res = {1, "주문 처리 중 오류가 발생했습니다. (" + std::string(e.what()) + ")", ""};
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_CREATE), nlohmann::json(res));
     }
 }

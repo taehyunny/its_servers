@@ -83,6 +83,8 @@ CREATE TABLE ORDERS (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
     store_request VARCHAR(255) DEFAULT '',  -- 사장님께 (예: "단무지 많이")
     rider_request VARCHAR(255) DEFAULT ''  -- 라이더님께 (예: "문 앞에 두고 가세요")
+    store_request VARCHAR(255) DEFAULT '',
+    rider_request VARCHAR(255) DEFAULT '',
 );
 
 -- 9. ORDER_ITEMS (주문 상세 항목)

@@ -215,3 +215,29 @@ std::vector<OrderHistoryItemDTO> OrderDAO::getOrderHistory(const std::string &us
 
     return historyList;
 }
+
+// 1. 주문번호로 매장 ID 가져오기
+int OrderDAO::getStoreIdByOrderId(const std::string &orderId)
+{
+    auto conn = DBManager::getInstance().getConnection();
+    std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+        "SELECT store_id FROM ORDERS WHERE order_id = ?"));
+    pstmt->setString(1, orderId);
+    std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+    if (rs->next())
+        return rs->getInt("store_id");
+    return -1;
+}
+
+// 2. 주문번호로 배달 주소 가져오기
+std::string OrderDAO::getDeliveryAddressByOrderId(const std::string &orderId)
+{
+    auto conn = DBManager::getInstance().getConnection();
+    std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+        "SELECT delivery_address FROM ORDERS WHERE order_id = ?"));
+    pstmt->setString(1, orderId);
+    std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+    if (rs->next())
+        return rs->getString("delivery_address").c_str();
+    return "";
+}

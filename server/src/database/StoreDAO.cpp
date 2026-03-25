@@ -294,3 +294,26 @@ bool StoreDAO::executeUpdate(const std::string &query, const std::vector<std::st
         return false;
     }
 }
+
+int StoreDAO::getDeliveryFee(int storeId)
+{
+    auto conn = DBManager::getInstance().getConnection();
+    try
+    {
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT delivery_fee FROM STORES WHERE store_id = ?"));
+        pstmt->setInt(1, storeId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            return rs->getInt("delivery_fee"); // 🚀 매장의 진짜 배달비 리턴!
+        }
+    }
+    catch (const sql::SQLException &e)
+    {
+        std::cerr << "🚨 [StoreDAO] 배달비 조회 에러: " << e.what() << std::endl;
+    }
+
+    return 0; // 매장을 못 찾거나 에러가 나면 기본값 0원 처리 (방어 코드)
+}

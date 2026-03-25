@@ -179,6 +179,7 @@ struct ResStoreDetailDTO
     StoreDataDTO storeData;
     std::vector<MenuDataDTO> menuList;
     std::vector<ReviewDTO> reviewList;
+    std::string storeAddress;
 
     friend void to_json(nlohmann::json &j, const ResStoreDetailDTO &dto)
     {
@@ -186,7 +187,8 @@ struct ResStoreDetailDTO
             {"status", dto.status},
             {"storeData", dto.storeData},
             {"menuList", dto.menuList},
-            {"reviewList", dto.reviewList}};
+            {"reviewList", dto.reviewList},
+            {"storeAddress", dto.storeAddress}};
     }
 
     friend void from_json(const nlohmann::json &j, ResStoreDetailDTO &dto)
@@ -198,6 +200,7 @@ struct ResStoreDetailDTO
             j.at("menuList").get_to(dto.menuList);
         if (j.contains("reviewList"))
             j.at("reviewList").get_to(dto.reviewList);
+        dto.storeAddress = j.value("storeAddress", j.value("store_address", ""));
     }
 };
 

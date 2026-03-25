@@ -27,8 +27,10 @@ public:
     bool updateOrderStatus(const std::string &orderId, int status);
 
     // 🚀 주문번호로 고객 ID 찾아오기 (알림 대상 식별용)
-    std::string getCustomerIdByOrderId(const std::string &orderId);
-    std::vector<OrderHistoryItemDTO> getOrderHistory(const std::string &userId, const std::string &keyword);
+    std::string getCustomerIdByOrderId(const std::string &orderId);                                          // 라이더 알림용
+    std::vector<OrderHistoryItemDTO> getOrderHistory(const std::string &userId, const std::string &keyword); // 주문 내역 조회 (검색어 포함)
+    int getStoreIdByOrderId(const std::string &orderId);                                             // 주문번호로 매장 ID 찾아오기 (라이더 알림용)
+    std::string getDeliveryAddressByOrderId(const std::string &orderId);                                     // 주문번호로 배달 주소 찾아오기 (라이더 알림용)
 
 private:
     OrderDAO() = default;

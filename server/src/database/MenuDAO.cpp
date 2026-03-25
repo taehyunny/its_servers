@@ -184,7 +184,8 @@ std::vector<OptionGroup> MenuDAO::getMenuOptionsParsed(int menuId)
     try
     {
         auto conn = DBManager::getInstance().getConnection();
-        if (!conn) return resultGroups;
+        if (!conn)
+            return resultGroups;
 
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "SELECT menu_options FROM MENUS WHERE menu_id = ?"));
@@ -195,17 +196,39 @@ std::vector<OptionGroup> MenuDAO::getMenuOptionsParsed(int menuId)
         if (rs->next())
         {
             std::string optionsStr = rs->isNull("menu_options") ? "[]" : rs->getString("menu_options").c_str();
-            
+
             // 🚀 태현님이 구현해둔 from_json 마법이 발동되는 순간!
             // JSON 문자열을 파싱해서 std::vector<OptionGroup>에 한 번에 쏟아 붓습니다.
             nlohmann::json j = nlohmann::json::parse(optionsStr);
-            j.get_to(resultGroups); 
+            j.get_to(resultGroups);
         }
     }
     catch (const std::exception &e)
     {
         std::cerr << "🚨 [MenuDAO] 메뉴 옵션 파싱 에러: " << e.what() << std::endl;
     }
-    
+
     return resultGroups;
+}
+std::string MenuDAO::getMenuName(int menuId)
+{
+    auto conn = DBManager::getInstance().getConnection();
+    try
+    {
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT menu_name FROM MENUS WHERE menu_id = ?"));
+        pstmt->setInt(1, menuId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            return rs->getString("menu_name").c_str(); // 🚀 찐 메뉴 이름 리턴!
+        }
+    }
+    catch (const sql::SQLException &e)
+    {
+        std::cerr << "🚨 [MenuDAO] 메뉴 이름 조회 에러: " << e.what() << std::endl;
+    }
+
+    return ""; // 못 찾으면 빈 문자열 리턴
 }

@@ -27,6 +27,8 @@ public:
     std::vector<MenuDTO> getMenusByStoreId(int storeId);          // 메뉴 목록 가져오기
     std::vector<OptionGroup> getOptionGroupsByMenuId(int menuId); // 메뉴별 옵션 그룹 가져오기
     std::vector<OptionGroup> getMenuOptionsParsed(int menuId);    // 메뉴 옵션 JSON 파싱 후 반환
+    std::string getMenuName(int menuId);
+
 private:
     MenuDAO() = default;
     ~MenuDAO() = default;
