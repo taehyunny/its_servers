@@ -23,8 +23,9 @@ struct OrderItemDTO
     int quantity;                   // 주문한 수량
     int unitPrice;                  // 주문 당시 메뉴의 단가 (가격 변동 대비)
     nlohmann::json selectedOptions; // 주문 당시 스냅샷
+    std::string menuName;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderItemDTO, menuId, quantity, unitPrice, selectedOptions)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderItemDTO, menuId, quantity, unitPrice, selectedOptions, menuName)
 };
 
 struct OrderCreateReqDTO
@@ -153,10 +154,12 @@ struct NotifyNewOrderDTO
     std::string deliveryAddress;
     std::string createdAt;
     std::vector<OrderItemDTO> items;
+    std::string storeRequest; // 🚀 사장님 요청사항 추가
+    std::string riderRequest; // 🚀 라이더 요청사항 추가
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(NotifyNewOrderDTO,
                                    orderId, userId, menuSummary, totalPrice,
-                                   deliveryAddress, createdAt, items)
+                                   deliveryAddress, createdAt, items, storeRequest, riderRequest)
 };
 
 // 🧑‍🍳 주문 거절 요청 (REQ_ORDER_REJECT = 3010)
@@ -174,7 +177,7 @@ struct ResOrderRejectDTO
     int status;          // 0: 성공, 1: 실패
     std::string message; // "주문 거절 처리가 완료되었습니다."
     std::string orderId; // 거절된 주문 번호 (클라이언트가 어떤 주문이 거절됐는지 알 수 있도록)
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResOrderRejectDTO, status, message)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResOrderRejectDTO, status, message, orderId)
 };
 
 // 🙋‍♂️ 주문 내역 하나를 나타내는 단위

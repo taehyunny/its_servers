@@ -71,7 +71,19 @@ bool SearchDAO::applySearchScore(const std::string &keyword)
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // 1순위: 완벽한 매장명 검색 (name -> store_name 수정 완료)
+        // 🚀 [추가된 0순위]: 검색어 자체가 카테고리명(예: "치킨", "분식")인지 먼저 확인!
+        std::unique_ptr<sql::PreparedStatement> pstmtCatDirect(conn->prepareStatement(
+            "UPDATE CATEGORIES SET popularity_score = popularity_score + 1 WHERE name = ?"));
+        pstmtCatDirect->setString(1, keyword);
+        int directCatUpdated = pstmtCatDirect->executeUpdate();
+
+        if (directCatUpdated > 0)
+        {
+            std::cout << "[SearchDAO] 카테고리 다이렉트 일치! 점수 +1 (" << keyword << ")" << std::endl;
+            return true; // 여기서 성공했으니 끝냅니다!
+        }
+
+        // 1순위: 완벽한 매장명 검색
         std::unique_ptr<sql::PreparedStatement> pstmtStore(conn->prepareStatement(
             "UPDATE STORES SET popularity_score = popularity_score + 1 WHERE store_name = ?"));
         pstmtStore->setString(1, keyword);
@@ -83,13 +95,11 @@ bool SearchDAO::applySearchScore(const std::string &keyword)
             return true;
         }
 
-        // 2 & 3순위: 메뉴 검색
-        // 주의: MENUS 테이블의 메뉴명 컬럼이 'name'이 맞다고 가정합니다! (만약 menu_name이면 수정 필요)
+        // 2 & 3순위: 메뉴 검색 (기존 로직 그대로 유지)
         std::unique_ptr<sql::PreparedStatement> pstmtCategory(conn->prepareStatement(
             "UPDATE CATEGORIES SET popularity_score = popularity_score + 1 "
-            "WHERE name = (" // 👈 menu_name이 아니라 name으로 수정!
-            "    SELECT S.category "
-            "    FROM MENUS M "
+            "WHERE name = ("
+            "    SELECT S.category FROM MENUS M "
             "    JOIN STORES S ON M.store_id = S.store_id "
             "    WHERE M.menu_name LIKE ? LIMIT 1"
             ")"));
@@ -104,7 +114,7 @@ bool SearchDAO::applySearchScore(const std::string &keyword)
         }
         else
         {
-            std::cout << "[SearchDAO] 검색어에 해당하는 매장/메뉴가 없습니다. (" << keyword << ")" << std::endl;
+            std::cout << "[SearchDAO] 검색어에 해당하는 매장/메뉴/카테고리가 없습니다. (" << keyword << ")" << std::endl;
         }
 
         return true;

@@ -212,6 +212,7 @@ std::vector<OptionGroup> MenuDAO::getMenuOptionsParsed(int menuId)
 }
 std::string MenuDAO::getMenuName(int menuId)
 {
+    std::cout << ">>> [DEBUG] getMenuName 호출됨! 넘어온 menuId: " << menuId << std::endl;
     auto conn = DBManager::getInstance().getConnection();
     try
     {
