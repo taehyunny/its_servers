@@ -633,30 +633,6 @@ src/handler/StoreHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.s
 .PHONY : src/handler/StoreHandler.cpp.s
 
-src/handler/SystemHandler.o: src/handler/SystemHandler.cpp.o
-.PHONY : src/handler/SystemHandler.o
-
-# target to build an object file
-src/handler/SystemHandler.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o
-.PHONY : src/handler/SystemHandler.cpp.o
-
-src/handler/SystemHandler.i: src/handler/SystemHandler.cpp.i
-.PHONY : src/handler/SystemHandler.i
-
-# target to preprocess a source file
-src/handler/SystemHandler.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.i
-.PHONY : src/handler/SystemHandler.cpp.i
-
-src/handler/SystemHandler.s: src/handler/SystemHandler.cpp.s
-.PHONY : src/handler/SystemHandler.s
-
-# target to generate assembly for a file
-src/handler/SystemHandler.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.s
-.PHONY : src/handler/SystemHandler.cpp.s
-
 src/handler/UserHandler.o: src/handler/UserHandler.cpp.o
 .PHONY : src/handler/UserHandler.o
 
@@ -849,30 +825,6 @@ src/thread/ThreadPool.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.s
 .PHONY : src/thread/ThreadPool.cpp.s
 
-src/util/Logger.o: src/util/Logger.cpp.o
-.PHONY : src/util/Logger.o
-
-# target to build an object file
-src/util/Logger.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o
-.PHONY : src/util/Logger.cpp.o
-
-src/util/Logger.i: src/util/Logger.cpp.i
-.PHONY : src/util/Logger.i
-
-# target to preprocess a source file
-src/util/Logger.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.i
-.PHONY : src/util/Logger.cpp.i
-
-src/util/Logger.s: src/util/Logger.cpp.s
-.PHONY : src/util/Logger.s
-
-# target to generate assembly for a file
-src/util/Logger.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.s
-.PHONY : src/util/Logger.cpp.s
-
 src/util/TimeUtil.o: src/util/TimeUtil.cpp.o
 .PHONY : src/util/TimeUtil.o
 
@@ -969,9 +921,6 @@ help:
 	@echo "... src/handler/StoreHandler.o"
 	@echo "... src/handler/StoreHandler.i"
 	@echo "... src/handler/StoreHandler.s"
-	@echo "... src/handler/SystemHandler.o"
-	@echo "... src/handler/SystemHandler.i"
-	@echo "... src/handler/SystemHandler.s"
 	@echo "... src/handler/UserHandler.o"
 	@echo "... src/handler/UserHandler.i"
 	@echo "... src/handler/UserHandler.s"
@@ -996,9 +945,6 @@ help:
 	@echo "... src/thread/ThreadPool.o"
 	@echo "... src/thread/ThreadPool.i"
 	@echo "... src/thread/ThreadPool.s"
-	@echo "... src/util/Logger.o"
-	@echo "... src/util/Logger.i"
-	@echo "... src/util/Logger.s"
 	@echo "... src/util/TimeUtil.o"
 	@echo "... src/util/TimeUtil.i"
 	@echo "... src/util/TimeUtil.s"

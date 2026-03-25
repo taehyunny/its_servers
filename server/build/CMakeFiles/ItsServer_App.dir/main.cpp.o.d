@@ -393,6 +393,7 @@ CMakeFiles/ItsServer_App.dir/main.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/StoreDetailDTO.h \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
+ /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
  /home/lms/Documents/its_server/server/src/database/UserDAO.h \
  /home/lms/Documents/its_server/server/src/database/AuthDAO.h \
  /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
@@ -401,5 +402,4 @@ CMakeFiles/ItsServer_App.dir/main.cpp.o: \
  /home/lms/Documents/its_server/server/src/handler/StoreHandler.h \
  /home/lms/Documents/its_server/server/src/handler/MenuHandler.h \
  /home/lms/Documents/its_server/server/src/handler/OrderHandler.h \
- /home/lms/Documents/its_server/server/src/handler/SystemHandler.h \
  /home/lms/Documents/its_server/server/src/handler/Dispatcher.h

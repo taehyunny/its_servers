@@ -14,27 +14,24 @@ void ChatHandler::handleChatConnect(std::shared_ptr<ClientSession> session, cons
     try
     {
         auto req = nlohmann::json::parse(jsonBody).get<ReqChatConnectDTO>();
-        std::cout << "[ChatHandler] 🚪 채팅방 입장 요청 (Order: " << req.orderId << ", User: " << req.userId << ")" << std::endl;
+        std::cout << "[ChatHandler] 🚪 채팅방 입장 요청 (Store: " << req.storeId << ", User: " << req.userId << ")" << std::endl;
 
-        // 1. 주문 번호를 단서로 [고객 ID]와 [사장님 ID]를 추적합니다!
-        std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
-        int storeId = OrderDAO::getInstance().getStoreIdByOrderId(req.orderId);
+        // 1. DTO에서 바로 값을 빼옵니다.
+        std::string customerId = req.userId;
 
-        // 💡 주의: StoreDAO에 getOwnerIdByStoreId(int storeId) 함수가 필요합니다!
-        std::string adminId = StoreDAO::getInstance().getOwnerIdByStoreId(storeId);
+        // 2. StoreDAO를 통해 매장 사장님 ID를 찾습니다.
+        std::string adminId = StoreDAO::getInstance().getOwnerIdByStoreId(req.storeId);
 
-        if (customerId.empty() || adminId.empty())
+        if (adminId.empty())
         {
-            throw std::runtime_error("채팅 대상을 찾을 수 없습니다.");
+            throw std::runtime_error("매장 사장님 정보를 찾을 수 없습니다.");
         }
 
-        // 2. ChatRoomManager를 통해 방을 생성합니다 (uint64_t 캐스팅 주의)
-        uint64_t orderIdNum = std::stoull(req.orderId.substr(4, 14)); // "ORD-..." 에서 숫자만 파싱하거나 예외 처리 필요
-        // (MVP 버전에서는 그냥 hash 방식이나 단순 변환을 쓰셔도 무방합니다.)
+        // 3. ChatRoomManager를 통해 방을 생성합니다.
+        // 💡 MVP 버전이므로 orderId는 0(또는 임의의 값)으로 넘겨버립니다!
+        int roomId = ChatRoomManager::getInstance().createRoom(customerId, adminId, 0);
 
-        int roomId = ChatRoomManager::getInstance().createRoom(customerId, adminId, orderIdNum);
-
-        // 3. 성공 응답 전송 (2091)
+        // 4. 성공 응답 전송 (2091)
         ResChatConnectDTO res = {0, roomId, "채팅방이 연결되었습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHAT_CONNECT), nlohmann::json(res));
     }
@@ -99,5 +96,5 @@ void ChatHandler::handleChatSend(std::shared_ptr<ClientSession> session, const s
         std::cerr << "🚨 [ChatHandler] 메시지 처리 에러: " << e.what() << std::endl;
         ResChatSendDTO res = {1, "메시지 처리 중 오류가 발생했습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHAT_SEND), nlohmann::json(res));
-    }   
+    }
 }

@@ -255,6 +255,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/StoreDetailDTO.h \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
+ /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
  /home/lms/Documents/its_server/server/src/database/SearchDAO.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \

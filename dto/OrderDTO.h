@@ -35,10 +35,10 @@ struct OrderCreateReqDTO
     std::string deliveryAddress;     // 배달 주소 (고객이 입력한 대로)
     int couponId;                    // 쿠폰 ID (쿠폰이 적용된 경우, 아니면 -1)
     std::vector<OrderItemDTO> items; // 주문 아이템 목록
-    std::string storeRequest; 
+    std::string storeRequest;
     std::string riderRequest;
 
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderCreateReqDTO, userId, storeId, totalPrice, deliveryAddress, couponId, items, storeRequest, riderRequest)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(OrderCreateReqDTO, userId, storeId, totalPrice, deliveryAddress, storeRequest, riderRequest, items)
 };
 
 struct OrderCreateResDTO

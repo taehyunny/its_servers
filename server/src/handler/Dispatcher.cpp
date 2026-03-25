@@ -29,10 +29,6 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { UserHandler::handlePhoneCheck(s, b); }},
     {CmdID::REQ_BUISNESS_NUM_CHECK, [](auto s, auto b)
      { UserHandler::handleBizNumCheck(s, b); }},
-    {CmdID::REQ_UPGRADE_NAME, [](auto s, auto b)
-     { UserHandler::handleGradeUpdate(s, b); }},
-    {CmdID::REQ_DOWNGRADE_NAME, [](auto s, auto b)
-     { UserHandler::handleGradeUpdate(s, b); }},
 
     // ── 2. 매장 및 메뉴 (Store & Menu) ──
     {CmdID::REQ_ORDER_LIST, [](auto s, auto b)
@@ -56,7 +52,7 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
     {CmdID::REQ_CHECKOUT_INFO, [](auto s, auto b)
      { OrderHandler::handleCheckoutInfo(s, b); }},
     {CmdID::REQ_ORDER_CREATE, [](auto s, auto b)
-     { OrderHandler::handleOrderCreate(s, b); }},
+     { OrderHandler::handleCreateOrder(s, b); }},
     {CmdID::REQ_ORDER_ACCEPT, [](auto s, auto b)
      { OrderHandler::handleOrderAccept(s, b); }},
     {CmdID::REQ_MENU_OPTION, [](auto s, auto b)
@@ -103,15 +99,15 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { SearchHandler::handleSearchStoreReq(s, b); }},
     // ── 7. 마이페이지 등 기타 (MyPage & Misc) ──
     {CmdID::REQ_UPGRADE_NAME, [](auto s, auto b)
-     {UserHandler::handleGradeUpdate(s, b);}},
+     { UserHandler::handleGradeUpdate(s, b); }},
     {CmdID::REQ_DOWNGRADE_NAME, [](auto s, auto b)
-     {UserHandler::handleGradeUpdate(s, b);}},
+     { UserHandler::handleGradeUpdate(s, b); }},
     {CmdID::REQ_ORDER_HISTORY, [](auto s, auto b)
-     {OrderHandler::handleOrderList(s, b); }}, // 주문 내역 조회 (고객용)
+     { OrderHandler::handleOrderList(s, b); }}, // 주문 내역 조회 (고객용)
     {CmdID::REQ_ORDER_HISTORY_SEARCH, [](auto s, auto b)
-     {OrderHandler::handleOrderHistorySearch(s, b); }}, // 주문 내역 검색 (고객용)
+     { OrderHandler::handleOrderHistorySearch(s, b); }}, // 주문 내역 검색 (고객용)
 
-     // ── 8. 1:1 채팅 상담 (Chat) ──
+    // ── 8. 1:1 채팅 상담 (Chat) ──
     {CmdID::REQ_CHAT_CONNECT, [](auto s, auto b)
      { ChatHandler::handleChatConnect(s, b); }},
     {CmdID::REQ_CHAT_SEND, [](auto s, auto b)

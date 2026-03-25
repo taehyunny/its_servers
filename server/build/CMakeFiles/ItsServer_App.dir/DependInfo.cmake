@@ -29,7 +29,6 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/src/handler/SalesHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/SearchHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/StoreHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o.d"
-  "/home/lms/Documents/its_server/server/src/handler/SystemHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/UserHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/network/ItsServer.cpp" "CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/network/PacketFramer.cpp" "CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o.d"
@@ -38,7 +37,6 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/src/session/ClientSession.cpp" "CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/session/ClientSession.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/session/SessionManager.cpp" "CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/session/SessionManager.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/thread/ThreadPool.cpp" "CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/thread/ThreadPool.cpp.o.d"
-  "/home/lms/Documents/its_server/server/src/util/Logger.cpp" "CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/util/Logger.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/util/TimeUtil.cpp" "CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/util/TimeUtil.cpp.o.d"
   )
 
