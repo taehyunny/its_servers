@@ -250,4 +250,20 @@ struct BizNumCheckResDTO
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(BizNumCheckResDTO, status, isAvailable, message)
 };
 
-// 1. 개별 옵션 항목 (작은 틀)
+// 🧑‍🍳 조리 시간 재설정 요청 (REQ_COOK_TIME_SET = 3020)
+struct ReqCookTimeSetDTO
+{
+    std::string orderId; // 조리 시간을 설정할 주문 번호
+    int cookTime;        // 사장님이 설정한 조리 시간 (분 단위, 예: 20)
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqCookTimeSetDTO, orderId, cookTime)
+};
+
+// 🧑‍🍳 조리 시간 설정 응답 (RES_COOK_TIME_SET = 3021)
+struct ResCookTimeSetDTO
+{
+    int status;
+    std::string message;
+
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResCookTimeSetDTO, status, message)
+};

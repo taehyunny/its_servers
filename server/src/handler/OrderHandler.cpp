@@ -13,6 +13,7 @@
 #include <nlohmann/json.hpp>
 #include <ctime>
 #include <iomanip>
+#include <regex> // 🚀 숫자 추출을 위해 추가
 
 using nlohmann::json;
 
@@ -648,5 +649,109 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
         }
         OrderCreateResDTO res = {1, "주문 처리 중 오류가 발생했습니다. (" + std::string(e.what()) + ")", ""};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_CREATE), nlohmann::json(res));
+    }
+}
+
+// =========================================================
+// 🧑‍🍳 조리 시간 재설정 및 전파 (REQ_COOK_TIME_SET = 3020)
+// =========================================================
+void OrderHandler::handleCookTimeSet(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    try
+    {
+        auto req = nlohmann::json::parse(jsonBody).get<ReqCookTimeSetDTO>();
+        std::cout << "[OrderHandler] ⏱️ 조리 시간 설정 요청 (OrderID: " << req.orderId << ", " << req.cookTime << "분)" << std::endl;
+
+        auto conn = DBManager::getInstance().getConnection();
+
+        // 1. 🚀 STORES 테이블에서 기존 예상 시간과 기본 조리 시간 가져오기 (JOIN 활용)
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT S.delivery_time_range, S.cook_time "
+            "FROM STORES S "
+            "JOIN ORDERS O ON S.store_id = O.store_id "
+            "WHERE O.order_id = ?"
+        ));
+        pstmt->setString(1, req.orderId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        int netDeliveryTime = 15; // 기본 순수 배달 시간 (Fallback용)
+
+        if (rs->next())
+        {
+            std::string timeRange = rs->isNull("delivery_time_range") ? "" : rs->getString("delivery_time_range").c_str();
+            int defaultCookTime = rs->isNull("cook_time") ? 30 : rs->getInt("cook_time");
+
+            // 2. 🚀 정규표현식으로 "20~30분" 등에서 가장 큰 숫자 추출
+            std::regex re("\\d+");
+            auto begin = std::sregex_iterator(timeRange.begin(), timeRange.end(), re);
+            auto end = std::sregex_iterator();
+            
+            int maxTotalTime = 0;
+            for (std::sregex_iterator i = begin; i != end; ++i) {
+                int val = std::stoi(i->str());
+                if (val > maxTotalTime) maxTotalTime = val;
+            }
+
+            // 3. 순수 배달 시간 계산 = (총 배달 예상 시간) - (기본 조리 시간)
+            if (maxTotalTime > 0) {
+                netDeliveryTime = maxTotalTime - defaultCookTime;
+            }
+
+            // 🛡️ [방어 로직] 계산 결과가 10분 미만이면 라이더 배달이 불가능하다고 판단, 최소 15분으로 보정
+            if (netDeliveryTime < 10) {
+                netDeliveryTime = 15;
+            }
+            
+            std::cout << "[OrderHandler] 📊 분석: 기존 범위(" << timeRange << "), 기본 조리(" << defaultCookTime 
+                      << "분) -> 🛵 도출된 순수 배달시간: " << netDeliveryTime << "분" << std::endl;
+        }
+
+        // 4. 최종 고객 예상 시간 산출! (사장님 입력 조리시간 + 계산된 순수 배달시간)
+        int totalEstimatedTime = req.cookTime + netDeliveryTime;
+
+        // 5. 사장님(클라이언트)에게 성공 응답 쏘기 (3021)
+        ResCookTimeSetDTO res = {200, "조리 시간이 성공적으로 설정되었습니다."};
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_COOK_TIME_SET), nlohmann::json(res));
+
+        // 6. 고객 ID 조회 후 고객 앱으로 푸시 알림 (9010)
+        std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
+        if (!customerId.empty())
+        {
+            NotifyOrderStateDTO notifyCustomer;
+            notifyCustomer.orderId = req.orderId;
+            notifyCustomer.state = 1; // 1: 조리중 상태
+            notifyCustomer.message = "사장님이 조리를 시작했습니다! (약 " + std::to_string(totalEstimatedTime) + "분 내 도착 예정 🛵)";
+
+            SessionManager::getInstance().sendToUser(
+                customerId,
+                static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE),
+                nlohmann::json(notifyCustomer)
+            );
+        }
+
+        // 7. 라이더들에게 브로드캐스트 (9020) - 메뉴 요약에 조리시간 세팅
+        NotifyDeliveryCallDTO notifyRiders;
+        notifyRiders.orderId = req.orderId;
+        notifyRiders.pickupAddress = StoreDAO::getInstance().getStoreDetail(OrderDAO::getInstance().getStoreIdByOrderId(req.orderId)).storeAddress;
+        notifyRiders.deliveryAddress = OrderDAO::getInstance().getDeliveryAddressByOrderId(req.orderId);
+        notifyRiders.deliveryFee = 3500;
+        
+        // 🚀 라이더에게 전달할 명확한 메시지
+        notifyRiders.menuSummary = "조리 완료까지 " + std::to_string(req.cookTime) + "분 남음"; 
+
+        int ROLE_RIDER = 2;
+        SessionManager::getInstance().broadcastToRole(
+            ROLE_RIDER,
+            static_cast<uint16_t>(CmdID::NOTIFY_DELIVERY_CALL),
+            nlohmann::json(notifyRiders)
+        );
+
+        std::cout << "[OrderHandler] ✅ 고객 알림(" << totalEstimatedTime << "분 도착) 및 라이더 전파 완료" << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [OrderHandler] 조리 시간 설정 중 에러: " << e.what() << std::endl;
+        ResCookTimeSetDTO res = {500, "서버 내부 오류로 설정에 실패했습니다."};
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_COOK_TIME_SET), nlohmann::json(res));
     }
 }

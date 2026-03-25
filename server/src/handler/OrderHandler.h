@@ -17,4 +17,5 @@ public:
     static void handleOrderHistory(std::shared_ptr<ClientSession> session, const std::string &jsonBody); // 주문 내역 조회 (고객용) (3080)
     static void handleOrderHistorySearch(std::shared_ptr<ClientSession> session, const std::string &jsonBody); // 주문 내역 검색 (고객용) (3083)
     static void handleCreateOrder(std::shared_ptr<ClientSession> session, const std::string &jsonBody); // 테스트용 주문 생성 (3100)
+    static void handleCookTimeSet(std::shared_ptr<ClientSession> session, const std::string &jsonBody); // 조리 시간 설정 요청 (3020)
 };

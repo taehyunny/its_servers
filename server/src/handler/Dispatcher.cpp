@@ -67,6 +67,9 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { OrderHandler::handleOrderList(s, b); }}, // 주문 내역 조회 (고객용)
     {CmdID::REQ_ORDER_HISTORY_SEARCH, [](auto s, auto b)
      { OrderHandler::handleOrderHistorySearch(s, b); }}, // 주문 내역 검색 (고객용)
+     {CmdID::REQ_COOK_TIME_SET, [](auto s, auto b)
+     { OrderHandler::handleCookTimeSet(s, b); }}, // 조리 시간 설정 요청 (사장님용)
+     
 
     // ── 4. 리뷰 및 통계 (Review & Sales) ──
     {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
