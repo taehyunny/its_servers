@@ -107,6 +107,13 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
     {CmdID::REQ_ORDER_HISTORY_SEARCH, [](auto s, auto b)
      {OrderHandler::handleOrderHistorySearch(s, b); }}, // 주문 내역 검색 (고객용)
 
+     // ── 8. 1:1 채팅 상담 (Chat) ──
+    {CmdID::REQ_CHAT_CONNECT, [](auto s, auto b)
+     { ChatHandler::handleChatConnect(s, b); }},
+    {CmdID::REQ_CHAT_SEND, [](auto s, auto b)
+     { ChatHandler::handleChatSend(s, b); }},
+     {C}
+
 };
 // =========================================================
 // 🚀 [2단계] Dispatch 함수 본체

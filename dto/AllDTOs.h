@@ -12,3 +12,4 @@
 #include "StoreDetailDTO.h"
 #include "AddressDTO.h"
 #include "PaymentDTO.h"
+#include "ChatDTO.h"

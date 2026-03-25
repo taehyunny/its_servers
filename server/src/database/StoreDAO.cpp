@@ -317,3 +317,17 @@ int StoreDAO::getDeliveryFee(int storeId)
 
     return 0; // 매장을 못 찾거나 에러가 나면 기본값 0원 처리 (방어 코드)
 }
+
+std::string StoreDAO::getOwnerIdByStoreId(int storeId)
+{
+    auto conn = DBManager::getInstance().getConnection();
+    std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+        "SELECT user_id FROM STORES WHERE store_id = ?"
+        // 💡 태현님의 DB 설계에 따라 사장님 ID 컬럼명이 'owner_id'일 수도 있으니 확인해 보세요!
+        ));
+    pstmt->setInt(1, storeId);
+    std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+    if (rs->next())
+        return rs->getString("user_id").c_str();
+    return "";
+}

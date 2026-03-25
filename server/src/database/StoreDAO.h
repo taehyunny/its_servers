@@ -21,6 +21,7 @@ public:
     bool executeUpdate(const std::string &query, const std::vector<std::string> &params);
     ResStoreDetailDTO getStoreDetail(int storeId);
     int getDeliveryFee(int storeId);
+    std::string getOwnerIdByStoreId(int storeId);
 
 private:
     StoreDAO() = default;

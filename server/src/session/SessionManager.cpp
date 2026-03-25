@@ -59,3 +59,20 @@ std::shared_ptr<ClientSession> SessionManager::getSessionByUserId(const std::str
 
     return nullptr; // 🚀 사장님이 앱을 끄고 오프라인 상태라면 nullptr 리턴
 }
+
+// 🚀 특정 유저ID로 패킷을 전송하고 성공 여부를 반환함
+// [SessionManager.h] 내부 수정
+template <typename T>
+bool sendToUser(const std::string &userId, uint16_t cmdId, const T &dto)
+{
+    std::lock_guard<std::mutex> lock(sessionMutex);
+    auto it = userMap.find(userId);
+
+    if (it != userMap.end())
+    {
+        it->second->sendPacket(cmdId, dto); // 실제 소켓 발사!
+        return true;                        // 🚀 성공 리턴
+    }
+
+    return false; // 실패(오프라인) 리턴
+}

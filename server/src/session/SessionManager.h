@@ -35,14 +35,22 @@ public:
 
     // 2. [9010번용] 특정 유저(고객)를 콕 집어서 알림 쏘기
     template <typename T>
-    void sendToUser(const std::string &userId, uint16_t cmdId, const T &dto)
+    bool sendToUser(const std::string &userId, uint16_t cmdId, const T &dto)
     {
         std::lock_guard<std::mutex> lock(sessionMutex);
+
+        // 1. 유저 아이디로 세션을 찾습니다.
         auto it = userMap.find(userId);
+
+        // 2. [방어 로직] 세션이 존재할 때만 전송하고 성공(true) 반환
         if (it != userMap.end())
         {
-            it->second->sendPacket(cmdId, dto); // jina의 소켓을 찾아서 발사!
+            it->second->sendPacket(cmdId, dto); // 실제 소켓 발사!
+            return true;
         }
+
+        // 3. 세션이 없으면(오프라인) 실패(false) 반환
+        return false;
     }
     void removeUser(const std::string &userId)
     {
