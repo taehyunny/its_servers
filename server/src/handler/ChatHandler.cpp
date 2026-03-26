@@ -34,7 +34,7 @@ void ChatHandler::handleChatConnect(std::shared_ptr<ClientSession> session, cons
         NotifyAdminChatReqDTO notifyAdmin = {customerId, "CUSTOMER", customerId + " 고객님이 1:1 문의를 요청했습니다."};
 
         // 🚀 [중요] 9030번(또는 지정된 번호)으로 사장님 세션에 푸시를 쏩니다!
-        uint16_t PUSH_CMD_ID = static_cast<uint16_t>(CmdID::NOTIFY_ADMIN_CHAT_REQ); // 💡 프론트엔드와 맞춘 알림 패킷 번호 (Global_protocol.h에 맞게 수정하세요)
+        uint16_t PUSH_CMD_ID = static_cast<uint16_t>(CmdID::NOTIFY_CHAT_MSG); // 💡 프론트엔드와 맞춘 알림 패킷 번호 (Global_protocol.h에 맞게 수정하세요)
         std::cout << " >>> [DEBUG] 사장님(" << adminId << ")에게 푸시 발송 시도... (Cmd: " << PUSH_CMD_ID << ")" << std::endl;
 
         bool isPushed = SessionManager::getInstance().sendToUser(

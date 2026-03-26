@@ -100,7 +100,7 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
             session->authenticate(res.userId, dbRole);
 
             // 💡 이름이 바뀐 registerUser를 호출합니다!
-            SessionManager::getInstance().registerUser(res.userId, session);
+        SessionManager::getInstance().registerUser(res.userId, dbRole, session);
 
             std::cout << "[UserHandler] 로그인 성공! 유저 '" << res.userId << "' [" << res.grade << "] 등급 세션 등록 완료." << std::endl;
         }

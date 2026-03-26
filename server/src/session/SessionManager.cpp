@@ -1,6 +1,9 @@
 #include "SessionManager.h"
 #include "ClientSession.h"
 #include <iostream>
+#include <algorithm>
+#include <unistd.h> // close() 함수 사용을 위해 추가
+#include <mutex>    // std::lock_guard 사용을 위해 추가
 
 void SessionManager::createSession(int fd)
 {
@@ -55,3 +58,17 @@ std::shared_ptr<ClientSession> SessionManager::getSessionByUserId(const std::str
 }
 
 
+std::shared_ptr<ClientSession> SessionManager::getAvailableAdminSession()
+{
+    std::lock_guard<std::mutex> lock(sessionMutex);
+    
+    int ADMIN_ROLE = 3; // 관리자 롤 번호 (가정)
+    
+    auto it = roleMap.find(ADMIN_ROLE);
+    if (it != roleMap.end() && !it->second.empty()) {
+        // 🚀 접속 중인 관리자가 있다면, 첫 번째 관리자 세션 반환 (또는 랜덤 배정)
+        return it->second.front(); 
+    }
+    
+    return nullptr; // 접속 중인 관리자가 없음!
+}

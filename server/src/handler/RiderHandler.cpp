@@ -176,6 +176,17 @@ void RiderHandler::handlePickup(std::shared_ptr<ClientSession> session, const st
                 {"message", "라이더가 음식을 픽업했습니다. 배달을 시작합니다!"}};
             SessionManager::getInstance().sendToUser(ownerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notify);
         }
+        std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(orderId);
+        if (!customerId.empty())
+        {
+            nlohmann::json notifyCustomer = {
+                {"orderId", orderId},
+                {"state", 2}, // 배달중(2) 상태
+                {"message", "라이더님이 음식을 픽업하여 배달을 시작했습니다! 🛵💨"}
+            };
+            SessionManager::getInstance().sendToUser(customerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notifyCustomer);
+            std::cout << "[RiderHandler] 🛵 고객(" << customerId << ")에게 픽업 알림 전송 완료!" << std::endl;
+        }
     }
     catch (const std::exception &e)
     {
