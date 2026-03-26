@@ -171,7 +171,8 @@ CREATE TABLE USERS (
     user_name VARCHAR(50) NOT NULL,
     phone_number VARCHAR(20) NOT NULL UNIQUE,
     role INT(11) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP()
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+    grade VARCHAR(20) DEFAULT '일반'
 );
 
 -- 16. USER_COUPONS (사용자 보유 쿠폰 내역)
@@ -228,6 +229,7 @@ CREATE TABLE ORDER_DETAILS (
     menu_name VARCHAR(100) NOT NULL, -- "황궁짜장면"
     quantity INT(11) NOT NULL,       -- 2개
     price INT(11) NOT NULL           -- 14000원
+    selected_options LONGTEXT DEFAULT NULL;
 );
 
 CREATE TABLE BRANDS (

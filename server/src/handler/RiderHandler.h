@@ -11,4 +11,6 @@ public:
 
     // 배달 완료 처리 (4010)
     static void handleDeliveryComplete(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
+
+    static void handlePickup(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
 };

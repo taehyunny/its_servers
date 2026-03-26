@@ -3,6 +3,8 @@
 #include "SessionManager.h"
 #include "Global_protocol.h"
 #include "AllDTOs.h"
+#include "OrderDAO.h"
+#include "StoreDAO.h"
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -135,5 +137,41 @@ void RiderHandler::handleDeliveryComplete(std::shared_ptr<ClientSession> session
         res["status"] = 500;
         res["message"] = "서버 내부 오류";
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_DELIVERY_COMPLETE), res);
+    }
+}
+
+void RiderHandler::handlePickup(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    try
+    {
+        auto req = nlohmann::json::parse(jsonBody);
+        std::string orderId = req.value("orderId", "");
+
+        auto conn = DBManager::getInstance().getConnection();
+        // 1. 상태 업데이트 (3: 배달중)
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "UPDATE ORDERS SET order_status = 3 WHERE order_id = ?"));
+        pstmt->setString(1, orderId);
+        pstmt->executeUpdate();
+
+        // 2. 라이더에게 응답 (4031)
+        nlohmann::json res = {{"status", 200}, {"orderId", orderId}};
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_PICKUP), res);
+
+        // 3. 사장님에게 알림 (9010) - 포스기 상태 업데이트용
+        int storeId = OrderDAO::getInstance().getStoreIdByOrderId(orderId);
+        std::string ownerId = StoreDAO::getInstance().getOwnerIdByStoreId(storeId);
+        if (!ownerId.empty())
+        {
+            nlohmann::json notify = {
+                {"orderId", orderId},
+                {"state", 3},
+                {"message", "라이더가 음식을 픽업했습니다. 배달을 시작합니다!"}};
+            SessionManager::getInstance().sendToUser(ownerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notify);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [RiderHandler] 배달 픽업 처리 오류: " << e.what() << std::endl;
     }
 }

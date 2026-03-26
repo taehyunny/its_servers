@@ -119,16 +119,17 @@ enum class CmdID : uint16_t
     RES_ORDER_DELETE = 2089,         // 주문 내역 삭제 응답
 
     // 채팅 상담 (2090 ~ 2095)
-    REQ_CHAT_CONNECT = 2090,   // 관리자 1:1 채팅방 입장 요청
-    RES_CHAT_CONNECT = 2091,   // 채팅방 입장 응답
-    REQ_CHAT_SEND = 2092,      // 메시지 전송 요청 (WebSocket 방식 검토 필요)
-    RES_CHAT_SEND = 2093,      // 메시지 전송 응답
-    REQ_UPGRADE_NAME = 2094,   // 등급 변경 요청
-    REQ_DOWNGRADE_NAME = 2096, // 등급 하락 요청
-    RES_GRADE_UPDATE = 2095,   // 등급 변경 응답 (업그레이드/다운그레이드 구분 없이 같은 CmdID로 처리)
-                               // 마이페이지 (2100 ~ 2109)
-    REQ_MY_INFO = 2100,        // 마이페이지 통합 정보 요청 (리뷰수, 주문수, 즐겨찾기수, 좋아요수)
-    RES_MY_INFO = 2101,        // 마이페이지 통합 정보 응답
+    REQ_CHAT_CONNECT = 2090, // 관리자 1:1 채팅방 입장 요청
+    RES_CHAT_CONNECT = 2091, // 채팅방 입장 응답
+    REQ_CHAT_SEND = 2092,    // 메시지 전송 요청 (WebSocket 방식 검토 필요)
+    RES_CHAT_SEND = 2093,    // 메시지 전송 응답
+    REQ_GRADE_UPDATE = 2094, // 등급 변경 요청
+    RES_GRADE_UPDATE = 2095, // 등급 변경 응답 (업그레이드/다운그레이드 구분 없이 같은 CmdID로 처리)
+    REQ_GRADE_NOW = 2096,    // 현재 등급 요청
+    RES_GRADE_NOW = 2097,    // 현재 등급 응답
+                             // 마이페이지 (2100 ~ 2109)
+    REQ_MY_INFO = 2100,      // 마이페이지 통합 정보 요청 (리뷰수, 주문수, 즐겨찾기수, 좋아요수)
+    RES_MY_INFO = 2101,      // 마이페이지 통합 정보 응답
 
     REQ_STORE_INFO_UPDATE = 2102,  // 매장 정보 업데이트 요청 (영업시간, 휴무일 등)
     RES_STORE_INFO_UPDATE = 2103,  // 매장 정보 업데이트 응답
@@ -176,9 +177,10 @@ enum class CmdID : uint16_t
     // ---------------------------------------------------------
     // [4000번대] 라이더(Rider) 파트
     // ---------------------------------------------------------
-    REQ_DELIVERY_ACCEPT = 4000, // 서버가 뿌린 배달 콜 수락 요청
-    RES_DELIVERY_ACCEPT = 4001, // 배달 콜 수락 응답
-
+    REQ_DELIVERY_ACCEPT = 4000,   // 서버가 뿌린 배달 콜 수락 요청
+    RES_DELIVERY_ACCEPT = 4001,   // 배달 콜 수락 응답
+    REQ_PICKUP = 4002,            // 픽업 완료 요청
+    RES_PICKUP = 4003,            // 픽업 완료 응답
     REQ_DELIVERY_COMPLETE = 4010, // 배달 완료 요청
     RES_DELIVERY_COMPLETE = 4011, // 배달 완료 응답
                                   // 🚀 라이더용 신규 추가
@@ -206,12 +208,12 @@ enum class CmdID : uint16_t
 
     RES_REVIEW_DELETE_OK = 5050, // 악성 리뷰 삭제 동의
     RES_REVIEW_DELETE_NO = 5051, // 악성 리뷰 삭제 비동의
-    
+
     REQ_ADMIN_INIT = 5090,       // 클라이언트 -> 서버: UI 없는 관리자 백그라운드 인증 요청
     RES_ADMIN_INIT = 5091,       // 서버 -> 클라이언트: 인증 완료 응답
-                           // ---------------------------------------------------------
-                           // [9000번대] 서버 푸시 알림 (Server Broadcast)
-                           // ---------------------------------------------------------
+                                 // ---------------------------------------------------------
+                                 // [9000번대] 서버 푸시 알림 (Server Broadcast)
+                                 // ---------------------------------------------------------
     NOTIFY_NEW_ORDER = 9000,     // 서버 -> 사장님: 새 주문 발생 알림
     NOTIFY_ORDER_STATE = 9010,   // 서버 -> 고객: 조리 시작, 배달 출발 등 상태 변경 알림
     NOTIFY_DELIVERY_CALL = 9020, // 서버 -> 라이더들: 주변 매장의 새 배달 콜 알림

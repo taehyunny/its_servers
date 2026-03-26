@@ -252,22 +252,44 @@ void UserHandler::handleGradeUpdate(std::shared_ptr<ClientSession> session, cons
 {
     try
     {
+        // 1. DTO 파싱
         auto req = nlohmann::json::parse(jsonBody).get<ReqGradeUpdateDTO>();
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 USERS 테이블의 grade를 쿨하게 업데이트!
+        // 🚀 action 값에 따른 메시지 분기 처리
+        // 1: 신규 구독(wow), 2: 해지 예약(일반) 등으로 매핑한다고 가정합니다.
+        std::string displayMsg = "";
+
+        if (req.action == 1)
+        {
+            displayMsg = "멤버십 가입이 완료되었습니다! 이제 배달비가 0원입니다. 🎉";
+        }
+        else if (req.action == 2)
+        {
+            displayMsg = "멤버십 해지가 예약되었습니다. 이용 기간 종료 후 일반 등급으로 변경됩니다.";
+        }
+
+        // 2. DB 업데이트 (USERS 테이블의 grade 컬럼 수정)
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "UPDATE USERS SET grade = ? WHERE user_id = ?"));
-        pstmt->setString(1, req.grade);
+
+        pstmt->setString(1, req.grade); // "wow" 또는 "일반"
         pstmt->setString(2, req.userId);
         pstmt->executeUpdate();
 
-        ResGradeUpdateDTO res = {200, "멤버십 등급이 [" + req.grade + "]로 변경되었습니다."};
+        // 3. 성공 응답 (status 200) 전송
+        ResGradeUpdateDTO res;
+        res.status = 200; // 성공
+        res.message = displayMsg;
+
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_GRADE_UPDATE), nlohmann::json(res));
+
+        std::cout << "[UserHandler] ✅ 등급 변경 완료: " << req.userId << " -> " << req.grade << " (Action: " << req.action << ")" << std::endl;
     }
-    catch (...)
+    catch (const std::exception &e)
     {
-        ResGradeUpdateDTO res = {500, "등급 업데이트 중 서버 오류가 발생했습니다."};
+        std::cerr << "🚨 [UserHandler] 등급 업데이트 에러: " << e.what() << std::endl;
+        ResGradeUpdateDTO res = {500, "서버 오류로 등급 변경에 실패했습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_GRADE_UPDATE), nlohmann::json(res));
     }
 }

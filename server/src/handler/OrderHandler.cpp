@@ -24,9 +24,14 @@ using nlohmann::json;
 void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     auto conn = DBManager::getInstance().getConnection();
+
     try
     {
         auto req = nlohmann::json::parse(jsonBody).get<OrderAcceptReqDTO>();
+        if (req.orderId.empty())
+        {
+            throw std::runtime_error("주문 번호가 누락되었습니다.");
+        }
         std::cout << "[OrderHandler] 🧑🍳 사장님 주문 수락 요청 수신 (ID: " << req.orderId << ")" << std::endl;
 
         // Step 1: 트랜잭션 시작
@@ -218,8 +223,8 @@ void OrderHandler::handleChangeOrderState(std::shared_ptr<ClientSession> session
 
 void OrderHandler::handleOrderList(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
-    json req = json::parse(jsonBody);
-    json res;
+    nlohmann::json req = nlohmann::json::parse(jsonBody);
+    nlohmann::json res;
     try
     {
         int storeId = req.value("storeId", 0);
@@ -233,7 +238,7 @@ void OrderHandler::handleOrderList(std::shared_ptr<ClientSession> session, const
 
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 1. 미완료 주문 목록 조회 (요청사항 컬럼 2개 추가)
+        // 🚀 1. 미완료 주문 목록 조회
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "SELECT order_id, total_price, order_status, "
             "delivery_address, created_at, store_request, rider_request "
@@ -244,70 +249,78 @@ void OrderHandler::handleOrderList(std::shared_ptr<ClientSession> session, const
         pstmt->setInt(1, storeId);
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
-        json orders = json::array();
+        nlohmann::json orders = nlohmann::json::array();
+
         while (rs->next())
         {
-            json order;
+            nlohmann::json order;
             std::string orderId = rs->getString("order_id").c_str();
-            order["orderId"] = orderId;
+
+            // 🚨 [핵심 해결] 누락되었던 필수 필드들을 전부 JSON에 명시적으로 담아줍니다!
+            order["orderId"] = orderId; // 👈 사장님 롤백 사태의 범인 검거!
             order["totalPrice"] = rs->getInt("total_price");
             order["orderStatus"] = rs->getInt("order_status");
             order["deliveryAddress"] = rs->getString("delivery_address").c_str();
             order["createdAt"] = rs->getString("created_at").c_str();
 
-            // 🚀 명세서 호환: 사장님/라이더 요청사항 매핑 (NULL 방어)
             order["storeRequest"] = rs->isNull("store_request") ? "" : rs->getString("store_request").c_str();
             order["riderRequest"] = rs->isNull("rider_request") ? "" : rs->getString("rider_request").c_str();
 
-            // 2. 해당 주문의 아이템 목록 조회
+            // 🚀 핵심: 하위 아이템(items) 조립 시작
+            nlohmann::json itemsArray = nlohmann::json::array();
+            std::string firstMenuName = "";
+            int itemCount = 0;
+
+            // 💡 태현님 요청 반영: MENUS 테이블과 JOIN, OI.unit_price 사용
             std::unique_ptr<sql::PreparedStatement> pstmtItems(conn->prepareStatement(
-                "SELECT OI.menu_id, M.menu_name, OI.quantity, "
-                "OI.unit_price, OI.selected_options "
+                "SELECT OI.menu_id, M.menu_name, OI.quantity, OI.unit_price, OI.selected_options "
                 "FROM ORDER_ITEMS OI "
                 "JOIN MENUS M ON OI.menu_id = M.menu_id "
                 "WHERE OI.order_id = ?"));
             pstmtItems->setString(1, orderId);
             std::unique_ptr<sql::ResultSet> rsItems(pstmtItems->executeQuery());
 
-            json items = json::array();
-            std::string firstMenuName = "";
-            int itemCount = 0;
-
             while (rsItems->next())
             {
-                json item;
+                nlohmann::json item;
                 item["menuId"] = rsItems->getInt("menu_id");
                 item["menuName"] = rsItems->getString("menu_name").c_str();
                 item["quantity"] = rsItems->getInt("quantity");
-                item["unitPrice"] = rsItems->getInt("unit_price");
+                item["unitPrice"] = rsItems->getInt("unit_price"); // 💡 unit_price 로 통일
 
-                // 🚀 명세서 호환: 옵션 배열명 변경 (options) 및 빈 배열([]) 처리
+                // 🚀 옵션 JSON 파싱 (방어 코드 및 명세서 호환 "options" 이름 사용)
                 std::string optStr = rsItems->isNull("selected_options") ? "[]" : rsItems->getString("selected_options").c_str();
                 try
                 {
-                    item["options"] = json::parse(optStr);
+                    item["options"] = nlohmann::json::parse(optStr); // selectedOptions 대신 options 사용!
                     if (!item["options"].is_array())
                     {
-                        item["options"] = json::array(); // 객체나 다른 타입이면 강제로 배열로!
+                        item["options"] = nlohmann::json::array();
                     }
                 }
                 catch (...)
                 {
-                    item["options"] = json::array(); // 파싱 에러 시에도 무조건 빈 배열 반환
+                    item["options"] = nlohmann::json::array();
                 }
 
+                // 메뉴 요약을 위한 첫 번째 메뉴 이름 저장
                 if (itemCount == 0)
-                    firstMenuName = rsItems->getString("menu_name").c_str();
+                {
+                    firstMenuName = item["menuName"];
+                }
                 itemCount++;
-                items.push_back(item);
+
+                itemsArray.push_back(item);
             }
 
-            // 3. menuSummary 생성 (예: "떡볶이 외 1건")
+            // 🚀 3. menuSummary 생성 (예: "치킨 외 1건")
             std::string menuSummary = firstMenuName;
             if (itemCount > 1)
+            {
                 menuSummary += " 외 " + std::to_string(itemCount - 1) + "건";
+            }
             order["menuSummary"] = menuSummary;
-            order["items"] = items;
+            order["items"] = itemsArray;
 
             orders.push_back(order);
         }
@@ -324,58 +337,6 @@ void OrderHandler::handleOrderList(std::shared_ptr<ClientSession> session, const
         res["status"] = 500;
         res["message"] = "서버 내부 오류";
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_LIST), res);
-    }
-}
-
-void OrderHandler::handleOrderReject(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
-{
-    auto conn = DBManager::getInstance().getConnection();
-    try
-    {
-        // 1. 요청 파싱
-        auto req = nlohmann::json::parse(jsonBody).get<ReqOrderRejectDTO>();
-        std::cout << "[OrderHandler] 🚫 사장님 주문 거절 요청 (ID: " << req.orderId << ", 사유: " << req.reason << ")" << std::endl;
-
-        // 2. DB 업데이트: 주문 상태를 '거절/취소(-1)'로 변경
-        // (💡 태현님의 DB 설계에 맞춰 취소 상태 번호를 -1이나 9 등으로 맞춰주세요!)
-        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "UPDATE ORDERS SET order_status = -1 WHERE order_id = ?"));
-        pstmt->setString(1, req.orderId);
-        int affected = pstmt->executeUpdate();
-
-        if (affected > 0)
-        {
-            // 3. 사장님에게 성공 응답 (3011) 쏘기
-            ResOrderRejectDTO res = {200, "주문 거절이 완료되었습니다."};
-            res.orderId = req.orderId; // 응답 DTO에 주문번호도 포함시킵니다!
-            session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_REJECT), nlohmann::json(res));
-
-            // 4. 고객에게 "취소 알림" 푸시 전송 (9010 완벽 재활용!)
-            std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
-            if (!customerId.empty())
-            {
-                NotifyOrderStateDTO notifyCustomer;
-                notifyCustomer.orderId = req.orderId;
-                notifyCustomer.state = -1; // -1: 취소 상태
-                notifyCustomer.message = "사장님 사정으로 주문이 취소되었습니다. 😭 (사유: " + req.reason + ")";
-
-                SessionManager::getInstance().sendToUser(
-                    customerId,
-                    static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE),
-                    nlohmann::json(notifyCustomer));
-            }
-            std::cout << "[OrderHandler] ✅ 주문 거절 처리 및 고객 알림 완료" << std::endl;
-        }
-        else
-        {
-            throw std::runtime_error("주문을 찾을 수 없거나 업데이트에 실패했습니다.");
-        }
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "🚨 [OrderHandler] 주문 거절 중 에러: " << e.what() << std::endl;
-        ResOrderRejectDTO res = {500, "거절 처리 중 서버 오류가 발생했습니다."};
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_REJECT), nlohmann::json(res));
     }
 }
 
@@ -787,4 +748,100 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
     }
 
     session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHECKOUT_INFO), nlohmann::json(res));
+}
+void OrderHandler::handleOrderReject(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    try
+    {
+        auto req = nlohmann::json::parse(jsonBody);
+        std::string orderId = req.value("orderId", "");
+        std::string reason = req.value("rejectReason", "재고 소진");
+
+        auto conn = DBManager::getInstance().getConnection();
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "UPDATE ORDERS SET order_status = 9 WHERE order_id = ?"));
+        pstmt->setString(1, orderId);
+        pstmt->executeUpdate();
+
+        // 1. 사장님에게 성공 응답
+        nlohmann::json res;
+        res["status"] = 200;
+        res["orderId"] = orderId;
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_REJECT), res);
+
+        // 2. 고객에게 알림 전송 (9010번 활용)
+        std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(orderId);
+        if (!customerId.empty())
+        {
+            nlohmann::json notify;
+            notify["orderId"] = orderId;
+            notify["state"] = 9;
+            notify["message"] = "사장님이 주문을 거절하였습니다. 사유: " + reason;
+            SessionManager::getInstance().sendToUser(customerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notify);
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [OrderHandler] 주문 거절 처리 중 에러: " << e.what() << std::endl;
+        nlohmann::json res;
+        res["status"] = 500;
+        res["message"] = "주문 거절 처리 중 서버 오류가 발생했습니다.";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_REJECT), res);
+    }
+}
+
+// [OrderHandler.cpp] 신규 추가
+void OrderHandler::handleCancel(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    try
+    {
+        auto req = nlohmann::json::parse(jsonBody);
+        std::string orderId = req.value("orderId", "");
+
+        if (orderId.empty())
+            throw std::runtime_error("주문 번호 누락");
+
+        auto conn = DBManager::getInstance().getConnection();
+
+        // 1. 주문 상태 업데이트 (9: 취소/거절)
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "UPDATE ORDERS SET order_status = 9 WHERE order_id = ?"));
+        pstmt->setString(1, orderId);
+        int affected = pstmt->executeUpdate();
+
+        if (affected > 0)
+        {
+            // 2. 관리자에게 성공 응답 (5012번 RES_CANCEL 가정)
+            nlohmann::json res = {{"status", 200}, {"orderId", orderId}};
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_CANCEL), res);
+
+            // 3. 🚀 관련자 전원에게 실시간 푸시 전파 (9010번 활용)
+            // 3-1. 고객에게 알림
+            std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(orderId);
+            if (!customerId.empty())
+            {
+                nlohmann::json notify = {
+                    {"orderId", orderId}, {"state", 9}, {"message", "관리자에 의해 주문이 취소/환불되었습니다."}};
+                SessionManager::getInstance().sendToUser(customerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notify);
+            }
+
+            // 3-2. 사장님에게 알림 (포스기 리스트 갱신용)
+            int storeId = OrderDAO::getInstance().getStoreIdByOrderId(orderId);
+            std::string ownerId = StoreDAO::getInstance().getOwnerIdByStoreId(storeId);
+            if (!ownerId.empty())
+            {
+                nlohmann::json notify = {
+                    {"orderId", orderId}, {"state", 9}, {"message", "관리자가 주문을 취소 처리했습니다."}};
+                SessionManager::getInstance().sendToUser(ownerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notify);
+            }
+
+            std::cout << "[OrderHandler] ✅ 주문 취소 및 전방위 알림 완료 (ID: " << orderId << ")" << std::endl;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [OrderHandler] handleCancel 에러: " << e.what() << std::endl;
+        nlohmann::json res = {{"status", 500}, {"message", "취소 처리 중 서버 오류"}};
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_CANCEL), res);
+    }
 }
