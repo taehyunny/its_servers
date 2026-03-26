@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/main.cpp" "CMakeFiles/ItsServer_App.dir/main.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/main.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/AddressDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/AddressDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/AddressDAO.cpp.o.d"
+  "/home/lms/Documents/its_server/server/src/database/AdminDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/AdminDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/AdminDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/AuthDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/AuthDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/CategoryDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/CategoryDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/DbManager.cpp" "CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/DbManager.cpp.o.d"
@@ -20,6 +21,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/src/database/StoreDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/StoreDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/database/UserDAO.cpp" "CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/database/UserDAO.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/AddressHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/AddressHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/AddressHandler.cpp.o.d"
+  "/home/lms/Documents/its_server/server/src/handler/AdminHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/AdminHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/AdminHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/CategoryHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/CategoryHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/ChatHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/Dispatcher.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o.d"

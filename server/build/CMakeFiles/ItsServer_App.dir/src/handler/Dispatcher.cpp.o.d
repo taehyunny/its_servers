@@ -292,6 +292,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
+ /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
  /home/lms/Documents/its_server/server/src/handler/UserHandler.h \
  /home/lms/Documents/its_server/server/src/handler/OrderHandler.h \
  /home/lms/Documents/its_server/server/src/handler/StoreHandler.h \
@@ -338,4 +339,5 @@ CMakeFiles/ItsServer_App.dir/src/handler/Dispatcher.cpp.o: \
  /home/lms/Documents/its_server/server/src/handler/SalesHandler.h \
  /home/lms/Documents/its_server/server/src/handler/ChatHandler.h \
  /home/lms/Documents/its_server/server/src/handler/RiderHandler.h \
+ /home/lms/Documents/its_server/server/src/handler/AdminHandler.h \
  /usr/include/c++/13/iostream

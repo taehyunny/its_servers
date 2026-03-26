@@ -177,6 +177,30 @@ src/database/AddressDAO.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/AddressDAO.cpp.s
 .PHONY : src/database/AddressDAO.cpp.s
 
+src/database/AdminDAO.o: src/database/AdminDAO.cpp.o
+.PHONY : src/database/AdminDAO.o
+
+# target to build an object file
+src/database/AdminDAO.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/AdminDAO.cpp.o
+.PHONY : src/database/AdminDAO.cpp.o
+
+src/database/AdminDAO.i: src/database/AdminDAO.cpp.i
+.PHONY : src/database/AdminDAO.i
+
+# target to preprocess a source file
+src/database/AdminDAO.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/AdminDAO.cpp.i
+.PHONY : src/database/AdminDAO.cpp.i
+
+src/database/AdminDAO.s: src/database/AdminDAO.cpp.s
+.PHONY : src/database/AdminDAO.s
+
+# target to generate assembly for a file
+src/database/AdminDAO.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/database/AdminDAO.cpp.s
+.PHONY : src/database/AdminDAO.cpp.s
+
 src/database/AuthDAO.o: src/database/AuthDAO.cpp.o
 .PHONY : src/database/AuthDAO.o
 
@@ -416,6 +440,30 @@ src/handler/AddressHandler.s: src/handler/AddressHandler.cpp.s
 src/handler/AddressHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/AddressHandler.cpp.s
 .PHONY : src/handler/AddressHandler.cpp.s
+
+src/handler/AdminHandler.o: src/handler/AdminHandler.cpp.o
+.PHONY : src/handler/AdminHandler.o
+
+# target to build an object file
+src/handler/AdminHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/AdminHandler.cpp.o
+.PHONY : src/handler/AdminHandler.cpp.o
+
+src/handler/AdminHandler.i: src/handler/AdminHandler.cpp.i
+.PHONY : src/handler/AdminHandler.i
+
+# target to preprocess a source file
+src/handler/AdminHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/AdminHandler.cpp.i
+.PHONY : src/handler/AdminHandler.cpp.i
+
+src/handler/AdminHandler.s: src/handler/AdminHandler.cpp.s
+.PHONY : src/handler/AdminHandler.s
+
+# target to generate assembly for a file
+src/handler/AdminHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/AdminHandler.cpp.s
+.PHONY : src/handler/AdminHandler.cpp.s
 
 src/handler/CategoryHandler.o: src/handler/CategoryHandler.cpp.o
 .PHONY : src/handler/CategoryHandler.o
@@ -888,6 +936,9 @@ help:
 	@echo "... src/database/AddressDAO.o"
 	@echo "... src/database/AddressDAO.i"
 	@echo "... src/database/AddressDAO.s"
+	@echo "... src/database/AdminDAO.o"
+	@echo "... src/database/AdminDAO.i"
+	@echo "... src/database/AdminDAO.s"
 	@echo "... src/database/AuthDAO.o"
 	@echo "... src/database/AuthDAO.i"
 	@echo "... src/database/AuthDAO.s"
@@ -918,6 +969,9 @@ help:
 	@echo "... src/handler/AddressHandler.o"
 	@echo "... src/handler/AddressHandler.i"
 	@echo "... src/handler/AddressHandler.s"
+	@echo "... src/handler/AdminHandler.o"
+	@echo "... src/handler/AdminHandler.i"
+	@echo "... src/handler/AdminHandler.s"
 	@echo "... src/handler/CategoryHandler.o"
 	@echo "... src/handler/CategoryHandler.i"
 	@echo "... src/handler/CategoryHandler.s"

@@ -257,6 +257,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
+ /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
  /home/lms/Documents/its_server/server/src/database/MenuDAO.h \
  /home/lms/Documents/its_server/server/src/session/ClientSession.h \
  /usr/include/c++/13/mutex /usr/include/c++/13/bits/std_mutex.h \
@@ -326,4 +327,17 @@ CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: \
  /usr/include/c++/13/bits/stl_queue.h \
  /usr/include/c++/13/condition_variable \
  /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
- /usr/include/c++/13/iostream
+ /usr/include/c++/13/iostream /usr/include/c++/13/regex \
+ /usr/include/c++/13/bitset /usr/include/c++/13/stack \
+ /usr/include/c++/13/bits/stl_stack.h \
+ /usr/include/c++/13/bits/regex_constants.h \
+ /usr/include/c++/13/bits/regex_error.h \
+ /usr/include/c++/13/bits/regex_automaton.h \
+ /usr/include/c++/13/bits/regex_automaton.tcc \
+ /usr/include/c++/13/bits/regex_scanner.h \
+ /usr/include/c++/13/bits/regex_scanner.tcc \
+ /usr/include/c++/13/bits/regex_compiler.h \
+ /usr/include/c++/13/bits/regex_compiler.tcc \
+ /usr/include/c++/13/bits/regex.h /usr/include/c++/13/bits/regex.tcc \
+ /usr/include/c++/13/bits/regex_executor.h \
+ /usr/include/c++/13/bits/regex_executor.tcc

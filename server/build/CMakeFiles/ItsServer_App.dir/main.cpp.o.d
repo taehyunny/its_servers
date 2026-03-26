@@ -394,6 +394,7 @@ CMakeFiles/ItsServer_App.dir/main.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
+ /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
  /home/lms/Documents/its_server/server/src/database/UserDAO.h \
  /home/lms/Documents/its_server/server/src/database/AuthDAO.h \
  /home/lms/Documents/its_server/server/src/database/StoreDAO.h \

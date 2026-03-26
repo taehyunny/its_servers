@@ -327,6 +327,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/ReviewHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/AddressDTO.h \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
+ /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
  /home/lms/Documents/its_server/server/src/database/DbManager.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \
