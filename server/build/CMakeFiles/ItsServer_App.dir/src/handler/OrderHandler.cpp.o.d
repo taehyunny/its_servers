@@ -258,6 +258,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
  /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
+ /home/lms/Documents/its_server/server/../dto/RiderDTO.h \
  /home/lms/Documents/its_server/server/src/database/MenuDAO.h \
  /home/lms/Documents/its_server/server/src/session/ClientSession.h \
  /usr/include/c++/13/mutex /usr/include/c++/13/bits/std_mutex.h \

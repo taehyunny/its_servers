@@ -176,7 +176,7 @@ std::pair<LoginResult, nlohmann::json> UserDAO::checkLogin(const std::string &us
     {
         auto conn = DBManager::getInstance().getConnection();
         std::string query = R"(
-            SELECT U.user_id, U.user_name, U.phone_number, U.role, C.address, S.store_name
+            SELECT U.user_id, U.user_name, U.phone_number, U.role, C.address, S.store_name, S.grade
             FROM USERS U
             LEFT JOIN CUSTOMERS C ON U.user_id = C.user_id
             LEFT JOIN STORES S ON U.user_id = S.owner_id
@@ -197,7 +197,7 @@ std::pair<LoginResult, nlohmann::json> UserDAO::checkLogin(const std::string &us
             userJson["role"] = rs->getInt("role");
             userJson["address"] = rs->isNull("address") ? "" : rs->getString("address").c_str();
             userJson["store_name"] = rs->isNull("store_name") ? "" : rs->getString("store_name").c_str();
-
+            userJson["grade"] = rs->isNull("grade") ? 0 : rs->getInt("grade");
             return {LoginResult::SUCCESS, userJson}; // ✅ 성공 코드와 함께 반환!
         }
     }
@@ -229,4 +229,26 @@ bool UserDAO::executeUpdate(const std::string &query, const std::vector<std::str
         std::cerr << "[UserDAO] 동적 업데이트 실패: " << e.what() << std::endl;
         return false;
     }
+}
+std::string UserDAO::getUserGrade(const std::string &userId)
+{
+    std::string grade = "일반"; // 기본값
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT grade FROM USERS WHERE user_id = ?"));
+        pstmt->setString(1, userId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            grade = rs->isNull("grade") ? "일반" : rs->getString("grade").c_str();
+        }
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "🚨 [UserDAO] 유저 등급 조회 실패: " << e.what() << std::endl;
+    }
+    return grade;
 }

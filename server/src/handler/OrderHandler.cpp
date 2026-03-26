@@ -8,6 +8,7 @@
 #include "DbManager.h" // DB 연결을 위한 매니저 클래스
 #include "StoreDAO.h"
 #include "MenuDAO.h"
+#include "UserDAO.h"
 #include <iostream>
 #include <mariadb/conncpp.hpp>
 #include <nlohmann/json.hpp>
@@ -847,4 +848,25 @@ void OrderHandler::handleDeliveryComplete(std::shared_ptr<ClientSession> session
         ResDeliveryCompleteDTO res = {500, "서버 오류로 완료 처리에 실패했습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_DELIVERY_COMPLETE), nlohmann::json(res));
     }
+}
+void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    auto req = nlohmann::json::parse(jsonBody).get<ReqCheckoutInfoDTO>();
+    ResCheckoutInfoDTO res;
+    res.status = 200;
+
+    // 1. 배달비 퍼오기 (StoreDAO 활용)
+    res.deliveryFee = StoreDAO::getInstance().getDeliveryFee(req.storeId);
+
+    // 2. 🚀 유저 등급 퍼오기 (방금 만든 UserDAO 핀셋 함수 활용!)
+    std::string currentGrade = UserDAO::getInstance().getUserGrade(req.userId);
+
+    // 3. 비즈니스 로직: 와우 회원이면 배달비 0원!
+    if (currentGrade == "wow" || currentGrade == "VIP")
+    {
+        res.deliveryFee = 0;
+        std::cout << "[OrderHandler] 🎉 와우 회원 감지! 배달비 무료 적용." << std::endl;
+    }
+
+    session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHECKOUT_INFO), nlohmann::json(res));
 }

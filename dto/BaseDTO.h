@@ -34,9 +34,10 @@ struct CategoryListResDTO
 // 🙋‍♂️ 등급 변경 요청 (REQ_UPGRADE_NAME / REQ_DOWNGRADE_NAME)
 struct ReqGradeUpdateDTO {
     std::string userId;
-    std::string targetGrade; // 변경할 등급 (예: "VIP", "프리미엄", "일반")
+    std::string grade; // 변경할 등급 (예: "wow", "일반")
+    int action; // 1: 신규 구독, 2: 해지 예약(is_active=0)
     
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqGradeUpdateDTO, userId, targetGrade)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqGradeUpdateDTO, userId, grade, action)
 };
 
 // 🙋‍♂️ 등급 변경 응답

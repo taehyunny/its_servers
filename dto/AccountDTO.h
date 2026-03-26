@@ -85,9 +85,9 @@ struct LoginResDTO
     std::string phoneNumber; // 전화번호 (로그인 시 클라이언트에서 저장할 수 있도록 반환)
     std::string role;        // 역할 (로그인 시 클라이언트에서 저장할 수 있도록 반환, "0": 고객, "1": 사장님, "2": 라이더)
     std::string storeName;   // 매장 이름 (로그인 시 클라이언트에서 저장할 수 있도록 반환)
-
+    std::string grade;       // 등급 (예: "wow", "일반")
     // 🚀 매크로 필수!
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoginResDTO, status, message, userName, address, phoneNumber, role, storeName)
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoginResDTO, status, message, userName, address, phoneNumber, role, storeName, grade)
 };
 // ------------------------------------------------------
 // [3] 통합 인증 응답 DTO (서버 -> 클라이언트)
@@ -103,7 +103,7 @@ struct AuthResDTO
     std::string phoneNumber; // 전화번호 (로그인 시 클라이언트에서 저장할 수 있도록 반환)
     std::string role;        // 역할 (로그인 시 클라이언트에서 저장할 수 있도록 반환, "0": 고객, "1": 사장님, "2": 라이더)
     std::string errorType;   // 400 에러일 때 어떤 필드가 문제인지 (예: "userId", "password", "phoneNumber" 등)
-
+    std::string grade;       // 등급 (예: "wow", "일반")
     // ── 사장님 전용 (role == "1" 일 때만 채워짐) ──────────────
     int storeId = 0;            // 사업자번호 겸 매장 ID
     std::string businessNumber; // 사업자 번호
@@ -122,7 +122,7 @@ struct AuthResDTO
                                    status, message, userId, address, userName, phoneNumber, role, errorType,
                                    storeId, storeName, category, storeAddress,
                                    cookTime, minOrderAmount, openTime, closeTime,
-                                   accountNumber, deliveryFee, approvalStatus, businessNumber)
+                                   accountNumber, deliveryFee, approvalStatus, businessNumber, grade)
 };
 // ---------------------------------------------------------
 // [5] 중복 확인 DTO (1040 ~ 1043)
@@ -160,3 +160,5 @@ struct PhoneCheckResDTO
     std::string message;                                                           // 유저에게 보여줄 메시지 (예: "이미 사용 중인 전화번호입니다.")
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(PhoneCheckResDTO, status, isAvailable, message) // JSON <-> Struct 자동 변환 매크로
 };
+
+// 2. 등급 변경(구독 관리) 요청 DTO

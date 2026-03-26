@@ -66,38 +66,39 @@ std::vector<TopStoreInfo> StoreDAO::getStoresByCategoryId(int categoryId)
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 [핵심] CATEGORIES 테이블과 JOIN해서 category_id로 필터링합니다!
+        // 🚀 SELECT에 S.brand_name 추가!
         std::string query = R"(
-            SELECT S.store_id, S.store_name, S.category, C.icon_name,
+            SELECT S.store_id, S.store_name, S.category, S.brand_name, C.icon_name,
                    S.delivery_time_range, S.rating, S.review_count, S.min_order_amount, S.delivery_fee
             FROM STORES S
             JOIN CATEGORIES C ON S.category = C.name
-            WHERE C.category_id = ?
+            WHERE C.category_id = ? AND S.status = 1
             ORDER BY S.total_sales DESC
         )";
 
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
-        pstmt->setInt(1, categoryId); // 🎯 클라이언트가 보낸 숫자(2, 3 등)를 여기에 꽂습니다.
-
+        pstmt->setInt(1, categoryId);
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
         while (rs->next())
         {
             TopStoreInfo store;
             store.storeId = rs->getInt("store_id");
-            store.storeName = rs->getString("store_name");
-            store.category = rs->getString("category");
-            store.iconPath = rs->getString("icon_name");
+            store.storeName = rs->getString("store_name").c_str();
+            store.category = rs->getString("category").c_str();
 
-            store.deliveryTimeRange = rs->getString("delivery_time_range");
-            store.rating = rs->getDouble("rating");
-            store.reviewCount = rs->getInt("review_count");
-            store.minOrderAmount = rs->getInt("min_order_amount");
-            store.deliveryFee = rs->getInt("delivery_fee");
+            // 🚀 DB에서 NULL일 수 있으므로 방어 로직 적용!
+            store.brandName = rs->isNull("brand_name") ? "" : rs->getString("brand_name").c_str();
+
+            store.iconPath = rs->isNull("icon_name") ? "" : rs->getString("icon_name").c_str();
+            store.deliveryTimeRange = rs->isNull("delivery_time_range") ? "20~30분" : rs->getString("delivery_time_range").c_str();
+            store.rating = rs->isNull("rating") ? 0.0 : rs->getDouble("rating");
+            store.reviewCount = rs->isNull("review_count") ? 0 : rs->getInt("review_count");
+            store.minOrderAmount = rs->isNull("min_order_amount") ? 0 : rs->getInt("min_order_amount");
+            store.deliveryFee = rs->isNull("delivery_fee") ? 0 : rs->getInt("delivery_fee");
 
             stores.push_back(store);
         }
-        std::cout << "[StoreDAO] 카테고리 ID " << categoryId << " 상점 " << stores.size() << "개 로드 완료." << std::endl;
     }
     catch (sql::SQLException &e)
     {
@@ -105,6 +106,7 @@ std::vector<TopStoreInfo> StoreDAO::getStoresByCategoryId(int categoryId)
     }
     return stores;
 }
+
 std::vector<TopStoreInfo> StoreDAO::getAllStores()
 {
     std::vector<TopStoreInfo> stores;
@@ -158,14 +160,14 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 [Fact Check] SQL 쿼리에 새로 추가된 3종 세트를 반드시 포함해야 합니다!
+        // 🚀 SELECT 쿼리에 S.pickup_time_range 대신 S.pickup_time 사용!
         std::unique_ptr<sql::PreparedStatement> pstmtStore(conn->prepareStatement(
-            "SELECT S.store_id, S.store_name, S.store_address, S.open_time, S.close_time, S.delivery_fee, "
-            "S.min_order_amount, S.rating, S.review_count, S.image_url, "
-            "U.phone_number, U.user_name AS representative_name, O.business_number " // 👈 조인해서 가져올 신규 컬럼들
+            "SELECT S.store_id, S.store_name, S.category, S.brand_name, S.store_address, S.open_time, S.close_time, S.delivery_fee, "
+            "S.min_order_amount, S.rating, S.review_count, S.image_url, S.delivery_time_range, S.pickup_time, "
+            "U.phone_number, U.user_name AS representative_name, O.business_number "
             "FROM STORES S "
-            "LEFT JOIN USERS U ON S.owner_id = U.user_id "  // 사장님 전화번호, 이름 가져오기
-            "LEFT JOIN OWNERS O ON S.owner_id = O.user_id " // 사장님 사업자번호 가져오기 (이전 에러 해결 반영!)
+            "LEFT JOIN USERS U ON S.owner_id = U.user_id "
+            "LEFT JOIN OWNERS O ON S.owner_id = O.user_id "
             "WHERE S.store_id = ?"));
 
         pstmtStore->setInt(1, storeId);
@@ -176,17 +178,22 @@ ResStoreDetailDTO StoreDAO::getStoreDetail(int storeId)
             result.status = 200;
             result.storeData.storeId = rsStore->getInt("store_id");
             result.storeData.storeName = rsStore->getString("store_name").c_str();
-            result.storeData.storeAddress = rsStore->getString("store_address").c_str();
+            result.storeData.category = rsStore->isNull("category") ? "" : rsStore->getString("category").c_str();
+            result.storeData.brandName = rsStore->isNull("brand_name") ? "" : rsStore->getString("brand_name").c_str();
+
+            // 🚀 DB의 pickup_time을 꺼내서 DTO의 pickupTime에 꽂아줍니다!
+            result.storeData.pickupTime = rsStore->isNull("pickup_time") ? "10~15분" : rsStore->getString("pickup_time").c_str();
+
+            result.storeData.storeAddress = rsStore->isNull("store_address") ? "" : rsStore->getString("store_address").c_str();
             result.storeData.operatingHours = rsStore->getString("open_time").c_str() + std::string(" ~ ") + rsStore->getString("close_time").c_str();
             result.storeData.deliveryFees = std::to_string(rsStore->getInt("delivery_fee")) + "원";
             result.storeData.isOpen = true; // 실제 로직에선 시간 체크 필요
             result.storeData.imageUrl = rsStore->isNull("image_url") ? "" : rsStore->getString("image_url").c_str();
             result.storeData.minOrderAmount = rsStore->getInt("min_order_amount");
-            result.storeData.rating = rsStore->getDouble("rating");
+            result.storeData.rating = rsStore->isNull("rating") ? 0.0 : rsStore->getDouble("rating");
             result.storeData.reviewCount = rsStore->getInt("review_count");
-            result.storeData.deliveryTimeRange = "30~45분";
+            result.storeData.deliveryTimeRange = rsStore->isNull("delivery_time_range") ? "30~45분" : rsStore->getString("delivery_time_range").c_str();
 
-            // 🚀 [추가 데이터 3종] DB에서 꺼내서 DTO에 꽂기
             result.storeData.phoneNumber = rsStore->isNull("phone_number") ? "정보 없음" : rsStore->getString("phone_number").c_str();
             result.storeData.representativeName = rsStore->isNull("representative_name") ? "정보 없음" : rsStore->getString("representative_name").c_str();
             result.storeData.businessNumber = rsStore->isNull("business_number") ? "정보 없음" : rsStore->getString("business_number").c_str();
@@ -328,4 +335,27 @@ std::string StoreDAO::getOwnerIdByStoreId(int storeId)
     if (rs->next())
         return rs->getString("owner_id").c_str();
     return "";
+}
+int StoreDAO::getDeliveryFee(int storeId)
+{
+    int fee = 0; // 기본 배달비 0원
+    try
+    {
+        auto conn = DBManager::getInstance().getConnection();
+        // 🚀 STORES 테이블에서 딱 delivery_fee 컬럼 하나만 가볍게 빼옵니다!
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT delivery_fee FROM STORES WHERE store_id = ?"));
+        pstmt->setInt(1, storeId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            fee = rs->isNull("delivery_fee") ? 0 : rs->getInt("delivery_fee");
+        }
+    }
+    catch (sql::SQLException &e)
+    {
+        std::cerr << "🚨 [StoreDAO] 배달비 조회 실패: " << e.what() << std::endl;
+    }
+    return fee;
 }

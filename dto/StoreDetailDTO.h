@@ -22,8 +22,10 @@ struct StoreDataDTO
     double rating;
     int reviewCount;
     std::string deliveryTimeRange;
-
-    // 🚀 [추가] 프론트엔드 요청 데이터 3종 세트
+    std::string pickupTime;
+    std::string brandName; // 편의점 브랜드명 (예: "GS25", "CU", "7-Eleven")
+    std::string category;  // 카테고리명 (예: "한식", "중식", "편의점" 등)
+                          // 🚀 [추가] 프론트엔드 요청 데이터 3종 세트
     std::string phoneNumber;
     std::string representativeName;
     std::string businessNumber;
@@ -43,6 +45,9 @@ struct StoreDataDTO
             {"rating", dto.rating},
             {"reviewCount", dto.reviewCount},
             {"deliveryTimeRange", dto.deliveryTimeRange},
+            {"pickupTime", dto.pickupTime},
+            {"brandName", dto.brandName},
+            {"category", dto.category}, // 🚀 카테고리도 추가로 보내줍니다! (예: "한식", "중식", "편의점" 등)
             // 🚀 [추가] JSON 응답에 포함
             {"phoneNumber", dto.phoneNumber},
             {"representativeName", dto.representativeName},
@@ -63,6 +68,8 @@ struct StoreDataDTO
         dto.rating = j.value("rating", 0.0);
         dto.reviewCount = j.value("reviewCount", j.value("review_count", 0));
         dto.deliveryTimeRange = j.value("deliveryTimeRange", j.value("delivery_time_range", ""));
+        dto.pickupTime = j.value("pickupTime", j.value("pickup_time", ""));
+        dto.brandName = j.value("brandName", j.value("brand_name", ""));
 
         // 🚀 [추가] 역직렬화 방패
         dto.phoneNumber = j.value("phoneNumber", j.value("phone_number", "정보 없음"));
@@ -84,7 +91,7 @@ struct MenuDataDTO
     std::string menuCategory;
     bool isPopular;
     nlohmann::json optionGroups; // 🚀 옵션 그룹 추가!
-
+    std::string reviewContent; // 🚀 메뉴 리뷰 내용 (예: "이 메뉴 정말 맛있어요!")
     friend void to_json(nlohmann::json &j, const MenuDataDTO &dto)
     {
         j = nlohmann::json{
@@ -97,7 +104,8 @@ struct MenuDataDTO
             {"imageUrl", dto.imageUrl},
             {"menuCategory", dto.menuCategory},
             {"isPopular", dto.isPopular},
-            {"optionGroups", dto.optionGroups}};
+            {"optionGroups", dto.optionGroups},
+            {"reviewContent", dto.reviewContent}};
     }
 
     friend void from_json(const nlohmann::json &j, MenuDataDTO &dto)
@@ -112,6 +120,7 @@ struct MenuDataDTO
         dto.menuCategory = j.value("menuCategory", j.value("menu_category", "기본 메뉴"));
         dto.isPopular = j.value("isPopular", j.value("is_popular", false));
         dto.optionGroups = j.value("optionGroups", j.value("option_groups", nlohmann::json::array()));
+        dto.reviewContent = j.value("reviewContent", j.value("review_content", ""));
     }
 };
 

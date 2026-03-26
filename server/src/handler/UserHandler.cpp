@@ -5,6 +5,7 @@
 #include "UserDAO.h"
 #include "AuthDAO.h"
 #include "MembershipDAO.h"
+#include "DbManager.h"
 #include <iostream>
 
 // 🚀 [수정] ClientSession* -> std::shared_ptr<ClientSession> 으로 변경
@@ -248,29 +249,21 @@ void UserHandler::handleGradeUpdate(std::shared_ptr<ClientSession> session, cons
     try
     {
         auto req = nlohmann::json::parse(jsonBody).get<ReqGradeUpdateDTO>();
-        std::cout << "[UserHandler] 👑 등급 변경 요청 (유저: " << req.userId << " -> " << req.targetGrade << ")" << std::endl;
+        auto conn = DBManager::getInstance().getConnection();
 
-        // DAO 호출 (트랜잭션 실행)
-        bool isSuccess = MembershipDAO::getInstance().updateMembershipGrade(req.userId, req.targetGrade);
+        // 🚀 USERS 테이블의 grade를 쿨하게 업데이트!
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "UPDATE USERS SET grade = ? WHERE user_id = ?"));
+        pstmt->setString(1, req.grade);
+        pstmt->setString(2, req.userId);
+        pstmt->executeUpdate();
 
-        ResGradeUpdateDTO res;
-        if (isSuccess)
-        {
-            res = {0, "등급이 성공적으로 변경되었습니다. (" + req.targetGrade + ")"};
-            std::cout << "[UserHandler] ✅ 등급 변경 완료" << std::endl;
-        }
-        else
-        {
-            res = {1, "등급 변경 중 서버 오류가 발생했습니다."};
-        }
-
-        // 💡 팁: 업그레이드/다운그레이드 구분 없이 같은 CmdID(응답)로 쏴줘도 됩니다.
+        ResGradeUpdateDTO res = {200, "멤버십 등급이 [" + req.grade + "]로 변경되었습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_GRADE_UPDATE), nlohmann::json(res));
     }
-    catch (const std::exception &e)
+    catch (...)
     {
-        std::cerr << "🚨 [UserHandler] 등급 변경 파싱 에러: " << e.what() << std::endl;
-        ResGradeUpdateDTO res = {1, "잘못된 요청 데이터입니다."};
+        ResGradeUpdateDTO res = {500, "등급 업데이트 중 서버 오류가 발생했습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_GRADE_UPDATE), nlohmann::json(res));
     }
 }

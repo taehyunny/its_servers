@@ -258,6 +258,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
  /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
+ /home/lms/Documents/its_server/server/../dto/RiderDTO.h \
  /home/lms/Documents/its_server/server/src/database/UserDAO.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \

@@ -60,6 +60,14 @@ public:
             }
         }
     }
+    // 🚀 [신규 추가] 로그인 성공 시 userMap에 세션을 등록해주는 함수
+    void registerUser(const std::string &userId, std::shared_ptr<ClientSession> session);
+
+    // 🚀 [신규 추가] 특정 유저 1명에게만 패킷 쏘기 (1:1 채팅, 푸시 알림용)
+    bool sendToUser(const std::string &userId, uint16_t cmdId, const nlohmann::json &payload);
+
+    // 🚀 [신규 추가] 특정 Role을 가진 모두에게 패킷 쏘기 (관리자 전체 알림용)
+    bool broadcastToRole(int targetRole, uint16_t cmdId, const nlohmann::json &payload);
 
 private:
     SessionManager() = default;
