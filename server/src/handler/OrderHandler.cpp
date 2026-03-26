@@ -55,9 +55,9 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
             // 액션 1: 사장님에게 성공 응답
             OrderAcceptResDTO res = {200, "주문 수락 및 매출 기록이 완료되었습니다."};
             res.orderId = req.orderId; // ✅ 응답 DTO에 주문번호도 포함시킵니다!
-            session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), res);
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), nlohmann::json(res));
 
-            // 액션 2: 고객 푸시 알림
+            // 액션 2: 고객 푸시 알림 (순서 및 로직 수정 완료)
             std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
             if (!customerId.empty())
             {
@@ -65,14 +65,23 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
                 notifyCustomer.orderId = req.orderId;
                 notifyCustomer.state = 1;
                 notifyCustomer.message = "사장님이 조리를 시작했습니다! (" + std::to_string(req.estimatedTime) + "분 소요 예정)";
-                SessionManager::getInstance().sendToUser(
+
+                // 🚀 푸시 전송 및 결과 받기
+                bool isCustomerNotified = SessionManager::getInstance().sendToUser(
                     customerId,
                     static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE),
-                    notifyCustomer);
+                    nlohmann::json(notifyCustomer));
+
+                // 🚀 전송 결과 로그 출력
+                std::cout << ">>> [DEBUG] 고객(" << customerId << ") 푸시 전송 결과: "
+                          << (isCustomerNotified ? "성공" : "실패 (오프라인)") << std::endl;
+            }
+            else
+            {
+                std::cout << ">>> [DEBUG] 고객 ID를 찾을 수 없어 푸시를 생략합니다." << std::endl;
             }
 
             // 액션 3: 라이더 브로드캐스트
-            // 액션 3: 라이더 브로드캐스트 (명세서 반영하여 추가 정보 채우기)
             NotifyDeliveryCallDTO notifyRiders;
             notifyRiders.orderId = req.orderId;
             notifyRiders.pickupAddress = StoreDAO::getInstance().getStoreDetail(OrderDAO::getInstance().getStoreIdByOrderId(req.orderId)).storeAddress;
@@ -116,8 +125,7 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
             SessionManager::getInstance().broadcastToRole(
                 ROLE_RIDER,
                 static_cast<uint16_t>(CmdID::NOTIFY_DELIVERY_CALL),
-                notifyRiders);
-
+                nlohmann::json(notifyRiders));
             std::cout << "[OrderHandler] ✅ 주문 수락 처리 완료" << std::endl;
         }
         else
@@ -134,7 +142,7 @@ void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, con
                   << e.what() << std::endl;
 
         OrderAcceptResDTO res = {500, "서버 내부 오류로 주문 수락에 실패했습니다."};
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), res);
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), nlohmann::json(res));
     }
 }
 
@@ -512,27 +520,26 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
             itemSum += (item.unitPrice * item.quantity);
         }
 
-        // 💡 StoreDAO에서 배달비를 가져옵니다. (기능 구현되어 있다고 가정)
+        // 💡 StoreDAO에서 배달비를 가져옵니다.
         int deliveryFee = StoreDAO::getInstance().getDeliveryFee(req.storeId);
 
         if (itemSum + deliveryFee != req.totalPrice)
         {
-            std::cerr << "🚨 [OrderHandler] 금액 위변조 의심! (메뉴합계+배달비: " << (itemSum + deliveryFee) << ", 수신된 총액: " << req.totalPrice << ")" << std::endl;
-            // 💡 기획/테스트 단계에서 배달비 로직이 꼬인다면 아래 throw 구문을 잠시 주석 처리하셔도 됩니다.
-            // throw std::runtime_error("결제 금액 검증에 실패했습니다.");
+            std::cerr << "🚨 [OrderHandler] 금액 변조 의심! (계산됨: " << (itemSum + deliveryFee) << ", 수신됨: " << req.totalPrice << ")" << std::endl;
+            // throw std::runtime_error("결제 금액 검증에 실패했습니다."); // 필요 시 주석 해제
         }
 
-        // 3. 트랜잭션 시작 (DB 안전제일!)
+        // 3. 트랜잭션 시작
         conn->setAutoCommit(false);
 
-        // 4. 🚀 고유 주문번호 생성 (난수 3자리 추가로 '따닥 클릭' 동시성 완벽 방어!)
+        // 4. 🚀 고유 주문번호 생성 (난수 추가로 동시성 완벽 방어)
         time_t now = time(nullptr);
         char timeBuf[80];
         strftime(timeBuf, sizeof(timeBuf), "%Y%m%d%H%M%S", localtime(&now));
 
         int randomNum = rand() % 1000;
         char randomBuf[10];
-        sprintf(randomBuf, "%03d", randomNum); // 007, 421 처럼 3자리 포맷팅
+        sprintf(randomBuf, "%03d", randomNum);
 
         std::string newOrderId = "ORD-" + std::string(timeBuf) + "-" + std::string(randomBuf) + "-" + req.userId;
 
@@ -542,14 +549,14 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
             "VALUES (?, ?, ?, ?, ?, ?, ?, 0, NOW())"));
         pstmtOrder->setString(1, newOrderId);
         pstmtOrder->setString(2, req.userId);
-        pstmtOrder->setInt(3, req.storeId);
+        pstmtOrder->setString(3, std::to_string(req.storeId)); // int를 string으로 변환 시 주의 (DB 타입 맞춤)
         pstmtOrder->setInt(4, req.totalPrice);
         pstmtOrder->setString(5, req.deliveryAddress);
         pstmtOrder->setString(6, req.storeRequest);
         pstmtOrder->setString(7, req.riderRequest);
         pstmtOrder->executeUpdate();
 
-        // 6. ORDER_DETAILS (또는 ORDER_ITEMS) 테이블 INSERT 및 푸시 알림용 데이터 조립
+        // 6. ORDER_DETAILS 테이블 INSERT 및 🚀 푸시 알림 데이터 조립
         std::unique_ptr<sql::PreparedStatement> pstmtItems(conn->prepareStatement(
             "INSERT INTO ORDER_DETAILS (order_id, menu_id, menu_name, quantity, price) VALUES (?, ?, ?, ?, ?)"));
 
@@ -560,10 +567,11 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
         {
             const auto &item = req.items[i];
 
-            // 메뉴 이름 조회 (없으면 대체 텍스트)
+            // 🚀 핵심: DB에서 진짜 메뉴 이름을 찾습니다.
             std::string menuName = MenuDAO::getInstance().getMenuName(item.menuId);
             if (menuName.empty())
                 menuName = "메뉴 #" + std::to_string(item.menuId);
+
             if (i == 0)
                 firstMenuName = menuName;
 
@@ -575,33 +583,53 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
             pstmtItems->setInt(5, item.unitPrice);
             pstmtItems->executeUpdate();
 
-            // 🚀 사장님 영수증 푸시(9000)를 위한 개별 메뉴 JSON 조립 (명세서 완벽 준수)
+            // 🚀 사장님 영수증 푸시를 위한 완벽한 JSON 조립!
+            // 🚀 사장님 영수증 푸시를 위한 완벽한 JSON 조립!
             nlohmann::json pushItem;
             pushItem["menuId"] = item.menuId;
             pushItem["menuName"] = menuName;
             pushItem["quantity"] = item.quantity;
             pushItem["unitPrice"] = item.unitPrice;
 
-            // 옵션 처리 (selectedOptions -> options 로 이름 변경 및 빈 배열 보장)
-            nlohmann::json itemJson = item; // DTO를 JSON 객체로 잠시 직렬화
+            // [수정된 부분 시작] ========================================
+            nlohmann::json itemJson = item;
             nlohmann::json opts = itemJson.value("selectedOptions", nlohmann::json::array());
-            if (!opts.is_array())
-                opts = nlohmann::json::array();
+            nlohmann::json optionNamesArray = nlohmann::json::array(); // 🚀 이름을 담을 새 배열 생성
 
-            pushItem["options"] = opts;
+            if (opts.is_array())
+            {
+                for (const auto &optId : opts)
+                {
+                    if (optId.is_number_integer())
+                    {
+                        // DB에서 옵션 이름 조회
+                        std::string optName = MenuDAO::getInstance().getOptionName(optId.get<int>());
+                        if (!optName.empty())
+                        {
+                            optionNamesArray.push_back(optName); // 배열에 추가
+                        }
+                    }
+                }
+            }
+
+            // 기존의 숫자 배열(opts) 대신, 새로 만든 이름 배열(optionNamesArray)을 장착!
+            pushItem["options"] = optionNamesArray;
+            // [수정된 부분 끝] ========================================
+
+            // 완성된 메뉴 1개를 배열에 담기
             pushItemsArray.push_back(pushItem);
         }
 
-        // 7. 모든 쿼리가 성공했으므로 영구 반영!
+        // 7. DB 영구 반영 (Commit)
         conn->commit();
         conn->setAutoCommit(true);
         std::cout << "[OrderHandler] ✅ 주문 생성 완벽 성공! (OrderID: " << newOrderId << ")" << std::endl;
 
-        // 8. 고객(클라이언트)에게 2021번 성공 응답 전송
+        // 8. 고객에게 2021번 성공 응답 전송
         OrderCreateResDTO res = {0, "주문이 성공적으로 생성되었습니다.", newOrderId};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_CREATE), nlohmann::json(res));
 
-        // 9. 🚀 사장님에게 9000번(NOTIFY_NEW_ORDER) 알림 발송! (클라이언트 명세서 100% 반영)
+        // 9. 사장님에게 9000번 알림 발송!
         std::string ownerId = StoreDAO::getInstance().getOwnerIdByStoreId(req.storeId);
         if (!ownerId.empty())
         {
@@ -609,21 +637,22 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
             pushData["orderId"] = newOrderId;
             pushData["deliveryAddress"] = req.deliveryAddress;
             pushData["totalPrice"] = req.totalPrice;
-            pushData["orderStatus"] = 0; // 0: 대기 상태
+            pushData["orderStatus"] = 0; // 대기 상태
 
             char createdAtBuf[80];
             strftime(createdAtBuf, sizeof(createdAtBuf), "%Y-%m-%d %H:%M:%S", localtime(&now));
             pushData["createdAt"] = std::string(createdAtBuf);
 
-            // 🚀 Depth 1 평탄화 (요청사항)
+            // 요청사항 평탄화
             pushData["storeRequest"] = req.storeRequest;
             pushData["riderRequest"] = req.riderRequest;
 
-            // 메뉴 요약 및 전체 아이템 내역
+            // 메뉴 요약 ("치킨 외 1건")
             pushData["menuSummary"] = firstMenuName + (req.items.size() > 1 ? " 외 " + std::to_string(req.items.size() - 1) + "건" : "");
+
+            // 🚀 우리가 공들여 만든 '이름이 포함된 아이템 배열'을 최종 장착!
             pushData["items"] = pushItemsArray;
 
-            // SessionManager를 통해 사장님에게 쏜다!
             bool isPushed = SessionManager::getInstance().sendToUser(
                 ownerId,
                 static_cast<uint16_t>(CmdID::NOTIFY_NEW_ORDER),
@@ -631,23 +660,23 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
 
             if (isPushed)
             {
-                std::cout << "[OrderHandler] 🔔 사장님(" << ownerId << ") 포스기에 접수 알림(9000번) 발송 완료!" << std::endl;
+                std::cout << "[OrderHandler] 🔔 사장님(" << ownerId << ") 포스기에 알림 발송 완료!" << std::endl;
             }
             else
             {
-                std::cout << "[OrderHandler] 📴 사장님(" << ownerId << ") 오프라인 상태 (푸시 생략)." << std::endl;
+                std::cout << "[OrderHandler] 📴 사장님(" << ownerId << ") 오프라인 (푸시 생략)" << std::endl;
             }
         }
     }
     catch (const std::exception &e)
     {
-        std::cerr << "🚨 [OrderHandler] 주문 생성 실패 (Rollback 실행): " << e.what() << std::endl;
+        std::cerr << "🚨 [OrderHandler] 주문 생성 실패 (Rollback): " << e.what() << std::endl;
         if (conn)
         {
             conn->rollback();
             conn->setAutoCommit(true);
         }
-        OrderCreateResDTO res = {1, "주문 처리 중 오류가 발생했습니다. (" + std::string(e.what()) + ")", ""};
+        OrderCreateResDTO res = {1, "주문 처리 중 오류: " + std::string(e.what()), ""};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_CREATE), nlohmann::json(res));
     }
 }
@@ -669,8 +698,7 @@ void OrderHandler::handleCookTimeSet(std::shared_ptr<ClientSession> session, con
             "SELECT S.delivery_time_range, S.cook_time "
             "FROM STORES S "
             "JOIN ORDERS O ON S.store_id = O.store_id "
-            "WHERE O.order_id = ?"
-        ));
+            "WHERE O.order_id = ?"));
         pstmt->setString(1, req.orderId);
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
@@ -685,24 +713,28 @@ void OrderHandler::handleCookTimeSet(std::shared_ptr<ClientSession> session, con
             std::regex re("\\d+");
             auto begin = std::sregex_iterator(timeRange.begin(), timeRange.end(), re);
             auto end = std::sregex_iterator();
-            
+
             int maxTotalTime = 0;
-            for (std::sregex_iterator i = begin; i != end; ++i) {
+            for (std::sregex_iterator i = begin; i != end; ++i)
+            {
                 int val = std::stoi(i->str());
-                if (val > maxTotalTime) maxTotalTime = val;
+                if (val > maxTotalTime)
+                    maxTotalTime = val;
             }
 
             // 3. 순수 배달 시간 계산 = (총 배달 예상 시간) - (기본 조리 시간)
-            if (maxTotalTime > 0) {
+            if (maxTotalTime > 0)
+            {
                 netDeliveryTime = maxTotalTime - defaultCookTime;
             }
 
             // 🛡️ [방어 로직] 계산 결과가 10분 미만이면 라이더 배달이 불가능하다고 판단, 최소 15분으로 보정
-            if (netDeliveryTime < 10) {
+            if (netDeliveryTime < 10)
+            {
                 netDeliveryTime = 15;
             }
-            
-            std::cout << "[OrderHandler] 📊 분석: 기존 범위(" << timeRange << "), 기본 조리(" << defaultCookTime 
+
+            std::cout << "[OrderHandler] 📊 분석: 기존 범위(" << timeRange << "), 기본 조리(" << defaultCookTime
                       << "분) -> 🛵 도출된 순수 배달시간: " << netDeliveryTime << "분" << std::endl;
         }
 
@@ -725,8 +757,7 @@ void OrderHandler::handleCookTimeSet(std::shared_ptr<ClientSession> session, con
             SessionManager::getInstance().sendToUser(
                 customerId,
                 static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE),
-                nlohmann::json(notifyCustomer)
-            );
+                nlohmann::json(notifyCustomer));
         }
 
         // 7. 라이더들에게 브로드캐스트 (9020) - 메뉴 요약에 조리시간 세팅
@@ -735,16 +766,15 @@ void OrderHandler::handleCookTimeSet(std::shared_ptr<ClientSession> session, con
         notifyRiders.pickupAddress = StoreDAO::getInstance().getStoreDetail(OrderDAO::getInstance().getStoreIdByOrderId(req.orderId)).storeAddress;
         notifyRiders.deliveryAddress = OrderDAO::getInstance().getDeliveryAddressByOrderId(req.orderId);
         notifyRiders.deliveryFee = 3500;
-        
+
         // 🚀 라이더에게 전달할 명확한 메시지
-        notifyRiders.menuSummary = "조리 완료까지 " + std::to_string(req.cookTime) + "분 남음"; 
+        notifyRiders.menuSummary = "조리 완료까지 " + std::to_string(req.cookTime) + "분 남음";
 
         int ROLE_RIDER = 2;
         SessionManager::getInstance().broadcastToRole(
             ROLE_RIDER,
             static_cast<uint16_t>(CmdID::NOTIFY_DELIVERY_CALL),
-            nlohmann::json(notifyRiders)
-        );
+            nlohmann::json(notifyRiders));
 
         std::cout << "[OrderHandler] ✅ 고객 알림(" << totalEstimatedTime << "분 도착) 및 라이더 전파 완료" << std::endl;
     }
@@ -753,5 +783,68 @@ void OrderHandler::handleCookTimeSet(std::shared_ptr<ClientSession> session, con
         std::cerr << "🚨 [OrderHandler] 조리 시간 설정 중 에러: " << e.what() << std::endl;
         ResCookTimeSetDTO res = {500, "서버 내부 오류로 설정에 실패했습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_COOK_TIME_SET), nlohmann::json(res));
+    }
+}
+
+void OrderHandler::handleDeliveryComplete(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    auto conn = DBManager::getInstance().getConnection();
+    try
+    {
+        auto req = nlohmann::json::parse(jsonBody).get<ReqDeliveryCompleteDTO>();
+        std::cout << "[OrderHandler] 🛵 라이더 배달 완료 보고 (ID: " << req.orderId << ")" << std::endl;
+
+        // 1. DB 업데이트 (상태 4: 배달 완료)
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "UPDATE ORDERS SET order_status = 4 WHERE order_id = ?"));
+        pstmt->setString(1, req.orderId);
+        int affected = pstmt->executeUpdate();
+
+        if (affected > 0)
+        {
+            // 2. 라이더에게 성공 응답 (4011)
+            ResDeliveryCompleteDTO res = {200, "배달 완료 처리가 정상적으로 기록되었습니다."};
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_DELIVERY_COMPLETE), nlohmann::json(res));
+
+            // 3. 고객에게 알림 (9010 재활용)
+            std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
+            if (!customerId.empty())
+            {
+                NotifyOrderStateDTO notifyCustomer;
+                notifyCustomer.orderId = req.orderId;
+                notifyCustomer.state = 4; // 배달 완료 상태
+                notifyCustomer.message = "배달이 완료되었습니다. 맛있게 드세요! 😋";
+
+                SessionManager::getInstance().sendToUser(
+                    customerId,
+                    static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE),
+                    nlohmann::json(notifyCustomer));
+            }
+
+            // 4. 사장님에게 알림 (포스기 화면 갱신용)
+            int storeId = OrderDAO::getInstance().getStoreIdByOrderId(req.orderId);
+            std::string ownerId = StoreDAO::getInstance().getOwnerIdByStoreId(storeId);
+            if (!ownerId.empty())
+            {
+                // 사장님도 9010 패킷을 수신하여 리스트에서 해당 주문을 '완료' 처리하도록 설계
+                NotifyOrderStateDTO notifyOwner;
+                notifyOwner.orderId = req.orderId;
+                notifyOwner.state = 4;
+                notifyOwner.message = "주문 번호[" + req.orderId + "] 배달이 완료되었습니다.";
+
+                SessionManager::getInstance().sendToUser(
+                    ownerId,
+                    static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE),
+                    nlohmann::json(notifyOwner));
+            }
+
+            std::cout << "[OrderHandler] ✅ 배달 완료 및 고객/사장님 알림 전송 완료" << std::endl;
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [OrderHandler] 배달 완료 처리 중 오류: " << e.what() << std::endl;
+        ResDeliveryCompleteDTO res = {500, "서버 오류로 완료 처리에 실패했습니다."};
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_DELIVERY_COMPLETE), nlohmann::json(res));
     }
 }

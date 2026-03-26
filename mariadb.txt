@@ -78,6 +78,7 @@ CREATE TABLE ORDERS (
     store_id INT(11) NOT NULL, -- MUL KEY
     total_price INT(11) NOT NULL,
     order_status INT(11) DEFAULT 0,
+    order_type INT(11) DEFAULT 0,
     delivery_address VARCHAR(255) NOT NULL,
     reject_reason VARCHAR(100) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
@@ -143,6 +144,7 @@ CREATE TABLE STORES (
     owner_id VARCHAR(50) NOT NULL, -- MUL KEY
     store_name VARCHAR(100) NOT NULL,
     category VARCHAR(20) NOT NULL,
+    brand_name VARCHAR(50) DEFAULT NULL,
     store_address VARCHAR(255) DEFAULT '주소 미상',
     open_time VARCHAR(10) DEFAULT '09:00',
     close_time VARCHAR(10) DEFAULT '22:00',
@@ -228,3 +230,8 @@ CREATE TABLE ORDER_DETAILS (
     price INT(11) NOT NULL           -- 14000원
 );
 
+CREATE TABLE BRANDS (
+    brand_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL,
+    logo_url VARCHAR(255)
+);

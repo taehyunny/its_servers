@@ -233,3 +233,27 @@ std::string MenuDAO::getMenuName(int menuId)
 
     return ""; // 못 찾으면 빈 문자열 리턴
 }
+// MenuDAO.cpp 하단에 추가
+
+std::string MenuDAO::getOptionName(int optionId)
+{
+    auto conn = DBManager::getInstance().getConnection();
+    try
+    {
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+            "SELECT option_name FROM MENU_OPTIONS WHERE option_id = ?"));
+        pstmt->setInt(1, optionId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        if (rs->next())
+        {
+            return rs->getString("option_name").c_str(); // 🚀 찐 옵션 이름 리턴!
+        }
+    }
+    catch (const sql::SQLException &e)
+    {
+        std::cerr << "🚨 [MenuDAO] 옵션 이름 조회 에러: " << e.what() << std::endl;
+    }
+
+    return ""; // 못 찾으면 빈 문자열 리턴
+}

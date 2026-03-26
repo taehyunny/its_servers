@@ -14,3 +14,4 @@
 #include "PaymentDTO.h"
 #include "ChatDTO.h"
 #include "AdminDTO.h" // 🚀 관리자 전용 DTO도 여기에 포함!
+#include "RiderDTO.h" // 🚀 라이더 전용 DTO도 여기에 포함!
