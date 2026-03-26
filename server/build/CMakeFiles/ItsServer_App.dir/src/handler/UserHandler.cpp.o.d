@@ -328,6 +328,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
  /home/lms/Documents/its_server/server/../dto/RiderDTO.h \
  /home/lms/Documents/its_server/server/src/session/SessionManager.h \
+ /usr/include/c++/13/iostream \
  /home/lms/Documents/its_server/server/src/database/UserDAO.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \
@@ -365,4 +366,8 @@ CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o: \
  /usr/local/include/mariadb/conncpp/jdbccompat.hpp \
  /home/lms/Documents/its_server/server/src/database/AuthDAO.h \
  /home/lms/Documents/its_server/server/src/database/MembershipDAO.h \
- /usr/include/c++/13/iostream
+ /home/lms/Documents/its_server/server/src/database/DbManager.h \
+ /usr/include/c++/13/queue /usr/include/c++/13/deque \
+ /usr/include/c++/13/bits/stl_deque.h /usr/include/c++/13/bits/deque.tcc \
+ /usr/include/c++/13/bits/stl_queue.h \
+ /usr/include/c++/13/condition_variable

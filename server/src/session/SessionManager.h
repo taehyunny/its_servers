@@ -3,6 +3,7 @@
 #include <string>
 #include <mutex>
 #include <memory>
+#include <iostream>
 #include "ClientSession.h"
 
 class SessionManager
@@ -19,26 +20,41 @@ public:
     std::shared_ptr<ClientSession> getSessionByUserId(const std::string &userId);
     void removeSession(int fd);
 
-    // 1. 로그인 시 userId와 세션 연결
-    void authenticateUser(const std::string &userId, std::shared_ptr<ClientSession> session)
+    // 1. 로그인 성공 시 유저 등록 (기존 authenticateUser와 동일 기능을 registerUser로 통일)
+    void registerUser(const std::string &userId, std::shared_ptr<ClientSession> session)
     {
         std::lock_guard<std::mutex> lock(sessionMutex);
         userMap[userId] = session;
+        std::cout << "[SessionManager] 유저 등록 완료: " << userId << std::endl;
     }
 
-    // 2. [9010번/채팅용] 특정 유저 콕 집어서 알림 쏘기 (템플릿은 헤더에 하나만!)
+    // 2. 특정 유저에게 패킷 전송 (템플릿 하나로 DTO와 json 모두 처리 가능!)
     template <typename T>
-    bool sendToUser(const std::string &userId, uint16_t cmdId, const T &dto)
+    bool sendToUser(const std::string &userId, uint16_t cmdId, const T &payload)
     {
         std::lock_guard<std::mutex> lock(sessionMutex);
         auto it = userMap.find(userId);
 
-        if (it != userMap.end())
+        if (it != userMap.end() && it->second)
         {
-            it->second->sendPacket(cmdId, dto);
-            return true; // 전송 성공
+            it->second->sendPacket(cmdId, payload);
+            return true;
         }
-        return false; // 오프라인 상태
+        return false;
+    }
+
+    // 3. 특정 역할(Role) 전체에게 브로드캐스트
+    template <typename T>
+    void broadcastToRole(int targetRole, uint16_t cmdId, const T &payload)
+    {
+        std::lock_guard<std::mutex> lock(sessionMutex);
+        for (auto &pair : userMap)
+        {
+            if (pair.second && pair.second->getRole() == targetRole)
+            {
+                pair.second->sendPacket(cmdId, payload);
+            }
+        }
     }
 
     void removeUser(const std::string &userId)
@@ -46,28 +62,6 @@ public:
         std::lock_guard<std::mutex> lock(sessionMutex);
         userMap.erase(userId);
     }
-
-    // 3. [9020번용] 특정 권한(라이더 등) 전체 브로드캐스트
-    template <typename T>
-    void broadcastToRole(int targetRole, uint16_t cmdId, const T &dto)
-    {
-        std::lock_guard<std::mutex> lock(sessionMutex);
-        for (auto &pair : userMap)
-        {
-            if (pair.second->getRole() == targetRole)
-            {
-                pair.second->sendPacket(cmdId, dto);
-            }
-        }
-    }
-    // 🚀 [신규 추가] 로그인 성공 시 userMap에 세션을 등록해주는 함수
-    void registerUser(const std::string &userId, std::shared_ptr<ClientSession> session);
-
-    // 🚀 [신규 추가] 특정 유저 1명에게만 패킷 쏘기 (1:1 채팅, 푸시 알림용)
-    bool sendToUser(const std::string &userId, uint16_t cmdId, const nlohmann::json &payload);
-
-    // 🚀 [신규 추가] 특정 Role을 가진 모두에게 패킷 쏘기 (관리자 전체 알림용)
-    bool broadcastToRole(int targetRole, uint16_t cmdId, const nlohmann::json &payload);
 
 private:
     SessionManager() = default;

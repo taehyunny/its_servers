@@ -328,4 +328,5 @@ CMakeFiles/ItsServer_App.dir/src/handler/AdminHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
  /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
  /home/lms/Documents/its_server/server/../dto/RiderDTO.h \
+ /home/lms/Documents/its_server/server/src/session/SessionManager.h \
  /usr/include/c++/13/iostream

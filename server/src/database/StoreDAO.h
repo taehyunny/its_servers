@@ -23,7 +23,6 @@ public:
     int getDeliveryFee(int storeId);
     std::string getOwnerIdByStoreId(int storeId);
     // 매장 ID를 넣으면 배달비(int)를 뱉어내는 함수 선언
-    int getDeliveryFee(int storeId);
 
 private:
     StoreDAO() = default;

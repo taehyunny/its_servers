@@ -336,26 +336,3 @@ std::string StoreDAO::getOwnerIdByStoreId(int storeId)
         return rs->getString("owner_id").c_str();
     return "";
 }
-int StoreDAO::getDeliveryFee(int storeId)
-{
-    int fee = 0; // 기본 배달비 0원
-    try
-    {
-        auto conn = DBManager::getInstance().getConnection();
-        // 🚀 STORES 테이블에서 딱 delivery_fee 컬럼 하나만 가볍게 빼옵니다!
-        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "SELECT delivery_fee FROM STORES WHERE store_id = ?"));
-        pstmt->setInt(1, storeId);
-        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
-
-        if (rs->next())
-        {
-            fee = rs->isNull("delivery_fee") ? 0 : rs->getInt("delivery_fee");
-        }
-    }
-    catch (sql::SQLException &e)
-    {
-        std::cerr << "🚨 [StoreDAO] 배달비 조회 실패: " << e.what() << std::endl;
-    }
-    return fee;
-}

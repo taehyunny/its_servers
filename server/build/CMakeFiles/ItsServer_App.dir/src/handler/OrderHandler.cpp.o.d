@@ -288,6 +288,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/types/struct_osockaddr.h \
  /usr/include/x86_64-linux-gnu/bits/in.h /usr/include/nlohmann/json.hpp \
  /home/lms/Documents/its_server/server/src/session/SessionManager.h \
+ /usr/include/c++/13/iostream \
  /home/lms/Documents/its_server/server/src/database/DbManager.h \
  /usr/local/include/mariadb/conncpp.hpp \
  /usr/local/include/mariadb/conncpp/Driver.hpp \
@@ -328,9 +329,9 @@ CMakeFiles/ItsServer_App.dir/src/handler/OrderHandler.cpp.o: \
  /usr/include/c++/13/bits/stl_queue.h \
  /usr/include/c++/13/condition_variable \
  /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
- /usr/include/c++/13/iostream /usr/include/c++/13/regex \
- /usr/include/c++/13/bitset /usr/include/c++/13/stack \
- /usr/include/c++/13/bits/stl_stack.h \
+ /home/lms/Documents/its_server/server/src/database/UserDAO.h \
+ /usr/include/c++/13/regex /usr/include/c++/13/bitset \
+ /usr/include/c++/13/stack /usr/include/c++/13/bits/stl_stack.h \
  /usr/include/c++/13/bits/regex_constants.h \
  /usr/include/c++/13/bits/regex_error.h \
  /usr/include/c++/13/bits/regex_automaton.h \

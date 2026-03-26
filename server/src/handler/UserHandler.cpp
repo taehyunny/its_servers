@@ -58,7 +58,7 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
     {
         auto req = nlohmann::json::parse(jsonBody).get<LoginReqDTO>();
 
-        // 🚀 1. UserDAO가 아니라 AuthDAO 호출! (req.role 까지 3개의 파라미터 전달)
+        // 1. AuthDAO 호출 (ID, PW, Role 검증)
         auto [resultCode, userJson] = AuthDAO::getInstance().validateLogin(req.userId, req.password, req.role);
 
         AuthResDTO res;
@@ -67,17 +67,19 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
         {
             res.status = 200;
             res.message = "로그인 성공";
-            res.userId = userJson.value("user_id", userJson.value("userId", ""));
-            res.userName = userJson.value("userName", userJson.value("user_name", ""));
+            res.userId = userJson.value("userId", "");
+            res.userName = userJson.value("userName", "");
             res.address = userJson.value("address", "");
             res.phoneNumber = userJson.value("phoneNumber", "");
 
+            // 🚀 [Fact Check] DB에서 꺼내온 grade를 응답 DTO에 꽂아줍니다!
+            res.grade = userJson.value("grade", "일반");
+
             std::string roleStr = userJson.value("role", "0");
             int dbRole = std::stoi(roleStr);
-
             res.role = roleStr;
 
-            // 🚀 2. 사장님(role == 1)일 경우 꽉꽉 채워주는 전용 데이터 매핑!
+            // 2. 사장님(role == 1) 전용 데이터 매핑
             if (dbRole == 1)
             {
                 res.businessNumber = userJson.value("businessNumber", "");
@@ -94,14 +96,18 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
                 res.deliveryFee = userJson.value("deliveryFee", 0);
             }
 
+            // 🚀 [중요 수정] 세션에 정보 저장 및 SessionManager 등록
             session->authenticate(res.userId, dbRole);
-            SessionManager::getInstance().authenticateUser(res.userId, session);
-            std::cout << "[UserHandler] 로그인 성공! 유저 '" << res.userId << "' 세션 맵 등록 완료." << std::endl;
+
+            // 💡 이름이 바뀐 registerUser를 호출합니다!
+            SessionManager::getInstance().registerUser(res.userId, session);
+
+            std::cout << "[UserHandler] 로그인 성공! 유저 '" << res.userId << "' [" << res.grade << "] 등급 세션 등록 완료." << std::endl;
         }
         else if (resultCode == LoginResult::ID_PASS_WRONG)
         {
             res.status = 401;
-            res.message = "아이디/비밀번호가 틀렸거나 권한이 맞지 않습니다."; // 메시지 디테일 추가
+            res.message = "아이디/비밀번호가 틀렸거나 권한이 맞지 않습니다.";
         }
         else
         {
@@ -109,8 +115,6 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
             res.message = "로그인 처리 중 서버 오류가 발생했습니다.";
         }
 
-        std::cout << ">>> [DEBUG] 클라이언트로 쏘는 최종 JSON: \n"
-                  << nlohmann::json(res).dump(4) << std::endl;
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_LOGIN), res);
     }
     catch (const std::exception &e)

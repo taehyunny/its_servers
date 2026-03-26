@@ -18,7 +18,7 @@ std::pair<LoginResult, nlohmann::json> AuthDAO::validateLogin(const std::string 
         // UA.is_default = 1 조건을 추가하여 현재 선택된 기본 주소만 타겟팅합니다.
         std::string query = R"(
             SELECT 
-                U.password_hash, U.user_name, U.phone_number, U.role,
+                U.password_hash, U.user_name, U.phone_number, U.role, U.grade,
                 UA.address, UA.detail,
                 O.account_number, O.approval_status, O.business_number,
                 S.store_id, S.store_name, S.category, S.store_address,
@@ -57,6 +57,10 @@ std::pair<LoginResult, nlohmann::json> AuthDAO::validateLogin(const std::string 
         userInfo["userName"] = rs->getString("user_name").c_str();
         userInfo["phoneNumber"] = rs->isNull("phone_number") ? "" : rs->getString("phone_number").c_str();
         userInfo["role"] = std::to_string(rs->getInt("role"));
+
+        // 🚀 DB에서 꺼낸 grade를 JSON에 예쁘게 담아줍니다!
+        userInfo["grade"] = rs->isNull("grade") ? "일반" : rs->getString("grade").c_str();
+
         userInfo["status"] = 200;
         userInfo["message"] = "로그인 성공";
 
