@@ -24,130 +24,107 @@ using nlohmann::json;
 void OrderHandler::handleOrderAccept(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     auto conn = DBManager::getInstance().getConnection();
-
     try
     {
         auto req = nlohmann::json::parse(jsonBody).get<OrderAcceptReqDTO>();
-        if (req.orderId.empty())
-        {
-            throw std::runtime_error("주문 번호가 누락되었습니다.");
-        }
         std::cout << "[OrderHandler] 🧑🍳 사장님 주문 수락 요청 수신 (ID: " << req.orderId << ")" << std::endl;
 
-        // Step 1: 트랜잭션 시작
+        // 🚀 트랜잭션 시작
         conn->setAutoCommit(false);
 
-        // Step 2: 주문 상태 업데이트 (수락: 1)
+        // 1. 주문 상태 업데이트 (수락: 1)
+        // 💡 방어 로직: 이미 수락(1)된 주문을 또 누르면 에러가 나도록 AND order_status = 0 조건 추가
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "UPDATE ORDERS SET order_status = 1 WHERE order_id = ?"));
-        pstmt->setString(1, req.orderId); // ✅ orderId → req.orderId
+            "UPDATE ORDERS SET order_status = 1 WHERE order_id = ? AND order_status = 0"));
+        pstmt->setString(1, req.orderId);
         int affected = pstmt->executeUpdate();
 
-        if (affected > 0)
+        if (affected == 0)
         {
-            // Step 3: STORES 테이블 매출(total_sales) 누적
-            std::unique_ptr<sql::PreparedStatement> pstmtSales(conn->prepareStatement(
-                "UPDATE STORES S "
-                "JOIN ORDERS O ON O.store_id = S.store_id "
-                "SET S.total_sales = S.total_sales + O.total_price "
-                "WHERE O.order_id = ?"));
-            pstmtSales->setString(1, req.orderId);
-            pstmtSales->executeUpdate();
-
-            // Step 4: 커밋
-            conn->commit();
-            conn->setAutoCommit(true);
-
-            // 액션 1: 사장님에게 성공 응답
-            OrderAcceptResDTO res = {200, "주문 수락 및 매출 기록이 완료되었습니다."};
-            res.orderId = req.orderId; // ✅ 응답 DTO에 주문번호도 포함시킵니다!
-            session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), nlohmann::json(res));
-
-            // 액션 2: 고객 푸시 알림 (순서 및 로직 수정 완료)
-            std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
-            if (!customerId.empty())
-            {
-                NotifyOrderStateDTO notifyCustomer;
-                notifyCustomer.orderId = req.orderId;
-                notifyCustomer.state = 1;
-                notifyCustomer.message = "사장님이 조리를 시작했습니다! (" + std::to_string(req.estimatedTime) + "분 소요 예정)";
-
-                // 🚀 푸시 전송 및 결과 받기
-                bool isCustomerNotified = SessionManager::getInstance().sendToUser(
-                    customerId,
-                    static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE),
-                    nlohmann::json(notifyCustomer));
-
-                // 🚀 전송 결과 로그 출력
-                std::cout << ">>> [DEBUG] 고객(" << customerId << ") 푸시 전송 결과: "
-                          << (isCustomerNotified ? "성공" : "실패 (오프라인)") << std::endl;
-            }
-            else
-            {
-                std::cout << ">>> [DEBUG] 고객 ID를 찾을 수 없어 푸시를 생략합니다." << std::endl;
-            }
-
-            // 액션 3: 라이더 브로드캐스트
-            NotifyDeliveryCallDTO notifyRiders;
-            notifyRiders.orderId = req.orderId;
-            notifyRiders.pickupAddress = StoreDAO::getInstance().getStoreDetail(OrderDAO::getInstance().getStoreIdByOrderId(req.orderId)).storeAddress;
-            notifyRiders.deliveryAddress = OrderDAO::getInstance().getDeliveryAddressByOrderId(req.orderId);
-            notifyRiders.deliveryFee = 3500; // 하드코딩 또는 DB 연동
-
-            // 🚀 라이더 앱 리스트에 띄워줄 상세 정보 조회 로직 추가!
-            std::unique_ptr<sql::PreparedStatement> pRiderInfo(conn->prepareStatement(
-                "SELECT total_price, created_at FROM ORDERS WHERE order_id = ?"));
-            pRiderInfo->setString(1, req.orderId);
-            std::unique_ptr<sql::ResultSet> rsRiderInfo(pRiderInfo->executeQuery());
-            if (rsRiderInfo->next())
-            {
-                notifyRiders.totalPrice = rsRiderInfo->getInt("total_price");
-                notifyRiders.createdAt = rsRiderInfo->getString("created_at").c_str();
-            }
-
-            // 메뉴 요약 정보 (떡볶이 외 1건)
-            std::unique_ptr<sql::PreparedStatement> pMenuSummary(conn->prepareStatement(
-                "SELECT M.menu_name FROM ORDER_ITEMS OI JOIN MENUS M ON OI.menu_id = M.menu_id WHERE OI.order_id = ? LIMIT 1"));
-            pMenuSummary->setString(1, req.orderId);
-            std::unique_ptr<sql::ResultSet> rsMenuSummary(pMenuSummary->executeQuery());
-
-            std::unique_ptr<sql::PreparedStatement> pMenuCount(conn->prepareStatement("SELECT COUNT(*) as cnt FROM ORDER_ITEMS WHERE order_id = ?"));
-            pMenuCount->setString(1, req.orderId);
-            std::unique_ptr<sql::ResultSet> rsMenuCount(pMenuCount->executeQuery());
-
-            std::string summary = "메뉴";
-            if (rsMenuSummary->next())
-            {
-                summary = rsMenuSummary->getString("menu_name").c_str();
-                if (rsMenuCount->next() && rsMenuCount->getInt("cnt") > 1)
-                {
-                    summary += " 외 " + std::to_string(rsMenuCount->getInt("cnt") - 1) + "건";
-                }
-            }
-            notifyRiders.menuSummary = summary;
-
-            // 라이더(ROLE 2) 전체에게 브로드캐스트 쏘기!
-            int ROLE_RIDER = 2;
-            SessionManager::getInstance().broadcastToRole(
-                ROLE_RIDER,
-                static_cast<uint16_t>(CmdID::NOTIFY_DELIVERY_CALL),
-                nlohmann::json(notifyRiders));
-            std::cout << "[OrderHandler] ✅ 주문 수락 처리 완료" << std::endl;
+            throw std::runtime_error("이미 수락되었거나 취소된 주문입니다.");
         }
-        else
+
+        // 2. STORES 테이블 매출 누적
+        std::unique_ptr<sql::PreparedStatement> pstmtSales(conn->prepareStatement(
+            "UPDATE STORES S "
+            "JOIN ORDERS O ON O.store_id = S.store_id "
+            "SET S.total_sales = S.total_sales + O.total_price "
+            "WHERE O.order_id = ?"));
+        pstmtSales->setString(1, req.orderId);
+        pstmtSales->executeUpdate();
+
+        // 3. 🚀 라이더 브로드캐스트용 정보 수집 (ORDER_ITEMS -> ORDER_DETAILS 로 완벽 수정!)
+        NotifyDeliveryCallDTO notifyRiders;
+        notifyRiders.orderId = req.orderId;
+        notifyRiders.pickupAddress = StoreDAO::getInstance().getStoreDetail(OrderDAO::getInstance().getStoreIdByOrderId(req.orderId)).storeAddress;
+        notifyRiders.deliveryAddress = OrderDAO::getInstance().getDeliveryAddressByOrderId(req.orderId);
+        notifyRiders.deliveryFee = 3500;
+
+        std::unique_ptr<sql::PreparedStatement> pRiderInfo(conn->prepareStatement(
+            "SELECT total_price, created_at FROM ORDERS WHERE order_id = ?"));
+        pRiderInfo->setString(1, req.orderId);
+        std::unique_ptr<sql::ResultSet> rsRiderInfo(pRiderInfo->executeQuery());
+        if (rsRiderInfo->next())
         {
-            throw std::runtime_error("주문을 찾을 수 없거나 상태 업데이트에 실패했습니다.");
+            notifyRiders.totalPrice = rsRiderInfo->getInt("total_price");
+            notifyRiders.createdAt = rsRiderInfo->getString("created_at").c_str();
         }
+
+        // 🚀 메뉴 요약 정보 (이제 에러 안 남!)
+        std::unique_ptr<sql::PreparedStatement> pMenuSummary(conn->prepareStatement(
+            "SELECT menu_name FROM ORDER_DETAILS WHERE order_id = ? LIMIT 1"));
+        pMenuSummary->setString(1, req.orderId);
+        std::unique_ptr<sql::ResultSet> rsMenuSummary(pMenuSummary->executeQuery());
+
+        std::unique_ptr<sql::PreparedStatement> pMenuCount(conn->prepareStatement(
+            "SELECT COUNT(*) as cnt FROM ORDER_DETAILS WHERE order_id = ?"));
+        pMenuCount->setString(1, req.orderId);
+        std::unique_ptr<sql::ResultSet> rsMenuCount(pMenuCount->executeQuery());
+
+        std::string summary = "메뉴";
+        if (rsMenuSummary->next())
+        {
+            summary = rsMenuSummary->getString("menu_name").c_str();
+            if (rsMenuCount->next() && rsMenuCount->getInt("cnt") > 1)
+            {
+                summary += " 외 " + std::to_string(rsMenuCount->getInt("cnt") - 1) + "건";
+            }
+        }
+        notifyRiders.menuSummary = summary;
+
+        // 🚀 4. 모든 작업이 안전하게 끝났을 때만 커밋! (위치 이동)
+        conn->commit();
+        conn->setAutoCommit(true);
+
+        // 5. 성공 응답 및 푸시 알림 전송
+        OrderAcceptResDTO res = {200, "주문 수락 및 매출 기록이 완료되었습니다."};
+        res.orderId = req.orderId;
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), nlohmann::json(res));
+
+        std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(req.orderId);
+        if (!customerId.empty())
+        {
+            NotifyOrderStateDTO notifyCustomer;
+            notifyCustomer.orderId = req.orderId;
+            notifyCustomer.state = 1;
+            notifyCustomer.message = "사장님이 조리를 시작했습니다! (" + std::to_string(req.estimatedTime) + "분 소요 예정)";
+            SessionManager::getInstance().sendToUser(customerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), nlohmann::json(notifyCustomer));
+        }
+
+        int ROLE_RIDER = 2;
+        SessionManager::getInstance().broadcastToRole(ROLE_RIDER, static_cast<uint16_t>(CmdID::NOTIFY_DELIVERY_CALL), nlohmann::json(notifyRiders));
+
+        std::cout << "[OrderHandler] ✅ 주문 수락 처리 완벽 성공!" << std::endl;
     }
     catch (const std::exception &e)
     {
-        conn->rollback();
-        conn->setAutoCommit(true);
-
-        std::cerr << "🚨 [OrderHandler] 주문 수락 중 에러 (Rollback 실행): "
-                  << e.what() << std::endl;
-
-        OrderAcceptResDTO res = {500, "서버 내부 오류로 주문 수락에 실패했습니다."};
+        if (conn)
+        {
+            conn->rollback();
+            conn->setAutoCommit(true);
+        }
+        std::cerr << "🚨 [OrderHandler] 주문 수락 중 에러 (Rollback 실행): " << e.what() << std::endl;
+        OrderAcceptResDTO res = {500, "주문 수락 실패: " + std::string(e.what())};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_ACCEPT), nlohmann::json(res));
     }
 }
@@ -223,8 +200,8 @@ void OrderHandler::handleChangeOrderState(std::shared_ptr<ClientSession> session
 
 void OrderHandler::handleOrderList(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
-    nlohmann::json req = nlohmann::json::parse(jsonBody);
-    nlohmann::json res;
+    json req = json::parse(jsonBody);
+    json res;
     try
     {
         int storeId = req.value("storeId", 0);
@@ -238,7 +215,7 @@ void OrderHandler::handleOrderList(std::shared_ptr<ClientSession> session, const
 
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 1. 미완료 주문 목록 조회
+        // 1. 미완료 주문 목록 조회
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
             "SELECT order_id, total_price, order_status, "
             "delivery_address, created_at, store_request, rider_request "
@@ -249,15 +226,15 @@ void OrderHandler::handleOrderList(std::shared_ptr<ClientSession> session, const
         pstmt->setInt(1, storeId);
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
-        nlohmann::json orders = nlohmann::json::array();
+        json orders = json::array();
 
+        // 🚀 루프 시작: 여기서 orderId가 만들어집니다!
         while (rs->next())
         {
-            nlohmann::json order;
+            json order;
             std::string orderId = rs->getString("order_id").c_str();
 
-            // 🚨 [핵심 해결] 누락되었던 필수 필드들을 전부 JSON에 명시적으로 담아줍니다!
-            order["orderId"] = orderId; // 👈 사장님 롤백 사태의 범인 검거!
+            order["orderId"] = orderId;
             order["totalPrice"] = rs->getInt("total_price");
             order["orderStatus"] = rs->getInt("order_status");
             order["deliveryAddress"] = rs->getString("delivery_address").c_str();
@@ -266,61 +243,54 @@ void OrderHandler::handleOrderList(std::shared_ptr<ClientSession> session, const
             order["storeRequest"] = rs->isNull("store_request") ? "" : rs->getString("store_request").c_str();
             order["riderRequest"] = rs->isNull("rider_request") ? "" : rs->getString("rider_request").c_str();
 
-            // 🚀 핵심: 하위 아이템(items) 조립 시작
-            nlohmann::json itemsArray = nlohmann::json::array();
+            // 🚀 2. ORDER_DETAILS 테이블에서 메뉴 리스트 조회 (JOIN 불필요!)
+            std::unique_ptr<sql::PreparedStatement> pstmtItems(conn->prepareStatement(
+                "SELECT menu_id, menu_name, quantity, "
+                "price AS unit_price, selected_options "
+                "FROM ORDER_DETAILS "
+                "WHERE order_id = ?"));
+            pstmtItems->setString(1, orderId); // 👈 위에서 만든 orderId를 여기서 사용!
+            std::unique_ptr<sql::ResultSet> rsItems(pstmtItems->executeQuery());
+
+            json items = json::array();
             std::string firstMenuName = "";
             int itemCount = 0;
 
-            // 💡 태현님 요청 반영: MENUS 테이블과 JOIN, OI.unit_price 사용
-            std::unique_ptr<sql::PreparedStatement> pstmtItems(conn->prepareStatement(
-                "SELECT OI.menu_id, M.menu_name, OI.quantity, OI.unit_price, OI.selected_options "
-                "FROM ORDER_ITEMS OI "
-                "JOIN MENUS M ON OI.menu_id = M.menu_id "
-                "WHERE OI.order_id = ?"));
-            pstmtItems->setString(1, orderId);
-            std::unique_ptr<sql::ResultSet> rsItems(pstmtItems->executeQuery());
-
             while (rsItems->next())
             {
-                nlohmann::json item;
+                json item;
                 item["menuId"] = rsItems->getInt("menu_id");
                 item["menuName"] = rsItems->getString("menu_name").c_str();
                 item["quantity"] = rsItems->getInt("quantity");
-                item["unitPrice"] = rsItems->getInt("unit_price"); // 💡 unit_price 로 통일
+                item["unitPrice"] = rsItems->getInt("unit_price");
 
-                // 🚀 옵션 JSON 파싱 (방어 코드 및 명세서 호환 "options" 이름 사용)
                 std::string optStr = rsItems->isNull("selected_options") ? "[]" : rsItems->getString("selected_options").c_str();
                 try
                 {
-                    item["options"] = nlohmann::json::parse(optStr); // selectedOptions 대신 options 사용!
+                    item["options"] = json::parse(optStr);
                     if (!item["options"].is_array())
                     {
-                        item["options"] = nlohmann::json::array();
+                        item["options"] = json::array();
                     }
                 }
                 catch (...)
                 {
-                    item["options"] = nlohmann::json::array();
+                    item["options"] = json::array();
                 }
 
-                // 메뉴 요약을 위한 첫 번째 메뉴 이름 저장
                 if (itemCount == 0)
-                {
-                    firstMenuName = item["menuName"];
-                }
+                    firstMenuName = rsItems->getString("menu_name").c_str();
                 itemCount++;
-
-                itemsArray.push_back(item);
+                items.push_back(item);
             }
 
-            // 🚀 3. menuSummary 생성 (예: "치킨 외 1건")
+            // 3. menuSummary 생성 (예: "떡볶이 외 1건")
             std::string menuSummary = firstMenuName;
             if (itemCount > 1)
-            {
                 menuSummary += " 외 " + std::to_string(itemCount - 1) + "건";
-            }
+
             order["menuSummary"] = menuSummary;
-            order["items"] = itemsArray;
+            order["items"] = items;
 
             orders.push_back(order);
         }
@@ -424,22 +394,9 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
         std::string newOrderId = "ORD-" + std::string(timeBuf) + "-" + std::string(randomBuf) + "-" + req.userId;
 
         // 5. ORDERS 테이블 INSERT
-        std::unique_ptr<sql::PreparedStatement> pstmtOrder(conn->prepareStatement(
-            "INSERT INTO ORDERS (order_id, user_id, store_id, total_price, delivery_address, store_request, rider_request, order_status, created_at) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?, 0, NOW())"));
-
-        pstmtOrder->setString(1, newOrderId);                  // 🚀 고유 주문번호 사용
-        pstmtOrder->setString(2, req.userId);                  // 🚀 userId는 그대로 string으로 저장
-        pstmtOrder->setString(3, std::to_string(req.storeId)); // int를 string으로 변환 시 주의 (DB 타입 맞춤)
-        pstmtOrder->setInt(4, req.totalPrice);                 // totalPrice는 int로 저장
-        pstmtOrder->setString(5, req.deliveryAddress);         // 🚀 주소는 string으로 저장
-        pstmtOrder->setString(6, req.storeRequest);            // 🚀 요청사항은 string으로 저장
-        pstmtOrder->setString(7, req.riderRequest);            // 🚀 요청사항은 string으로 저장
-        pstmtOrder->executeUpdate();
-
-        // 6. ORDER_DETAILS 테이블 INSERT 및 🚀 푸시 알림 데이터 조립
+        // 🚀 1. 쿼리문에 selected_options 컬럼과 물음표(?) 6번째 추가!
         std::unique_ptr<sql::PreparedStatement> pstmtItems(conn->prepareStatement(
-            "INSERT INTO ORDER_DETAILS (order_id, menu_id, menu_name, quantity, price, options) VALUES (?, ?, ?, ?, ?, ?)"));
+            "INSERT INTO ORDER_DETAILS (order_id, menu_id, menu_name, quantity, price, selected_options) VALUES (?, ?, ?, ?, ?, ?)"));
 
         nlohmann::json pushItemsArray = nlohmann::json::array();
         std::string firstMenuName = "";
@@ -448,7 +405,6 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
         {
             const auto &item = req.items[i];
 
-            // 🚀 핵심: DB에서 진짜 메뉴 이름을 찾습니다.
             std::string menuName = MenuDAO::getInstance().getMenuName(item.menuId);
             if (menuName.empty())
                 menuName = "메뉴 #" + std::to_string(item.menuId);
@@ -456,25 +412,10 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
             if (i == 0)
                 firstMenuName = menuName;
 
-            // DB 저장
-            pstmtItems->setString(1, newOrderId);
-            pstmtItems->setInt(2, item.menuId);
-            pstmtItems->setString(3, menuName);
-            pstmtItems->setInt(4, item.quantity);
-            pstmtItems->setInt(5, item.unitPrice);
-            pstmtItems->setString(6, item.selectedOptions.dump()); // 🚀 옵션 JSON 저장
-            pstmtItems->executeUpdate();
-
-            nlohmann::json pushItem;
-            pushItem["menuId"] = item.menuId;
-            pushItem["menuName"] = menuName;
-            pushItem["quantity"] = item.quantity;
-            pushItem["unitPrice"] = item.unitPrice;
-
-            // [수정된 부분 시작] ========================================
+            // 🚀 옵션 이름 배열 생성 로직 (기존 태현님 코드 재활용)
             nlohmann::json itemJson = item;
             nlohmann::json opts = itemJson.value("selectedOptions", nlohmann::json::array());
-            nlohmann::json optionNamesArray = nlohmann::json::array(); // 🚀 이름을 담을 새 배열 생성
+            nlohmann::json optionNamesArray = nlohmann::json::array();
 
             if (opts.is_array())
             {
@@ -482,21 +423,32 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
                 {
                     if (optId.is_number_integer())
                     {
-                        // DB에서 옵션 이름 조회
                         std::string optName = MenuDAO::getInstance().getOptionName(optId.get<int>());
                         if (!optName.empty())
                         {
-                            optionNamesArray.push_back(optName); // 배열에 추가
+                            optionNamesArray.push_back(optName);
                         }
                     }
                 }
             }
 
-            // 기존의 숫자 배열(opts) 대신, 새로 만든 이름 배열(optionNamesArray)을 장착!
-            pushItem["options"] = optionNamesArray;
-            // [수정된 부분 끝] ========================================
+            // 🚀 2. DB 저장 (6번째 파라미터에 방금 만든 옵션 이름 배열을 문자열로 변환해서 저장!)
+            pstmtItems->setString(1, newOrderId);
+            pstmtItems->setInt(2, item.menuId);
+            pstmtItems->setString(3, menuName);
+            pstmtItems->setInt(4, item.quantity);
+            pstmtItems->setInt(5, item.unitPrice);
+            pstmtItems->setString(6, optionNamesArray.dump()); // 👈 여기가 핵심입니다!
+            pstmtItems->executeUpdate();
 
-            // 완성된 메뉴 1개를 배열에 담기
+            // 사장님 푸시(9000)를 위한 JSON 조립
+            nlohmann::json pushItem;
+            pushItem["menuId"] = item.menuId;
+            pushItem["menuName"] = menuName;
+            pushItem["quantity"] = item.quantity;
+            pushItem["unitPrice"] = item.unitPrice;
+            pushItem["options"] = optionNamesArray;
+
             pushItemsArray.push_back(pushItem);
         }
 

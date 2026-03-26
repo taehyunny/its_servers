@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "json.hpp"
+#include "OrderDTO.h"
 
 using json = nlohmann::json;
 
