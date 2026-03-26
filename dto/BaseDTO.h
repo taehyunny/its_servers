@@ -5,7 +5,7 @@
 // 주의: 헤더 파일에서의 using namespace는 피하는 것이 좋으므로 구조체 안에서 명시적으로 사용하거나 별도 처리합니다.
 // 여기서는 실무적 편의를 위해 nlohmann::json을 직접 사용합니다.
 
-struct BaseResponseDTO
+struct BaseResponseDTO // 모든 응답 DTO의 기본 구조체 (status + message)
 {
     int status;          // 200: 성공, 400: 실패, 409: 충돌
     std::string message; // 클라이언트 UI 팝업용 메시지
@@ -13,7 +13,7 @@ struct BaseResponseDTO
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(BaseResponseDTO, status, message)
 };
 
-struct CategoryItem
+struct CategoryItem // 카테고리 리스트의 각 아이템을 나타내는 DTO
 {
     int id;               // 1, 2, 3...
     std::string name;     // "한식", "중식", "일식"
@@ -32,18 +32,20 @@ struct CategoryListResDTO
 };
 
 // 🙋‍♂️ 등급 변경 요청 (REQ_UPGRADE_NAME / REQ_DOWNGRADE_NAME)
-struct ReqGradeUpdateDTO {
+struct ReqGradeUpdateDTO
+{
     std::string userId;
     std::string grade; // 변경할 등급 (예: "wow", "일반")
-    int action; // 1: 신규 구독, 2: 해지 예약(is_active=0)
-    
+    int action;        // 1: 신규 구독, 2: 해지 예약(is_active=0)
+
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqGradeUpdateDTO, userId, grade, action)
 };
 
 // 🙋‍♂️ 등급 변경 응답
-struct ResGradeUpdateDTO {
-    int status;          // 0: 성공, 1: 실패
-    std::string message; 
-    
+struct ResGradeUpdateDTO
+{
+    int status; // 0: 성공, 1: 실패
+    std::string message;
+
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResGradeUpdateDTO, status, message)
 };

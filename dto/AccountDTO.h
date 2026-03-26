@@ -41,7 +41,7 @@ struct SignupReqDTO
                            {"accountNumber", dto.accountNumber},   // 계좌 번호 (사장님일 때만 채워짐)
                            {"storeName", dto.storeName},           // 매장 이름 (사장님일 때만 채워짐)
                            {"category", dto.category},             // 매장 카테고리 (사장님일 때만 채워짐)
-                           {"storeAddress", dto.storeAddress}};
+                           {"storeAddress", dto.storeAddress}};   // 매장 주소 (사장님일 때만 채워짐)
     }
 
     // ⚠️ 매크로 대신 커스텀 파서 사용! (선택적 필드 처리)
@@ -67,7 +67,7 @@ struct SignupReqDTO
 // ---------------------------------------------------------
 // [2] 로그인 요청 DTO (클라이언트 -> 서버)
 // ---------------------------------------------------------
-struct LoginReqDTO
+struct LoginReqDTO   // 로그인 요청 DTO (클라이언트 -> 서버)
 {
     std::string userId;   // 아이디 (핸들러의 req.userId에 대응)
     std::string password; // 비밀번호 (핸들러의 req.password에 대응)
@@ -76,7 +76,7 @@ struct LoginReqDTO
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(LoginReqDTO, userId, password, role)
 };
 
-struct LoginResDTO
+struct LoginResDTO  // 로그인 응답 DTO (서버 -> 클라이언트)
 {
     int status;              // 200: 성공, 400: 클라이언트 오류, 500: 서버 오류 등
     std::string message;     // 유저에게 보여줄 메시지 (예: "로그인 성공", "비밀번호가 틀렸습니다.")
@@ -93,7 +93,7 @@ struct LoginResDTO
 // [3] 통합 인증 응답 DTO (서버 -> 클라이언트)
 // ---------------------------------------------------------
 // 회원가입과 로그인 모두 상태값(status), 메시지(message), 유저이름(userName)을 반환하므로 하나로 통합합니다.
-struct AuthResDTO
+struct AuthResDTO  
 {
     int status;              // 200: 성공, 400: 클라이언트 오류, 500: 서버 오류 등
     std::string userId;      // 아이디 (로그인 시 클라이언트에서 저장할 수 있도록 반환)
@@ -136,7 +136,7 @@ struct AuthCheckReqDTO
 };
 
 // 1041: 아이디 중복 확인 응답 (폰번호 응답과 구조가 같아서 같이 써도 되지만, 명확성을 위해 분리)
-struct AuthCheckResDTO
+struct AuthCheckResDTO  // 서버 -> 클라이언트: "이 아이디 중복 확인 결과입니다!" 응답 DTO
 {
     int status;          // 200(사용가능), 409(중복)
     bool isAvailable;    // 🚀 핵심: 사용 가능 여부 (true: 사용 가능, false: 중복)
@@ -145,7 +145,7 @@ struct AuthCheckResDTO
 };
 
 // 1042: 폰번호 중복 확인 요청
-struct PhoneCheckReqDTO
+struct PhoneCheckReqDTO  // 클라이언트 -> 서버: "이 전화번호 중복 확인 요청입니다!" 요청 DTO
 {
     std::string phoneNumber;                                            // 전화번호 (핸들러의 req.phoneNumber에 대응)
     int role;                                                           // 🚀 핵심: 사장님(1)인지 손님(0)인지 구분!
@@ -153,12 +153,10 @@ struct PhoneCheckReqDTO
 };
 
 // 1043: 폰번호 중복 확인 응답
-struct PhoneCheckResDTO
+struct PhoneCheckResDTO  // 서버 -> 클라이언트: "이 전화번호 중복 확인 결과입니다!" 응답 DTO
 {
     int status;                                                                    // 200(사용가능), 409(중복)
     bool isAvailable;                                                              // 🚀 핵심: 사용 가능 여부 (true: 사용 가능, false: 중복)
     std::string message;                                                           // 유저에게 보여줄 메시지 (예: "이미 사용 중인 전화번호입니다.")
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(PhoneCheckResDTO, status, isAvailable, message) // JSON <-> Struct 자동 변환 매크로
 };
-
-// 2. 등급 변경(구독 관리) 요청 DTO

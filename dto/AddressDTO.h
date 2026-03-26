@@ -7,7 +7,7 @@
 // 주소 목록 아이템 (조회 응답에서 사용)
 
 // 🚀 이름을 AddressItemDTO로 통일!
-struct AddressItemDTO
+struct AddressItemDTO // 주소 목록 아이템 구조체 (ResAddressListDTO에서 사용)
 {
     int addressId = 0;
     std::string address;
@@ -21,26 +21,25 @@ struct AddressItemDTO
 
 // [2070] 주소 저장 요청
 
-struct ReqAddressSaveDTO
+struct ReqAddressSaveDTO // 클라이언트 -> 서버: "새 주소 저장 요청입니다!" 요청 DTO
 {
 
-    std::string userId;     // 유저 ID (누락 방지 위해 필수)
-    std::string address;   // 도로명 주소 (예: "서울특별시 강남구 테헤란로 123")
+    std::string userId;  // 유저 ID (누락 방지 위해 필수)
+    std::string address; // 도로명 주소 (예: "서울특별시 강남구 테헤란로 123")
     std::string detail;  // 상세 주소 (예: "101동 202호")
-    std::string guide;  // 길 안내 (예: "정문에서 오른쪽으로 50m")
-    std::string label;  // 주소 라벨 (예: "집", "회사", "기타")
-    
+    std::string guide;   // 길 안내 (예: "정문에서 오른쪽으로 50m")
+    std::string label;   // 주소 라벨 (예: "집", "회사", "기타")
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqAddressSaveDTO,
 
                                    userId, address, detail, guide, label)
 };
 
-// 
-struct ResAddressSaveDTO
+//
+struct ResAddressSaveDTO // [2071] 주소 저장 응답
 {
 
-    int status = 200;   
+    int status = 200;
     int addressId = 0;
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResAddressSaveDTO, status, addressId)
@@ -92,7 +91,7 @@ struct ResAddressDeleteDTO
 struct ReqAddressUpdateDTO
 {
 
-    std::string userId;  // 유저 ID (누락 방지 위해 필수)
+    std::string userId; // 유저 ID (누락 방지 위해 필수)
     int addressId = 0;  // 수정할 주소 ID (누락 방지 위해 필수)
     std::string detail; // 상세 주소 (예: "101동 202호")
     std::string guide;  // 길 안내 (예: "정문에서 오른쪽으로 50m")
@@ -118,7 +117,7 @@ struct ResAddressUpdateDTO
 struct ReqAddressDefaultDTO
 {
 
-    std::string userId;  // 유저 ID (누락 방지 위해 필수)
+    std::string userId; // 유저 ID (누락 방지 위해 필수)
 
     int addressId = 0;
 

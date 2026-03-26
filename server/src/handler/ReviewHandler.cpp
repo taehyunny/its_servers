@@ -12,6 +12,9 @@ using nlohmann::json;
 // =========================================================
 // ① 리뷰 목록 조회 (REQ_REVIEW_LIST = 2014)
 // =========================================================
+// =========================================================
+// ① 가게 전체 리뷰 목록 조회 (REQ_REVIEW_LIST = 2014)
+// =========================================================
 void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     json req = json::parse(jsonBody);
@@ -19,7 +22,6 @@ void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, con
     try
     {
         int storeId = req.value("storeId", 0);
-        int menuId = req.value("menuId", 0); // 🚀 menuId를 가져옵니다.
 
         if (storeId == 0)
         {
@@ -31,25 +33,12 @@ void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, con
 
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 1. 동적 쿼리 생성
+        // 🚀 순수하게 가게 리뷰만 가져옵니다.
         std::string query = "SELECT review_id, user_id, rating, content, owner_reply, created_at "
-                            "FROM REVIEWS WHERE store_id = ? ";
+                            "FROM REVIEWS WHERE store_id = ? ORDER BY created_at DESC";
 
-        if (menuId > 0)
-        {
-            query += "AND menu_id = ? "; // menuId가 있을 때만 조건 추가
-        }
-        query += "ORDER BY created_at DESC";
-
-        // 🚀 2. pstmt 생성 (이 부분이 빠져있었습니다!)
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
-
-        // 🚀 3. 파라미터 바인딩
         pstmt->setInt(1, storeId);
-        if (menuId > 0)
-        {
-            pstmt->setInt(2, menuId); // 쿼리에 두 번째 ?가 있을 때만 세팅
-        }
 
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
@@ -68,19 +57,86 @@ void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, con
 
         res["status"] = 200;
         res["message"] = "조회 성공";
+        res["storeId"] = storeId;
         res["reviews"] = reviews;
 
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_REVIEW_LIST), res);
     }
     catch (const std::exception &e)
     {
-        std::cerr << "[ReviewHandler] handleReviewList 오류: " << e.what() << std::endl;
+        std::cerr << "🚨 [ReviewHandler] 가게 리뷰 조회 오류: " << e.what() << std::endl;
         res["status"] = 500;
         res["message"] = "서버 내부 오류";
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_REVIEW_LIST), res);
     }
 }
 
+// =========================================================
+// 🚀 [신규] 특정 메뉴 리뷰 목록 조회 (REQ_MENU_REVIEW_LIST = 2016)
+// =========================================================
+void ReviewHandler::handleMenuReviewList(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    json req = json::parse(jsonBody);
+    json res;
+    try
+    {
+        int menuId = req.value("menuId", 0);
+
+        std::cout << "\n========================================" << std::endl;
+        std::cout << "📥 [REQ_MENU_REVIEW_LIST] 특정 메뉴 리뷰 요청 (menuId: " << menuId << ")" << std::endl;
+        std::cout << "========================================" << std::endl;
+
+        if (menuId == 0)
+        {
+            res["status"] = 400;
+            res["message"] = "menuId가 없습니다.";
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
+            return;
+        }
+
+        auto conn = DBManager::getInstance().getConnection();
+
+        // 💡 핵심: REVIEWS 테이블과 ORDER_ITEMS 테이블을 order_id로 조인해서 menu_id를 찾아냅니다!
+        std::string query =
+            "SELECT R.review_id, R.user_id, R.rating, R.content, R.owner_reply, R.created_at "
+            "FROM REVIEWS R "
+            "JOIN ORDER_ITEMS OI ON R.order_id = OI.order_id "
+            "WHERE OI.menu_id = ? "
+            "ORDER BY R.created_at DESC";
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
+        pstmt->setInt(1, menuId);
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        json reviews = json::array();
+        while (rs->next())
+        {
+            json rv;
+            rv["reviewId"] = rs->getInt("review_id");
+            rv["userId"] = rs->getString("user_id").c_str();
+            rv["rating"] = rs->getInt("rating");
+            rv["content"] = rs->getString("content").c_str();
+            rv["ownerReply"] = rs->isNull("owner_reply") ? "" : rs->getString("owner_reply").c_str();
+            rv["createdAt"] = rs->getString("created_at").c_str();
+            reviews.push_back(rv);
+        }
+
+        res["status"] = 200;
+        res["message"] = "조회 성공";
+        res["menuId"] = menuId;
+        res["reviews"] = reviews;
+
+        std::cout << "📤 [RES_MENU_REVIEW_LIST] " << reviews.size() << "건 조회 완료!" << std::endl;
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [ReviewHandler] 메뉴 리뷰 조회 오류: " << e.what() << std::endl;
+        res["status"] = 500;
+        res["message"] = "서버 내부 오류";
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
+    }
+}
 // =========================================================
 // ② 답글 등록 (REQ_REVIEW_REPLY = 3070)
 // =========================================================
@@ -94,10 +150,17 @@ void ReviewHandler::handleReviewReply(std::shared_ptr<ClientSession> session, co
         int storeId = req.value("storeId", 0);
         std::string ownerReply = req.value("ownerReply", "");
 
+        std::cout << "\n========================================" << std::endl;
+        std::cout << "📥 [REQ_REVIEW_REPLY] 사장님 답글 등록 요청 수신" << std::endl;
+        std::cout << "👉 storeId: " << storeId << ", reviewId: " << reviewId << std::endl;
+        std::cout << "👉 내용: " << ownerReply << std::endl;
+        std::cout << "========================================" << std::endl;
         if (reviewId == 0 || storeId == 0 || ownerReply.empty())
         {
             res["status"] = 400;
             res["message"] = "reviewId, storeId, ownerReply 중 누락된 값이 있습니다.";
+            std::cout << "📤 [RES_REVIEW_REPLY] 에러 응답 전송:\n"
+                      << res.dump(4) << "\n========================================" << std::endl;
             session->sendPacket(static_cast<uint16_t>(CmdID::RES_REVIEW_REPLY), res);
             return;
         }
@@ -122,7 +185,8 @@ void ReviewHandler::handleReviewReply(std::shared_ptr<ClientSession> session, co
             res["status"] = 404;
             res["message"] = "해당 리뷰를 찾을 수 없거나 권한이 없습니다.";
         }
-
+        std::cout << "📤 [RES_REVIEW_REPLY] 처리 결과 전송:\n"
+                  << res.dump(4) << "\n========================================" << std::endl;
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_REVIEW_REPLY), res);
     }
     catch (const std::exception &e)

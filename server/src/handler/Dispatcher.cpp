@@ -51,7 +51,7 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { MenuHandler::handleMenuSoldOut(s, b); }},
 
     // ── 3. 주문 및 결제 (Order & Payment) ──
-    {CmdID::REQ_ORDER_REJECT, [](auto s, auto b) 
+    {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)
      { OrderHandler::handleOrderReject(s, b); }},
     {CmdID::REQ_CHECKOUT_INFO, [](auto s, auto b)
      { OrderHandler::handleCheckoutInfo(s, b); }},
@@ -66,13 +66,14 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
     {CmdID::REQ_ORDER_REJECT, [](auto s, auto b)
      { OrderHandler::handleOrderReject(s, b); }}, // 🚀 사장님 주문 거절 기능 (구현되어 있다면 활성화)
     {CmdID::REQ_ORDER_HISTORY, [](auto s, auto b)
-     { OrderHandler::handleOrderList(s, b); }}, // 주문 내역 조회 (고객용)
+     { OrderHandler::handleOrderHistory(s, b); }}, // 주문 내역 조회 (고객용)
     {CmdID::REQ_ORDER_HISTORY_SEARCH, [](auto s, auto b)
      { OrderHandler::handleOrderHistorySearch(s, b); }}, // 주문 내역 검색 (고객용)
     {CmdID::REQ_COOK_TIME_SET, [](auto s, auto b)
      { OrderHandler::handleCookTimeSet(s, b); }}, // 조리 시간 설정 요청 (사장님용)
     {CmdID::REQ_PICKUP, [](auto s, auto b)
      { RiderHandler::handlePickup(s, b); }}, // 픽업 완료 요청 (라이더용)
+
     // ── 4. 리뷰 및 통계 (Review & Sales) ──
     {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
      { ReviewHandler::handleReviewList(s, b); }},
@@ -80,7 +81,10 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { ReviewHandler::handleReviewReply(s, b); }},
     {CmdID::REQ_SALES_STAT, [](auto s, auto b)
      { SalesHandler::handleSalesStat(s, b); }}, // 🚀 신규: 매출 통계
-
+    {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
+     { ReviewHandler::handleReviewList(s, b); }}, // 리뷰 목록 요청 (고객용, 매장 상세 화면에서)
+    {CmdID::REQ_MENU_REVIEW_LIST, [](auto s, auto b)
+     { ReviewHandler::handleMenuReviewList(s, b); }}, // 특정 메뉴 리뷰 목록 요청 (고객용, 메뉴 상세 화면에서)
     // ── 5. 주소 관리 (Address) ──
     {CmdID::REQ_ADDRESS_SAVE, [](auto s, auto b)
      { AddressHandler::handleAddressSave(s, b); }},
@@ -107,10 +111,6 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
     // ── 7. 마이페이지 등 기타 (MyPage & Misc) ──
     {CmdID::REQ_GRADE_UPDATE, [](auto s, auto b)
      { UserHandler::handleGradeUpdate(s, b); }},
-    {CmdID::REQ_ORDER_HISTORY, [](auto s, auto b)
-     { OrderHandler::handleOrderList(s, b); }}, // 주문 내역 조회 (고객용)
-    {CmdID::REQ_ORDER_HISTORY_SEARCH, [](auto s, auto b)
-     { OrderHandler::handleOrderHistorySearch(s, b); }}, // 주문 내역 검색 (고객용)
 
     // ── 8. 1:1 채팅 상담 (Chat) ──
     {CmdID::REQ_CHAT_CONNECT, [](auto s, auto b)

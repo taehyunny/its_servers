@@ -6,7 +6,7 @@
 using json = nlohmann::json;
 
 // 🚀 [2024] 결제 처리 요청 DTO
-struct ReqPaymentProcessDTO
+struct ReqPaymentProcessDTO   // 클라이언트 -> 서버: "결제 처리 해주세요!" 요청 DTO
 {
     std::string orderId;   // 주문 번호 [cite: 8]
     std::string userId;    // 결제자 ID
@@ -20,7 +20,7 @@ struct ReqPaymentProcessDTO
 };
 
 // 🚀 [2025] 결제 결과 및 영수증 정보 응답 DTO
-struct ResPaymentProcessDTO
+struct ResPaymentProcessDTO   // 서버 -> 클라이언트: "결제 처리 결과입니다!" 응답 DTO
 {
     int status;             // 200: 성공, 400: 잔액부족 등
     std::string message;    // 결과 메시지

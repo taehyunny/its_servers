@@ -85,6 +85,7 @@ void RiderHandler::handleDeliveryComplete(std::shared_ptr<ClientSession> session
     {
         json req = json::parse(jsonBody);
         std::string orderId = req.value("orderId", "");
+        std::cout << ">>> [DEBUG] 라이더가 보낸 완료 요청 orderId: [" << orderId << "]" << std::endl;
 
         if (orderId.empty())
         {
@@ -98,28 +99,33 @@ void RiderHandler::handleDeliveryComplete(std::shared_ptr<ClientSession> session
 
         // 🚀 order_status = 4 (배달완료) 로 UPDATE
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "UPDATE ORDERS SET order_status = 4 WHERE order_id = ?"));
+            "UPDATE ORDERS SET order_status = 3 WHERE order_id = ?")); // 태현님의 정의대로 3으로 수정
         pstmt->setString(1, orderId);
         int affected = pstmt->executeUpdate();
 
         if (affected > 0)
         {
             res["status"] = 200;
-            res["message"] = "배달 완료 처리되었습니다.";
             res["orderId"] = orderId;
 
-            // 🚀 고객에게 "배달 완료!" 푸시 알림 전송 (9010)
-            // 고객 ID 조회를 위해 OrderDAO 사용 (이미 OrderHandler 등에서 쓰고 계신 로직 적용)
-            std::unique_ptr<sql::PreparedStatement> pstmtUser(conn->prepareStatement(
-                "SELECT user_id FROM ORDERS WHERE order_id = ?"));
-            pstmtUser->setString(1, orderId);
-            std::unique_ptr<sql::ResultSet> rsUser(pstmtUser->executeQuery());
-
-            if (rsUser->next())
+            // 🚀 2. 고객에게 알림 (state: 3)
+            std::string customerId = OrderDAO::getInstance().getCustomerIdByOrderId(orderId);
+            if (!customerId.empty())
             {
-                std::string customerId = rsUser->getString("user_id").c_str();
-                NotifyOrderStateDTO notifyCustomer = {orderId, 4, "배달이 완료되었습니다. 맛있게 드세요! 😋"};
+                // state를 태현님이 정한 '3'으로 통일!
+                nlohmann::json notifyCustomer = {
+                    {"orderId", orderId}, {"state", 3}, {"message", "배달이 완료되었습니다. 맛있게 드세요! 😋"}};
                 SessionManager::getInstance().sendToUser(customerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notifyCustomer);
+            }
+
+            // 🚀 3. [추가] 사장님에게 알림 (이게 없어서 안 왔던 겁니다!)
+            int storeId = OrderDAO::getInstance().getStoreIdByOrderId(orderId);
+            std::string ownerId = StoreDAO::getInstance().getOwnerIdByStoreId(storeId);
+            if (!ownerId.empty())
+            {
+                nlohmann::json notifyOwner = {
+                    {"orderId", orderId}, {"state", 3}, {"message", "주문하신 상품의 배달이 완료되었습니다!"}};
+                SessionManager::getInstance().sendToUser(ownerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notifyOwner);
             }
         }
         else
@@ -148,9 +154,10 @@ void RiderHandler::handlePickup(std::shared_ptr<ClientSession> session, const st
         std::string orderId = req.value("orderId", "");
 
         auto conn = DBManager::getInstance().getConnection();
-        // 1. 상태 업데이트 (3: 배달중)
+
+        // 🚀 수정: 상태 업데이트 (2: 배달중) !!! 아까 3으로 되어있던 걸 2로 고쳤습니다.
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "UPDATE ORDERS SET order_status = 3 WHERE order_id = ?"));
+            "UPDATE ORDERS SET order_status = 2 WHERE order_id = ?"));
         pstmt->setString(1, orderId);
         pstmt->executeUpdate();
 
@@ -158,14 +165,14 @@ void RiderHandler::handlePickup(std::shared_ptr<ClientSession> session, const st
         nlohmann::json res = {{"status", 200}, {"orderId", orderId}};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_PICKUP), res);
 
-        // 3. 사장님에게 알림 (9010) - 포스기 상태 업데이트용
+        // 3. 사장님에게 알림 (9010)
         int storeId = OrderDAO::getInstance().getStoreIdByOrderId(orderId);
         std::string ownerId = StoreDAO::getInstance().getOwnerIdByStoreId(storeId);
         if (!ownerId.empty())
         {
             nlohmann::json notify = {
                 {"orderId", orderId},
-                {"state", 3},
+                {"state", 2}, // 여기도 2로 잘 되어 있네요!
                 {"message", "라이더가 음식을 픽업했습니다. 배달을 시작합니다!"}};
             SessionManager::getInstance().sendToUser(ownerId, static_cast<uint16_t>(CmdID::NOTIFY_ORDER_STATE), notify);
         }

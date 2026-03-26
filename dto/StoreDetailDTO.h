@@ -6,29 +6,26 @@
 // =========================================================
 // [매장 상세 페이지용 DTO] 카멜/스네이크 완벽 대응 파서
 // =========================================================
-
-// ── 1. 상점 상세 정보 ──
-// ── 1. 상점 상세 정보 ──
-struct StoreDataDTO
+struct StoreDataDTO   //  매장 상세 정보 DTO (프론트엔드 요청 2002번에 대응)
 {
-    int storeId;
-    std::string storeName;
-    std::string storeAddress;
-    std::string operatingHours;
-    std::string deliveryFees;
-    bool isOpen;
-    std::string imageUrl;
-    int minOrderAmount;
-    double rating;
-    int reviewCount;
-    std::string deliveryTimeRange;
-    std::string pickupTime;
+    int storeId;     // 매장 ID (PK)
+    std::string storeName;  // 매장 이름 (예: "맛있는 떡볶이")
+    std::string storeAddress;  // 매장 주소 (예: "서울시 강남구 테헤란로 123")
+    std::string operatingHours;  // 영업 시간 (예: "10:00 ~ 22:00")
+    std::string deliveryFees;  // 배달비 정보 (예: "3,000원", "무료" 등)
+    bool isOpen;  // 영업 중 여부 (true: 영업 중, false: 영업 종료)
+    std::string imageUrl;  // 매장 이미지 URL (예: "https://example.com/images/store123.jpg")
+    int minOrderAmount; // 최소 주문 금액 (예: 15000)
+    double rating;   // 평점 (예: 4.5)
+    int reviewCount; // 리뷰 수 (예: 120)
+    std::string deliveryTimeRange;  // 배달 예상 시간 범위 (예: "30~40분")
+    std::string pickupTime;   // 픽업 예상 시간 (예: "20분")
     std::string brandName; // 편의점 브랜드명 (예: "GS25", "CU", "7-Eleven")
     std::string category;  // 카테고리명 (예: "한식", "중식", "편의점" 등)
                           // 🚀 [추가] 프론트엔드 요청 데이터 3종 세트
-    std::string phoneNumber;
-    std::string representativeName;
-    std::string businessNumber;
+    std::string phoneNumber;  // 전화번호 (예: "02-1234-5678")
+    std::string representativeName; // 대표자명 (예: "홍길동")
+    std::string businessNumber; // 사업자 등록번호 (예: "123-45-67890")
 
     // 🚀 서버 -> 클라이언트 (전송용)
     friend void to_json(nlohmann::json &j, const StoreDataDTO &dto)
@@ -69,7 +66,7 @@ struct StoreDataDTO
         dto.reviewCount = j.value("reviewCount", j.value("review_count", 0));
         dto.deliveryTimeRange = j.value("deliveryTimeRange", j.value("delivery_time_range", ""));
         dto.pickupTime = j.value("pickupTime", j.value("pickup_time", ""));
-        dto.brandName = j.value("brandName", j.value("brand_name", ""));
+        dto.brandName = j.value("brandName", j.value("brand_name", "정보 없음"));
 
         // 🚀 [추가] 역직렬화 방패
         dto.phoneNumber = j.value("phoneNumber", j.value("phone_number", "정보 없음"));
@@ -79,18 +76,18 @@ struct StoreDataDTO
 };
 
 // ── 2. 단일 메뉴 정보 ──
-struct MenuDataDTO
+struct MenuDataDTO  // 🚀 [구조 변경 핵심] 메뉴 상세 정보용 신규 DTO 
 {
-    int menuId;
-    int storeId;
-    std::string menuName;
-    int basePrice;
-    bool isSoldOut;
-    std::string description;
-    std::string imageUrl;
-    std::string menuCategory;
-    bool isPopular;
-    nlohmann::json optionGroups; // 🚀 옵션 그룹 추가!
+    int menuId;   // 메뉴 ID (PK)
+    int storeId;  // 어떤 매장에 속한 메뉴인지 (FK)
+    std::string menuName; // 메뉴 이름 (예: "황궁짜장면")
+    int basePrice; // 기본 가격 (옵션 제외)
+    bool isSoldOut;  // 품절 여부
+    std::string description;  // 메뉴 설명 (예: "쫄깃한 면발과 진한 소스의 조화!")
+    std::string imageUrl;   // 메뉴 이미지 URL (예: "https://example.com/images/jjajangmyeon.jpg")
+    std::string menuCategory;  // 메뉴 카테고리 (예: "면류", "밥류", "사이드" 등)
+    bool isPopular;  // 인기 메뉴 여부 (예: true면 "인기" 뱃지 표시)
+    nlohmann::json optionGroups; // 🚀 옵션 그룹 추가! 
     std::string reviewContent; // 🚀 메뉴 리뷰 내용 (예: "이 메뉴 정말 맛있어요!")
     friend void to_json(nlohmann::json &j, const MenuDataDTO &dto)
     {
@@ -125,22 +122,22 @@ struct MenuDataDTO
 };
 
 // ── 3. 단일 리뷰 정보 ──
-struct ReviewDTO
+struct ReviewDTO    // 🚀 [구조 변경 핵심] 메뉴 리뷰용 신규 DTO
 {
-    int reviewId;
-    std::string orderId;
-    std::string userId;
-    int storeId;
+    int reviewId;   // 리뷰 ID (PK)
+    std::string orderId;// 주문 ID (어떤 주문에 대한 리뷰인지)
+    std::string userId;// 리뷰 작성자 ID
+    int storeId;// 리뷰 대상 상점 ID
 
     // 🚀 [구조 변경 핵심] 메뉴 리뷰용 신규 데이터 2종
     int menuId;           // DB 조회 및 저장용 (어떤 메뉴인가?)
     std::string menuName; // 프론트엔드 표시용 (예: "황궁짜장면")
 
-    int rating;
-    std::string content;
-    std::string imageUrl;
-    std::string ownerReply;
-    std::string createdAt;
+    int rating; //  별점 (1~5)
+    std::string content;// 리뷰 내용
+    std::string imageUrl;// 리뷰 이미지 URL (선택)
+    std::string ownerReply; // 사장님 답글 (선택)
+    std::string createdAt; // 리뷰 작성 시각 (예: "2024-08-15 14:30:00")
 
     // 🚀 서버 -> 클라이언트 (응답 시 JSON 조립)
     friend void to_json(nlohmann::json &j, const ReviewDTO &dto)
@@ -182,13 +179,13 @@ struct ReviewDTO
 // =========================================================
 // [최종 응답] 2302번 프로토콜: 매장 상세 정보 응답 패키지
 // =========================================================
-struct ResStoreDetailDTO
+struct ResStoreDetailDTO  // 서버 -> 클라이언트: "이 매장 상세 정보입니다!" 응답 DTO
 {
-    int status;
-    StoreDataDTO storeData;
-    std::vector<MenuDataDTO> menuList;
-    std::vector<ReviewDTO> reviewList;
-    std::string storeAddress;
+    int status;   // 200: 성공, 400: 실패
+    StoreDataDTO storeData;   // 매장 상세 정보
+    std::vector<MenuDataDTO> menuList;  // 메뉴 리스트
+    std::vector<ReviewDTO> reviewList;  // 리뷰 리스트
+    std::string storeAddress;   // 🚀 [추가] 매장 주소도 별도로 담아줍니다 (storeData.storeAddress와 중복이지만 프론트엔드 요청 반영)
 
     friend void to_json(nlohmann::json &j, const ResStoreDetailDTO &dto)
     {
@@ -216,9 +213,9 @@ struct ResStoreDetailDTO
 // =========================================================
 // [요청] 2301번 프로토콜: 매장 클릭 시 요청
 // =========================================================
-struct ReqStoreDetailDTO
+struct ReqStoreDetailDTO // 클라이언트 -> 서버: "이 매장 상세 정보 요청입니다!" 요청 DTO
 {
-    int storeId;
+    int storeId; // 요청 시 매장 ID만 보내면 됩니다!
 
     friend void to_json(nlohmann::json &j, const ReqStoreDetailDTO &dto)
     {

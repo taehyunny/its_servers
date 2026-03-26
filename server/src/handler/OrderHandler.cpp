@@ -410,14 +410,14 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
         }
 
         // 3. 트랜잭션 시작
-        conn->setAutoCommit(false);
+        conn->setAutoCommit(false); // 트랜잭션 시작
 
         // 4. 🚀 고유 주문번호 생성 (난수 추가로 동시성 완벽 방어)
         time_t now = time(nullptr);
         char timeBuf[80];
         strftime(timeBuf, sizeof(timeBuf), "%Y%m%d%H%M%S", localtime(&now));
 
-        int randomNum = rand() % 1000;
+        int randomNum = rand() % 1000; // 000~999 사이의 난수 생성
         char randomBuf[10];
         sprintf(randomBuf, "%03d", randomNum);
 
@@ -427,18 +427,19 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
         std::unique_ptr<sql::PreparedStatement> pstmtOrder(conn->prepareStatement(
             "INSERT INTO ORDERS (order_id, user_id, store_id, total_price, delivery_address, store_request, rider_request, order_status, created_at) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, 0, NOW())"));
-        pstmtOrder->setString(1, newOrderId);
-        pstmtOrder->setString(2, req.userId);
+
+        pstmtOrder->setString(1, newOrderId);                  // 🚀 고유 주문번호 사용
+        pstmtOrder->setString(2, req.userId);                  // 🚀 userId는 그대로 string으로 저장
         pstmtOrder->setString(3, std::to_string(req.storeId)); // int를 string으로 변환 시 주의 (DB 타입 맞춤)
-        pstmtOrder->setInt(4, req.totalPrice);
-        pstmtOrder->setString(5, req.deliveryAddress);
-        pstmtOrder->setString(6, req.storeRequest);
-        pstmtOrder->setString(7, req.riderRequest);
+        pstmtOrder->setInt(4, req.totalPrice);                 // totalPrice는 int로 저장
+        pstmtOrder->setString(5, req.deliveryAddress);         // 🚀 주소는 string으로 저장
+        pstmtOrder->setString(6, req.storeRequest);            // 🚀 요청사항은 string으로 저장
+        pstmtOrder->setString(7, req.riderRequest);            // 🚀 요청사항은 string으로 저장
         pstmtOrder->executeUpdate();
 
         // 6. ORDER_DETAILS 테이블 INSERT 및 🚀 푸시 알림 데이터 조립
         std::unique_ptr<sql::PreparedStatement> pstmtItems(conn->prepareStatement(
-            "INSERT INTO ORDER_DETAILS (order_id, menu_id, menu_name, quantity, price) VALUES (?, ?, ?, ?, ?)"));
+            "INSERT INTO ORDER_DETAILS (order_id, menu_id, menu_name, quantity, price, options) VALUES (?, ?, ?, ?, ?, ?)"));
 
         nlohmann::json pushItemsArray = nlohmann::json::array();
         std::string firstMenuName = "";
@@ -461,10 +462,9 @@ void OrderHandler::handleCreateOrder(std::shared_ptr<ClientSession> session, con
             pstmtItems->setString(3, menuName);
             pstmtItems->setInt(4, item.quantity);
             pstmtItems->setInt(5, item.unitPrice);
+            pstmtItems->setString(6, item.selectedOptions.dump()); // 🚀 옵션 JSON 저장
             pstmtItems->executeUpdate();
 
-            // 🚀 사장님 영수증 푸시를 위한 완벽한 JSON 조립!
-            // 🚀 사장님 영수증 푸시를 위한 완벽한 JSON 조립!
             nlohmann::json pushItem;
             pushItem["menuId"] = item.menuId;
             pushItem["menuName"] = menuName;
