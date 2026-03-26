@@ -209,6 +209,7 @@ std::vector<OrderHistoryItemDTO> OrderDAO::getOrderHistory(const std::string &us
                     firstMenu = rsMenu->getString("menu_name").c_str();
                 menuCount++;
             }
+            item.menuName = firstMenu.empty() ? "메뉴 정보 없음" : firstMenu;
 
             if (menuCount > 1)
             {

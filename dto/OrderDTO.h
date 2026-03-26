@@ -189,6 +189,7 @@ struct OrderHistoryItemDTO // 주문 내역 리스트에서 각 주문을 나타
     std::string orderId;          // 주문 번호
     int storeId;                  // 매장 ID (주문 내역 리스트에서 매장 이름과 매칭하기 위해 필요)
     std::string storeName;        // 매장 이름 (주문 내역 리스트에서 바로 보여줄 수 있도록)
+    std::string menuName;         // 대표 메뉴 이름 (예: "짜장면" or "떡볶이")
     int totalPrice;               // 총 결제 금액
     int status;                   // 주문 상태 (예: 1=조리중, 2=조리완료, 3=배달중, 4=배달완료)
     std::string menuSummary;      // "짜장면 외 1건"
@@ -196,7 +197,7 @@ struct OrderHistoryItemDTO // 주문 내역 리스트에서 각 주문을 나타
     std::string deliveryPhotoUrl; // 배달 완료 사진 (영수증 대용)
 
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(OrderHistoryItemDTO,
-                                   orderId, storeId, storeName, totalPrice, status, menuSummary, createdAt, deliveryPhotoUrl)
+                                   orderId, storeId, storeName, menuName, totalPrice, status, menuSummary, createdAt, deliveryPhotoUrl)
 };
 
 // 🙋‍♂️ 2081: RES_ORDER_HISTORY
@@ -230,23 +231,3 @@ struct ReqOrderDetailDTO
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqOrderDetailDTO, orderId)
 };
 
-// [2087] 주문 상세 응답 (서버 -> 클라이언트) - 영수증용
-struct ResOrderDetailDTO
-{                                // 서버 -> 클라이언트: "여기 주문 상세 영수증 정보입니다!" 응답 DTO
-    int status;                  // 200: 성공, 400: 클라이언트 오류, 500: 서버 오류 등
-    std::string orderId;         // 주문 번호
-    std::string storeName;       // 매장 이름
-    std::string createdAt;       // 주문 일시
-    std::string paymentMethod;   // DB: PAYMENTS.payment_method (카카오페이 등)
-    std::string deliveryAddress; // DB: ORDERS.delivery_address
-    int totalMenuPrice;          // 순수 메뉴 합계
-    int deliveryFee;             // 배달팁
-    int totalPrice;              // 총 결제금액
-
-    // 상세 메뉴 리스트 (팀장님이 만든 기존 DTO 재활용)
-    std::vector<OrderItemDTO> items;
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ResOrderDetailDTO, status, orderId, storeName, createdAt,
-                                   paymentMethod, deliveryAddress, totalMenuPrice,
-                                   deliveryFee, totalPrice, items)
-};

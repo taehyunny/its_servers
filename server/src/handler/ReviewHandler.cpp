@@ -22,23 +22,51 @@ void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, con
     try
     {
         int storeId = req.value("storeId", 0);
+        int menuId = req.value("menuId", 0);
 
-        if (storeId == 0)
+        // 둘 다 없으면 에러 처리
+        if (storeId == 0 && menuId == 0)
         {
             res["status"] = 400;
-            res["message"] = "storeId가 없습니다.";
+            res["message"] = "storeId 또는 menuId가 필요합니다.";
             session->sendPacket(static_cast<uint16_t>(CmdID::RES_REVIEW_LIST), res);
             return;
         }
 
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 순수하게 가게 리뷰만 가져옵니다.
-        std::string query = "SELECT review_id, user_id, rating, content, owner_reply, created_at "
-                            "FROM REVIEWS WHERE store_id = ? ORDER BY created_at DESC";
+        // 🚀 1. 마법의 동적 JOIN 쿼리 (가게 전체 리뷰 vs 특정 메뉴 리뷰 완벽 대응)
+        std::string query = "SELECT R.review_id, R.user_id, R.rating, R.content, R.owner_reply, R.created_at "
+                            "FROM REVIEWS R ";
+
+        if (menuId > 0)
+        {
+            query += "JOIN ORDER_ITEMS OI ON R.order_id = OI.order_id ";
+        }
+        query += "WHERE 1=1 ";
+
+        if (storeId > 0 && menuId == 0)
+        {
+            query += "AND R.store_id = ? ";
+        }
+        if (menuId > 0)
+        {
+            query += "AND OI.menu_id = ? ";
+        }
+        query += "ORDER BY R.created_at DESC";
 
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
-        pstmt->setInt(1, storeId);
+
+        // 🚀 2. 동적 파라미터 바인딩
+        int paramIndex = 1;
+        if (storeId > 0 && menuId == 0)
+        {
+            pstmt->setInt(paramIndex++, storeId);
+        }
+        if (menuId > 0)
+        {
+            pstmt->setInt(paramIndex++, menuId);
+        }
 
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
@@ -57,84 +85,20 @@ void ReviewHandler::handleReviewList(std::shared_ptr<ClientSession> session, con
 
         res["status"] = 200;
         res["message"] = "조회 성공";
+
+        // 🚀 3. 클라이언트가 데이터를 무시하지 않도록 메아리(Echo) 쳐주기!
         res["storeId"] = storeId;
+        res["menuId"] = menuId; // 👈 이 한 줄이 쟁반짜장 리뷰를 살려냅니다!
         res["reviews"] = reviews;
 
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_REVIEW_LIST), res);
     }
     catch (const std::exception &e)
     {
-        std::cerr << "🚨 [ReviewHandler] 가게 리뷰 조회 오류: " << e.what() << std::endl;
+        std::cerr << "🚨 [ReviewHandler] handleReviewList 오류: " << e.what() << std::endl;
         res["status"] = 500;
         res["message"] = "서버 내부 오류";
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_REVIEW_LIST), res);
-    }
-}
-
-// =========================================================
-// 🚀 [신규] 특정 메뉴 리뷰 목록 조회 (REQ_MENU_REVIEW_LIST = 2016)
-// =========================================================
-void ReviewHandler::handleMenuReviewList(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
-{
-    json req = json::parse(jsonBody);
-    json res;
-    try
-    {
-        int menuId = req.value("menuId", 0);
-
-        std::cout << "\n========================================" << std::endl;
-        std::cout << "📥 [REQ_MENU_REVIEW_LIST] 특정 메뉴 리뷰 요청 (menuId: " << menuId << ")" << std::endl;
-        std::cout << "========================================" << std::endl;
-
-        if (menuId == 0)
-        {
-            res["status"] = 400;
-            res["message"] = "menuId가 없습니다.";
-            session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
-            return;
-        }
-
-        auto conn = DBManager::getInstance().getConnection();
-
-        // 💡 핵심: REVIEWS 테이블과 ORDER_ITEMS 테이블을 order_id로 조인해서 menu_id를 찾아냅니다!
-        std::string query =
-            "SELECT R.review_id, R.user_id, R.rating, R.content, R.owner_reply, R.created_at "
-            "FROM REVIEWS R "
-            "JOIN ORDER_ITEMS OI ON R.order_id = OI.order_id "
-            "WHERE OI.menu_id = ? "
-            "ORDER BY R.created_at DESC";
-
-        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
-        pstmt->setInt(1, menuId);
-        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
-
-        json reviews = json::array();
-        while (rs->next())
-        {
-            json rv;
-            rv["reviewId"] = rs->getInt("review_id");
-            rv["userId"] = rs->getString("user_id").c_str();
-            rv["rating"] = rs->getInt("rating");
-            rv["content"] = rs->getString("content").c_str();
-            rv["ownerReply"] = rs->isNull("owner_reply") ? "" : rs->getString("owner_reply").c_str();
-            rv["createdAt"] = rs->getString("created_at").c_str();
-            reviews.push_back(rv);
-        }
-
-        res["status"] = 200;
-        res["message"] = "조회 성공";
-        res["menuId"] = menuId;
-        res["reviews"] = reviews;
-
-        std::cout << "📤 [RES_MENU_REVIEW_LIST] " << reviews.size() << "건 조회 완료!" << std::endl;
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
-    }
-    catch (const std::exception &e)
-    {
-        std::cerr << "🚨 [ReviewHandler] 메뉴 리뷰 조회 오류: " << e.what() << std::endl;
-        res["status"] = 500;
-        res["message"] = "서버 내부 오류";
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
     }
 }
 // =========================================================

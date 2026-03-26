@@ -83,8 +83,7 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { SalesHandler::handleSalesStat(s, b); }}, // 🚀 신규: 매출 통계
     {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
      { ReviewHandler::handleReviewList(s, b); }}, // 리뷰 목록 요청 (고객용, 매장 상세 화면에서)
-    {CmdID::REQ_MENU_REVIEW_LIST, [](auto s, auto b)
-     { ReviewHandler::handleMenuReviewList(s, b); }}, // 특정 메뉴 리뷰 목록 요청 (고객용, 메뉴 상세 화면에서)
+
     // ── 5. 주소 관리 (Address) ──
     {CmdID::REQ_ADDRESS_SAVE, [](auto s, auto b)
      { AddressHandler::handleAddressSave(s, b); }},
