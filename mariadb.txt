@@ -219,7 +219,6 @@ CREATE TABLE PAYMENTS (
     user_id VARCHAR(50) NOT NULL,                 -- 누구의 구독인가?
     grade_name VARCHAR(20) NOT NULL,              -- 등급 이름 
     start_date DATETIME NOT NULL,                 -- 시작일
-    end_date DATETIME NOT NULL,                   -- 만료 예정일 (한 달 뒤)
     is_active BOOLEAN DEFAULT TRUE,               -- 현재 활성화 상태인지? (1: 유지, 0: 만료/해지)
     FOREIGN KEY (user_id) REFERENCES CUSTOMERS(user_id)
 );

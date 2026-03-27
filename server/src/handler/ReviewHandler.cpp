@@ -161,3 +161,65 @@ void ReviewHandler::handleReviewReply(std::shared_ptr<ClientSession> session, co
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_REVIEW_REPLY), res);
     }
 }
+
+// 🚀 [CmdID: 2016] 특정 메뉴에 대한 리뷰만 쏙쏙 골라오기
+void ReviewHandler::handleMenuReviewList(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    json req = json::parse(jsonBody);
+    json res;
+    try
+    {
+        // 1. 요청받은 menuId 확인
+        int menuId = req.value("menuId", 0);
+
+        if (menuId == 0)
+        {
+            res["status"] = 400;
+            res["message"] = "정확한 menuId를 입력해주세요.";
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
+            return;
+        }
+
+        std::cout << "[ReviewHandler] 🍜 메뉴(ID: " << menuId << ") 리뷰 상세 조회 요청" << std::endl;
+
+        auto conn = DBManager::getInstance().getConnection();
+
+        // 2. 쿼리 최적화: REVIEWS 테이블에서 직접 menu_id로 필터링 (JOIN 필요 없음!)
+        std::string query = "SELECT review_id, user_id, rating, content, owner_reply, created_at "
+                            "FROM REVIEWS "
+                            "WHERE menu_id = ? "
+                            "ORDER BY created_at DESC";
+
+        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
+        pstmt->setInt(1, menuId);
+
+        std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
+
+        json reviews = json::array();
+        while (rs->next())
+        {
+            json rv;
+            rv["reviewId"] = rs->getInt("review_id");
+            rv["userId"] = std::string(rs->getString("user_id"));
+            rv["rating"] = rs->getInt("rating");
+            rv["content"] = std::string(rs->getString("content"));
+            rv["ownerReply"] = rs->isNull("owner_reply") ? "" : std::string(rs->getString("owner_reply"));
+            rv["createdAt"] = std::string(rs->getString("created_at"));
+            reviews.push_back(rv);
+        }
+
+        // 3. 응답 조립 (아까 성공했던 jina 로그 규격에 맞춤)
+        res["status"] = 200;
+        res["message"] = "조회 성공";
+        res["menuId"] = menuId; // 에코(Echo) 데이터
+        res["reviews"] = reviews;
+
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [ReviewHandler] handleMenuReviewList 오류: " << e.what() << std::endl;
+        res["status"] = 500;
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);
+    }
+}

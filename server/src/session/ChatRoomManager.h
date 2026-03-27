@@ -30,6 +30,9 @@ public:
     // 🚀 메시지 전달 시: 상대방이 누구인지 찾기용
     std::shared_ptr<ChatRoom> getRoom(int roomId);
 
+    // 🚀 모든 방 정보 가져오기 (메시지 라우팅용)
+    std::vector<std::shared_ptr<ChatRoom>> getAllRooms();
+
     // 🚀 채팅 종료 시: 메모리 회수 (태현님이 강조하신 그 부분!)
     void removeRoom(int roomId);
 

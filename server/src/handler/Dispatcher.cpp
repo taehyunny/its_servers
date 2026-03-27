@@ -7,16 +7,21 @@
 #include "SearchHandler.h"
 #include "AddressHandler.h"
 #include "ReviewHandler.h"
-#include "SalesHandler.h" // 🚀 주석 해제 및 활성화!
-#include "ChatHandler.h"  // 🚀 신규: 채팅 상담 핸들러
-#include "RiderHandler.h" // 🚀 신규: 라이더 관련 핸들러
-#include "AdminHandler.h" // 🚀 신규: 관리자 관련 핸들러
+#include "SalesHandler.h"  // 🚀 주석 해제 및 활성화!
+#include "ChatHandler.h"   // 🚀 신규: 채팅 상담 핸들러
+#include "RiderHandler.h"  // 🚀 신규: 라이더 관련 핸들러
+#include "AdminHandler.h"  // 🚀 신규: 관리자 관련 핸들러
+#include "SystemHandler.h" // 🚀 신규: 시스템 관련 핸들러
 #include <iostream>
 
 // =========================================================
 // 🌐 핸들러 맵 초기화 (도메인별 구역 분리)
 // =========================================================
 const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap = {
+
+    // ㅡ ㅡ 0. 공통 (Common) ㅡ ㅡ
+    {CmdID::REQ_HEARTBEAT, [](auto s, auto b)
+     { SystemHandler::handleHeartbeat(s, b); }},
 
     // ── 1. 유저 및 인증 (Auth & User) ──
     {CmdID::REQ_SIGNUP, [](auto s, auto b)
@@ -85,6 +90,8 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { SalesHandler::handleSalesStat(s, b); }}, // 🚀 신규: 매출 통계
     {CmdID::REQ_REVIEW_LIST, [](auto s, auto b)
      { ReviewHandler::handleReviewList(s, b); }}, // 리뷰 목록 요청 (고객용, 매장 상세 화면에서)
+    {CmdID::REQ_MENU_REVIEW_LIST, [](auto s, auto b)
+     { ReviewHandler::handleMenuReviewList(s, b); }}, // 특정 메뉴 리뷰 목록 요청 (고객용, 메뉴 상세 화면에서)
 
     // ── 5. 주소 관리 (Address) ──
     {CmdID::REQ_ADDRESS_SAVE, [](auto s, auto b)
@@ -115,7 +122,7 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
 
     // ── 8. 1:1 채팅 상담 (Chat) ──
     {CmdID::REQ_CHAT_CONNECT, [](auto s, auto b)
-     { ChatHandler::handleChatConnect(s, b); }},
+     { ChatHandler::handleChatRequest(s, b); }},
     {CmdID::REQ_CHAT_SEND, [](auto s, auto b)
      { ChatHandler::handleChatSend(s, b); }},
 
@@ -131,9 +138,7 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
     {CmdID::REQ_ADMIN_ORDER_LIST, [](auto s, auto b)
      { AdminHandler::handleAdminOrderList(s, b); }},
     {CmdID::RES_REQUEST_OK, [](auto s, auto b)
-     { ChatHandler::handleAdminChatAccept(s, b); }},
-    {CmdID::RES_REQUEST_NO, [](auto s, auto b)
-     { ChatHandler::handleAdminChatReject(s, b); }},
+     { ChatHandler::handleChatAccept(s, b); }},
     {CmdID::REQ_CANCEL, [](auto s, auto b)
      { OrderHandler::handleCancel(s, b); }},
 

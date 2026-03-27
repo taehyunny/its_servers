@@ -705,6 +705,30 @@ src/handler/StoreHandler.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.s
 .PHONY : src/handler/StoreHandler.cpp.s
 
+src/handler/SystemHandler.o: src/handler/SystemHandler.cpp.o
+.PHONY : src/handler/SystemHandler.o
+
+# target to build an object file
+src/handler/SystemHandler.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o
+.PHONY : src/handler/SystemHandler.cpp.o
+
+src/handler/SystemHandler.i: src/handler/SystemHandler.cpp.i
+.PHONY : src/handler/SystemHandler.i
+
+# target to preprocess a source file
+src/handler/SystemHandler.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.i
+.PHONY : src/handler/SystemHandler.cpp.i
+
+src/handler/SystemHandler.s: src/handler/SystemHandler.cpp.s
+.PHONY : src/handler/SystemHandler.s
+
+# target to generate assembly for a file
+src/handler/SystemHandler.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/ItsServer_App.dir/build.make CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.s
+.PHONY : src/handler/SystemHandler.cpp.s
+
 src/handler/UserHandler.o: src/handler/UserHandler.cpp.o
 .PHONY : src/handler/UserHandler.o
 
@@ -1002,6 +1026,9 @@ help:
 	@echo "... src/handler/StoreHandler.o"
 	@echo "... src/handler/StoreHandler.i"
 	@echo "... src/handler/StoreHandler.s"
+	@echo "... src/handler/SystemHandler.o"
+	@echo "... src/handler/SystemHandler.i"
+	@echo "... src/handler/SystemHandler.s"
 	@echo "... src/handler/UserHandler.o"
 	@echo "... src/handler/UserHandler.i"
 	@echo "... src/handler/UserHandler.s"

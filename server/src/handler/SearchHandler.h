@@ -31,4 +31,5 @@ public:
 
     // 5. 실시간 매장 검색 요청 (2116 -> 2117)
     static void handleSearchStoreReq(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
+    
 };

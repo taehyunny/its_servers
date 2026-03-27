@@ -15,7 +15,7 @@ public:
     }
 
     // 🚀 등급 변경 및 테이블 동기화 (트랜잭션 처리)
-    bool updateMembershipGrade(const std::string& userId, const std::string& targetGrade);
+    bool updateMembershipGrade(const std::string &userId, const std::string &targetGrade, int action);
 
 private:
     MembershipDAO() = default;

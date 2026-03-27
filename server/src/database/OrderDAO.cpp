@@ -152,13 +152,14 @@ std::vector<OrderHistoryItemDTO> OrderDAO::getOrderHistory(const std::string &us
     {
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 1. 쿼리: 과거 주문 내역(완료 4, 취소 -1) 조회
+        // 🚀 1. 쿼리 수정: order_status IN (4, -1) 조건 삭제!
+        // 이제 대기 중(0), 조리 중(1), 배달 중(3)인 모든 주문이 화면에 나옵니다.
         std::string query =
             "SELECT O.order_id, O.store_id, S.store_name, O.total_price, "
             "O.order_status, O.created_at "
             "FROM ORDERS O "
             "JOIN STORES S ON O.store_id = S.store_id "
-            "WHERE O.user_id = ? AND O.order_status IN (4, -1) ";
+            "WHERE O.user_id = ? "; // 💡 여기가 핵심 수정 포인트!
 
         // 검색어(keyword)가 있으면 가게 이름으로 필터링
         if (!keyword.empty())
@@ -181,22 +182,25 @@ std::vector<OrderHistoryItemDTO> OrderDAO::getOrderHistory(const std::string &us
         {
             OrderHistoryItemDTO item;
 
-            // 🚀 2. 태현님의 DTO 규격에 맞춘 완벽한 매핑!
+            // 🚀 2. DTO 규격에 맞춘 완벽한 매핑
             item.orderId = rs->getString("order_id").c_str();
             item.storeId = rs->getInt("store_id");
             item.storeName = rs->getString("store_name").c_str();
             item.totalPrice = rs->getInt("total_price");
-            item.status = rs->getInt("order_status");             // 💡 DTO의 status
-            item.createdAt = rs->getString("created_at").c_str(); // 💡 DTO의 createdAt
+            item.status = rs->getInt("order_status"); // 💡 프론트엔드가 이걸 보고 상태를 표시합니다
+            item.createdAt = rs->getString("created_at").c_str();
 
-            // (배달 사진은 현재 DB 컬럼에 없다고 가정하고 빈 문자열 처리, 필요시 컬럼 추가)
+            // (배달 사진은 현재 DB 컬럼에 없다고 가정하고 빈 문자열 처리)
             item.deliveryPhotoUrl = "";
 
-            // 🚀 3. 메뉴 요약(menuSummary) 만들기 (ORDER_ITEMS와 MENUS 조인)
+            // 🚀 3. 메뉴 요약(menuSummary) 만들기
+            // 💡 주의: 여기서 테이블 이름은 복수형(ORDER_ITEMS)이 맞습니다!
             std::unique_ptr<sql::PreparedStatement> pstmtMenu(conn->prepareStatement(
-                "SELECT M.menu_name FROM ORDER_ITEMS OI "
-                "JOIN MENUS M ON OI.menu_id = M.menu_id "
+                "SELECT M.menu_name "
+                "FROM ORDER_ITEMS OI "                    // 💡 테이블 이름 S 확인!
+                "JOIN MENUS M ON OI.menu_id = M.menu_id " // 💡 JOIN 포인트
                 "WHERE OI.order_id = ?"));
+
             pstmtMenu->setString(1, item.orderId);
             std::unique_ptr<sql::ResultSet> rsMenu(pstmtMenu->executeQuery());
 
@@ -206,7 +210,7 @@ std::vector<OrderHistoryItemDTO> OrderDAO::getOrderHistory(const std::string &us
             while (rsMenu->next())
             {
                 if (menuCount == 0)
-                    firstMenu = rsMenu->getString("menu_name").c_str();
+                    firstMenu = std::string(rsMenu->getString("menu_name"));
                 menuCount++;
             }
             item.menuName = firstMenu.empty() ? "메뉴 정보 없음" : firstMenu;

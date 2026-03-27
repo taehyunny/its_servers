@@ -37,6 +37,19 @@ std::shared_ptr<ChatRoom> ChatRoomManager::getRoom(int roomId)
 
     return nullptr; // 방이 없으면 nullptr 반환
 }
+std::vector<std::shared_ptr<ChatRoom>> ChatRoomManager::getAllRooms()
+{
+    std::lock_guard<std::mutex> lock(roomMutex); // 읽을 때도 락을 걸어 동시성 문제 방지!
+    std::vector<std::shared_ptr<ChatRoom>> roomList;
+
+    // 맵(rooms)을 순회하면서 모든 방을 벡터에 담습니다.
+    for (const auto &pair : rooms)
+    {
+        roomList.push_back(pair.second);
+    }
+
+    return roomList;
+}
 
 // 🚀 채팅 종료 시 메모리 회수 (태현님이 말씀하신 가장 중요한 부분!)
 void ChatRoomManager::removeRoom(int roomId)

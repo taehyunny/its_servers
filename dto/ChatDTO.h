@@ -46,3 +46,12 @@ struct NotifyChatRecvDTO
     std::string sendTime; // 보낸 시간 (클라이언트에 띄우기 위함)
     NLOHMANN_DEFINE_TYPE_INTRUSIVE(NotifyChatRecvDTO, roomId, senderId, content, sendTime)
 };
+struct ReqChatAcceptDTO
+{
+    std::string requesterId;   // "정태현"
+    std::string requesterType; // "CUSTOMER"
+    std::string result;        // "ACCEPT"
+
+    // 💡 nlohmann json 라이브러리가 이 구조체를 이해할 수 있게 매크로를 꼭 넣어주세요!
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE(ReqChatAcceptDTO, requesterId, requesterType, result)
+};

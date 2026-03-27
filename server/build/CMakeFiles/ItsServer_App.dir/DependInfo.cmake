@@ -32,6 +32,7 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/home/lms/Documents/its_server/server/src/handler/SalesHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SalesHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/SearchHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/StoreHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/StoreHandler.cpp.o.d"
+  "/home/lms/Documents/its_server/server/src/handler/SystemHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/SystemHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/handler/UserHandler.cpp" "CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/handler/UserHandler.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/network/ItsServer.cpp" "CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/network/ItsServer.cpp.o.d"
   "/home/lms/Documents/its_server/server/src/network/PacketFramer.cpp" "CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o" "gcc" "CMakeFiles/ItsServer_App.dir/src/network/PacketFramer.cpp.o.d"

@@ -319,7 +319,6 @@ CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.o: \
  /home/lms/Documents/its_server/server/src/session/ChatRoomManager.h \
  /home/lms/Documents/its_server/server/src/session/SessionManager.h \
  /usr/include/c++/13/iostream \
- /home/lms/Documents/its_server/server/src/database/OrderDAO.h \
  /home/lms/Documents/its_server/server/../dto/AllDTOs.h \
  /home/lms/Documents/its_server/server/../dto/BaseDTO.h \
  /home/lms/Documents/its_server/server/../include/json.hpp \
@@ -332,6 +331,4 @@ CMakeFiles/ItsServer_App.dir/src/handler/ChatHandler.cpp.o: \
  /home/lms/Documents/its_server/server/../dto/PaymentDTO.h \
  /home/lms/Documents/its_server/server/../dto/ChatDTO.h \
  /home/lms/Documents/its_server/server/../dto/AdminDTO.h \
- /home/lms/Documents/its_server/server/../dto/RiderDTO.h \
- /home/lms/Documents/its_server/server/src/database/StoreDAO.h \
- /usr/include/c++/13/chrono
+ /home/lms/Documents/its_server/server/../dto/RiderDTO.h

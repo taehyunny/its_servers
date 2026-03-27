@@ -139,3 +139,4 @@ void SearchHandler::handleSearchStoreReq(std::shared_ptr<ClientSession> session,
         std::cerr << "[SearchHandler] 매장 검색 에러: " << e.what() << std::endl;
     }
 }
+
