@@ -191,14 +191,67 @@ std::pair<LoginResult, nlohmann::json> UserDAO::checkLogin(const std::string &us
 
         if (rs->next())
         {
-            userJson["user_id"] = rs->getString("user_id").c_str();
-            userJson["user_name"] = rs->getString("user_name").c_str();
-            userJson["phone_number"] = rs->isNull("phone_number") ? "" : rs->getString("phone_number").c_str();
+            // 🚀 1. 기본 유저 정보 세팅 (안전한 std::string 캐스팅 적용)
+            userJson["user_id"] = std::string(rs->getString("user_id"));
+            userJson["user_name"] = std::string(rs->getString("user_name"));
+            userJson["phone_number"] = rs->isNull("phone_number") ? "" : std::string(rs->getString("phone_number"));
             userJson["role"] = rs->getInt("role");
-            userJson["address"] = rs->isNull("address") ? "" : rs->getString("address").c_str();
-            userJson["store_name"] = rs->isNull("store_name") ? "" : rs->getString("store_name").c_str();
+            userJson["address"] = rs->isNull("address") ? "" : std::string(rs->getString("address"));
+            userJson["store_name"] = rs->isNull("store_name") ? "" : std::string(rs->getString("store_name"));
             userJson["grade"] = rs->isNull("grade") ? 0 : rs->getInt("grade");
-            return {LoginResult::SUCCESS, userJson}; // ✅ 성공 코드와 함께 반환!
+
+            // ---------------------------------------------------------
+            // 🚀 로그인 성공 시 메인 화면 데이터 (윗줄/아랫줄/1등매장) 동기화
+            // ---------------------------------------------------------
+
+            // 🚀 2. 윗줄: 음식 카테고리 ('편의점', '마트' 제외)
+            std::unique_ptr<sql::PreparedStatement> pstmtFood(conn->prepareStatement(
+                "SELECT category_id, name FROM CATEGORIES WHERE name NOT IN ('편의점', '마트') ORDER BY category_id ASC"));
+            std::unique_ptr<sql::ResultSet> rsFood(pstmtFood->executeQuery());
+            
+            userJson["foodCategories"] = nlohmann::json::array();
+            while (rsFood->next()) {
+                userJson["foodCategories"].push_back({
+                    {"categoryId", rsFood->getInt("category_id")},
+                    {"name", std::string(rsFood->getString("name"))}
+                });
+            }
+
+            // 🚀 3. 아랫줄: 브랜드 카테고리 (편의점, 마트 통합)
+            std::unique_ptr<sql::PreparedStatement> pstmtBrand(conn->prepareStatement(
+                "SELECT DISTINCT brand_name FROM STORES WHERE category IN ('편의점', '마트') AND brand_name IS NOT NULL"));
+            std::unique_ptr<sql::ResultSet> rsBrand(pstmtBrand->executeQuery());
+            
+            userJson["brandCategories"] = nlohmann::json::array();
+            while (rsBrand->next()) {
+                userJson["brandCategories"].push_back({
+                    {"brandName", std::string(rsBrand->getString("brand_name"))}
+                });
+            }
+
+            // 🚀 4. 매출 1등 매장 (새로고침과 동일한 프론트엔드 UI 풀세트!)
+            std::unique_ptr<sql::PreparedStatement> pstmtStore(conn->prepareStatement(
+                "SELECT store_id, store_name, total_sales, rating, delivery_fee, "
+                "min_order_amount, review_count, delivery_time_range, icon_name "
+                "FROM STORES ORDER BY total_sales DESC LIMIT 10"));
+            std::unique_ptr<sql::ResultSet> rsStore(pstmtStore->executeQuery());
+
+            userJson["topStores"] = nlohmann::json::array();
+            while (rsStore->next()) {
+                userJson["topStores"].push_back({
+                    {"storeId", rsStore->getInt("store_id")},
+                    {"storeName", std::string(rsStore->getString("store_name"))},
+                    {"totalSales", rsStore->getInt("total_sales")},
+                    {"rating", rsStore->getDouble("rating")},
+                    {"deliveryFee", rsStore->getInt("delivery_fee")},
+                    {"minOrderAmount", rsStore->getInt("min_order_amount")},
+                    {"reviewCount", rsStore->getInt("review_count")},
+                    {"deliveryTimeRange", std::string(rsStore->getString("delivery_time_range"))},
+                    {"iconName", std::string(rsStore->getString("icon_name"))}
+                });
+            }
+
+            return {LoginResult::SUCCESS, userJson}; // ✅ 성공 코드와 함께 모든 데이터 반환!
         }
     }
     catch (sql::SQLException &e)
