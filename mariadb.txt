@@ -158,6 +158,7 @@ CREATE TABLE STORES (
     rating DECIMAL(2,1) DEFAULT 0.0,
     review_count INT(11) DEFAULT 0,
     delivery_time_range VARCHAR(50) DEFAULT '20~30분',
+    pickup_time varchar(50) DEFAULT '10~15분', 
     total_sales INT(11) DEFAULT 0,
     delivery_fee INT(11) DEFAULT 0,
     icon_name VARCHAR(255) DEFAULT 'default_icon',
