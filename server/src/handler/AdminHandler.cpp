@@ -33,8 +33,7 @@ void AdminHandler::handleAdminInit(std::shared_ptr<ClientSession> session, const
 
         // 3. 🚀 [가장 중요] SessionManager의 userMap에 공식 등록!
         // 이 코드가 있어야 나중에 관리자에게 9040번 푸시를 정확하게 쏠 수 있습니다.
-        SessionManager::getInstance().registerUser(adminId, session);
-
+        SessionManager::getInstance().registerUser(adminId, role, session);
         std::cout << "\n==================================================" << std::endl;
         std::cout << "[AdminHandler] 👑 백그라운드 관리자 인증 완료!" << std::endl;
         std::cout << " >>> [DEBUG] 등록된 ID: " << adminId << ", Role: " << role << " (FD: " << session->getFd() << ")" << std::endl;

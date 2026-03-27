@@ -60,15 +60,15 @@ enum class CmdID : uint16_t
     REQ_STORE_DETAIL = 2002,       // 특정 매장 상세 정보 요청 (상호명, 주소, 영업시간, 포장 가능 여부 등)
     RES_STORE_DETAIL = 2003,       // 매장 상세 정보 응답
 
-    REQ_MENU_LIST = 2010,   // 특정 상점 메뉴 목록 요청 (카테고리별, 품절 여부 포함)
-    RES_MENU_LIST = 2011,   // 메뉴 목록 응답
-    REQ_MENU_OPTION = 2012, // 특정 메뉴의 추가 선택 옵션 요청 (필수/선택 옵션)
-    RES_MENU_OPTION = 2013, // 메뉴 옵션 응답
-    REQ_REVIEW_LIST = 2014, // 매장 리뷰 목록 요청 (필터·정렬 파라미터 포함)
-    RES_REVIEW_LIST = 2015, // 리뷰 목록 응답 (주문 메뉴 버튼 포함)
+    REQ_MENU_LIST = 2010,        // 특정 상점 메뉴 목록 요청 (카테고리별, 품절 여부 포함)
+    RES_MENU_LIST = 2011,        // 메뉴 목록 응답
+    REQ_MENU_OPTION = 2012,      // 특정 메뉴의 추가 선택 옵션 요청 (필수/선택 옵션)
+    RES_MENU_OPTION = 2013,      // 메뉴 옵션 응답
+    REQ_REVIEW_LIST = 2014,      // 매장 리뷰 목록 요청 (필터·정렬 파라미터 포함)
+    RES_REVIEW_LIST = 2015,      // 리뷰 목록 응답 (주문 메뉴 버튼 포함)
     REQ_MENU_REVIEW_LIST = 2016, // 특정 메뉴 리뷰 목록 요청 (필터·정렬 파라미터 포함)
     RES_MENU_REVIEW_LIST = 2017, // 특정 메뉴 리뷰 목록 응답
-    // 주문 / 결제 (2020 ~ 2029)
+                                 // 주문 / 결제 (2020 ~ 2029)
     REQ_ORDER_CREATE = 2020,    // 장바구니 결제 및 주문 생성 요청
     RES_ORDER_CREATE = 2021,    // 주문 생성 응답
                                 // REQ_COUPON_CHECK = 2022, // 쿠폰 유효성 확인 요청

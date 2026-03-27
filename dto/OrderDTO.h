@@ -24,8 +24,9 @@ struct OrderItemDTO // 주문 생성 시 클라이언트가 보내는 주문 아
     int unitPrice;                  // 주문 당시 메뉴의 단가 (가격 변동 대비)
     nlohmann::json selectedOptions; // 주문 당시 스냅샷
     std::string menuName;
-
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(OrderItemDTO, menuId, quantity, unitPrice, selectedOptions, menuName)
+    std::vector<std::string> options; // 🚀 옵션 이름 배열 (예: ["매운맛", "단무지 추가"])
+    
+    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(OrderItemDTO, menuId, quantity, unitPrice, selectedOptions, menuName, options)
 };
 
 struct OrderCreateReqDTO // 주문 생성 요청 DTO (클라이언트 -> 서버)

@@ -57,18 +57,22 @@ std::shared_ptr<ClientSession> SessionManager::getSessionByUserId(const std::str
     return nullptr;
 }
 
-
+// 🚀 roleMap 대신 userMap을 순회하여 관리자를 찾는 완벽한 로직!
 std::shared_ptr<ClientSession> SessionManager::getAvailableAdminSession()
 {
     std::lock_guard<std::mutex> lock(sessionMutex);
-    
-    int ADMIN_ROLE = 3; // 관리자 롤 번호 (가정)
-    
-    auto it = roleMap.find(ADMIN_ROLE);
-    if (it != roleMap.end() && !it->second.empty()) {
-        // 🚀 접속 중인 관리자가 있다면, 첫 번째 관리자 세션 반환 (또는 랜덤 배정)
-        return it->second.front(); 
+
+    int ADMIN_ROLE = 3; // 💡 관리자 롤 번호 (필요시 맞게 수정하세요)
+
+    for (auto &pair : userMap)
+    {
+        // 세션이 살아있고, 해당 세션의 역할(Role)이 3이라면 즉시 반환!
+        if (pair.second && pair.second->getRole() == ADMIN_ROLE)
+        {
+            std::cout << "[SessionManager] 🎧 대기 중인 관리자(" << pair.first << ") 배정 완료!" << std::endl;
+            return pair.second;
+        }
     }
-    
+
     return nullptr; // 접속 중인 관리자가 없음!
 }

@@ -14,46 +14,34 @@ void ChatHandler::handleChatConnect(std::shared_ptr<ClientSession> session, cons
     try
     {
         auto req = nlohmann::json::parse(jsonBody).get<ReqChatConnectDTO>();
-        std::cout << "\n==================================================" << std::endl;
-        std::cout << "[ChatHandler] 🚪 1:1 문의 입장 요청 수신 (Cmd: 2090)" << std::endl;
-        std::cout << " >>> [DEBUG] 요청 고객 ID: " << req.userId << std::endl;
-        std::cout << " >>> [DEBUG] 타겟 매장 ID: " << req.storeId << std::endl;
-
         std::string customerId = req.userId;
 
-        // StoreDAO를 통해 매장 사장님 ID를 찾습니다.
-        std::string adminId = StoreDAO::getInstance().getOwnerIdByStoreId(req.storeId);
-        std::cout << " >>> [DEBUG] DB에서 찾은 사장님 ID: [" << adminId << "]" << std::endl;
+        // 🚀 1. 사장님이 아니라, '접속 중인 관리자(Role 3)'를 찾습니다!
+        std::string adminId = "";
+        auto adminSession = SessionManager::getInstance().getAvailableAdminSession();
 
-        if (adminId.empty())
+        if (adminSession)
         {
-            throw std::runtime_error("매장 사장님 정보를 찾을 수 없습니다.");
-        }
-
-        // 사장님에게 쏠 푸시 데이터 세팅
-        NotifyAdminChatReqDTO notifyAdmin = {customerId, "CUSTOMER", customerId + " 고객님이 1:1 문의를 요청했습니다."};
-
-        // 🚀 [중요] 9030번(또는 지정된 번호)으로 사장님 세션에 푸시를 쏩니다!
-        uint16_t PUSH_CMD_ID = static_cast<uint16_t>(CmdID::NOTIFY_CHAT_MSG); // 💡 프론트엔드와 맞춘 알림 패킷 번호 (Global_protocol.h에 맞게 수정하세요)
-        std::cout << " >>> [DEBUG] 사장님(" << adminId << ")에게 푸시 발송 시도... (Cmd: " << PUSH_CMD_ID << ")" << std::endl;
-
-        bool isPushed = SessionManager::getInstance().sendToUser(
-            adminId,
-            PUSH_CMD_ID,
-            nlohmann::json(notifyAdmin));
-
-        if (isPushed)
-        {
-            std::cout << " >>> [DEBUG] ✅ 사장님에게 푸시 전송 성공! (사장님이 온라인 상태입니다)" << std::endl;
+            adminId = adminSession->getUserId();
+            std::cout << " >>> [DEBUG] 대기 중인 관리자(Role 3) 발견: [" << adminId << "]" << std::endl;
         }
         else
         {
-            std::cerr << " >>> [DEBUG] 🚨 사장님에게 푸시 전송 실패! (현재 오프라인이거나 세션이 없습니다)" << std::endl;
+            // 🚨 접속 중인 관리자가 한 명도 없을 때
+            ResChatConnectDTO res = {404, -1, "현재 상담 가능한 관리자가 모두 오프라인입니다."};
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHAT_CONNECT), nlohmann::json(res));
+            return;
         }
+
+        // 🚀 2. 관리자에게 9030(또는 약속된 번호)으로 상담 요청 푸시 발송
+        NotifyAdminChatReqDTO notifyAdmin = {customerId, "CUSTOMER", customerId + " 고객님이 1:1 상담을 요청했습니다."};
+        uint16_t PUSH_CMD_ID = static_cast<uint16_t>(CmdID::NOTIFY_ADMIN_CHAT_REQ);
+
+        bool isPushed = SessionManager::getInstance().sendToUser(adminId, PUSH_CMD_ID, nlohmann::json(notifyAdmin));
 
         // 고객에게는 상태에 따라 202(대기) 또는 404(오프라인) 응답 전송
         int status = isPushed ? 202 : 404;
-        std::string msg = isPushed ? "사장님의 연결을 기다리고 있습니다..." : "현재 사장님이 오프라인 상태입니다.";
+        std::string msg = isPushed ? "상담원의 연결을 기다리고 있습니다..." : "현재 상담원이 오프라인 상태입니다.";
 
         ResChatConnectDTO res = {status, -1, msg};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHAT_CONNECT), nlohmann::json(res));

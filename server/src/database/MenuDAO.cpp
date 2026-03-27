@@ -235,24 +235,58 @@ std::string MenuDAO::getMenuName(int menuId)
 }
 // MenuDAO.cpp 하단에 추가
 
-std::string MenuDAO::getOptionName(int optionId)
+// [MenuDAO.cpp 내부]
+std::string MenuDAO::getOptionName(int menuId, int optionId)
 {
     auto conn = DBManager::getInstance().getConnection();
     try
     {
+        std::cout << ">>> [DEBUG][MenuDAO] 🔍 옵션 이름 조회 시도... (메뉴: " << menuId << ", 옵션: " << optionId << ")" << std::endl;
+
+        // 🚀 1. MENUS 테이블에서 해당 메뉴의 JSON(menu_options)을 통째로 가져옵니다.
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
-            "SELECT option_name FROM MENU_OPTIONS WHERE option_id = ?"));
-        pstmt->setInt(1, optionId);
+            "SELECT menu_options FROM MENUS WHERE menu_id = ?"));
+        pstmt->setInt(1, menuId);
         std::unique_ptr<sql::ResultSet> rs(pstmt->executeQuery());
 
         if (rs->next())
         {
-            return rs->getString("option_name").c_str(); // 🚀 찐 옵션 이름 리턴!
+            std::string jsonStr = rs->isNull("menu_options") ? "" : rs->getString("menu_options").c_str();
+
+            if (!jsonStr.empty())
+            {
+                // 🚀 2. JSON 파싱 시작 (올려주신 사진의 구조대로 껍질을 깝니다)
+                nlohmann::json groups = nlohmann::json::parse(jsonStr);
+
+                if (groups.is_array())
+                {
+                    for (const auto &group : groups)
+                    {
+                        auto optsArray = group.value("options", nlohmann::json::array());
+                        for (const auto &opt : optsArray)
+                        {
+                            // 💡 우리가 찾는 optionId와 일치하면 이름을 리턴!
+                            if (opt.value("optionId", 0) == optionId)
+                            {
+                                std::string optName = opt.value("optionName", "");
+                                std::cout << ">>> [DEBUG][MenuDAO] ✅ 옵션 찾음! (ID: " << optionId << " -> 이름: [" << optName << "])" << std::endl;
+                                return optName;
+                            }
+                        }
+                    }
+                }
+            }
         }
+
+        std::cout << ">>> [DEBUG][MenuDAO] ⚠️ 옵션 찾기 실패! 메뉴 " << menuId << "의 JSON 안에 option_id(" << optionId << ")가 없습니다." << std::endl;
     }
-    catch (const sql::SQLException &e)
+    catch (const nlohmann::json::parse_error &e)
     {
-        std::cerr << "🚨 [MenuDAO] 옵션 이름 조회 에러: " << e.what() << std::endl;
+        std::cerr << "🚨 [MenuDAO] JSON 파싱 에러 (DB 데이터 오염 의심): " << e.what() << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [MenuDAO] 옵션 이름 조회 일반 에러: " << e.what() << std::endl;
     }
 
     return ""; // 못 찾으면 빈 문자열 리턴

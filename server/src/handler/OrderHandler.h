@@ -20,4 +20,5 @@ public:
     static void handleCookTimeSet(std::shared_ptr<ClientSession> session, const std::string &jsonBody);        // 조리 시간 설정 요청 (3020)
     static void handleDeliveryComplete(std::shared_ptr<ClientSession> session, const std::string &jsonBody);   // 배달 완료 보고 (4010)
     static void handleCancel(std::shared_ptr<ClientSession> session, const std::string &jsonBody);             // 주문 취소 요청 (고객용) (3090)
+    static void handleOrderDetail(std::shared_ptr<ClientSession> session, const std::string &jsonBody);        // 주문 상세 조회 (고객용) (3085)
 };

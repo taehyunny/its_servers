@@ -28,7 +28,7 @@ public:
     std::vector<OptionGroup> getOptionGroupsByMenuId(int menuId); // 메뉴별 옵션 그룹 가져오기
     std::vector<OptionGroup> getMenuOptionsParsed(int menuId);    // 메뉴 옵션 JSON 파싱 후 반환
     std::string getMenuName(int menuId);
-    std::string getOptionName(int optionId);
+    std::string getOptionName(int menuId, int optionId); // 🚀 파라미터 2개로 변경
 
 private:
     MenuDAO() = default;
