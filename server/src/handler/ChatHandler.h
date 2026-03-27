@@ -14,4 +14,6 @@ public:
     // 🧑‍💻 3. 스레드 연결 (5000번): 관리자의 수락/거절 처리 및 방(스레드) 할당
     static void handleChatAccept(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
 
+    // 🚀 4. 채팅 종료 처리 (5002번): 관리자 또는 사장님이 채팅 종료를 요청했을 때
+    static void handleChatClose(std::shared_ptr<ClientSession> session, const std::string &jsonBody);
 };

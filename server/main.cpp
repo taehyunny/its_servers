@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signalHandler); // kill 명령 처리
 
     // ── 포트 파싱 ─────────────────────────────────────────────────────────
-    int port = 8080;
+    int port = 8000;
     if (argc > 1)
     {
         try
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
             {
                 std::cerr << "[WARNING] 포트 범위 오류 (" << port
                           << "). 기본값(8080)을 사용합니다." << std::endl;
-                port = 8080;
+                port = 8000;
             }
         }
         catch (const std::exception &)
@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     std::cout << "===========================================" << std::endl;
 
     try
-    {   // 1. DB 커넥션 풀 초기화
+    { // 1. DB 커넥션 풀 초기화
         DBManager::getInstance().init("jdbc:mariadb://localhost:3306/its_bedalyo", "bedalyo", "1234", threadCount);
 
         // 2. [오늘의 성과] 데이터 로드 테스트 (서버 부팅 시 콘솔 출력용)

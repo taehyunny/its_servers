@@ -593,15 +593,15 @@ void OrderHandler::handleDeliveryComplete(std::shared_ptr<ClientSession> session
 // 🚀 [완벽 수정본] 2027: 결제 화면 정보 응답 핸들러
 void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
-    auto req = nlohmann::json::parse(jsonBody).get<ReqCheckoutInfoDTO>();
-    ResCheckoutInfoDTO res = {};
-    res.status = 200;
-
-    auto conn = DBManager::getInstance().getConnection();
-
     try
     {
-        // 1. 유저 정보 조회 (Grade, Card, Account, Point, Address) - 테이블명 'CUSTOMERS' 오타 주의!
+        auto req = nlohmann::json::parse(jsonBody).get<ReqCheckoutInfoDTO>();
+        ResCheckoutInfoDTO res = {};
+        res.status = 200;
+
+        auto conn = DBManager::getInstance().getConnection();
+
+        // 🚀 1. 유저 정보 조회 (CUSTOMERS 테이블과 완벽 매칭!)
         std::unique_ptr<sql::PreparedStatement> pstmtUser(conn->prepareStatement(
             "SELECT customer_grade, card_number, account_number, point, address "
             "FROM CUSTOMERS WHERE user_id = ?"));
@@ -610,15 +610,16 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
 
         if (rsUser->next())
         {
-            // isNull 방어 코드 추가로 안정성 극대화!
-            res.customerGrade = rsUser->isNull("customer_grade") ? "" : rsUser->getString("customer_grade").c_str();
-            res.cardNumber = rsUser->isNull("card_number") ? "" : rsUser->getString("card_number").c_str();
-            res.accountNumber = rsUser->isNull("account_number") ? "" : rsUser->getString("account_number").c_str();
-            res.userPoint = rsUser->getInt("point");
-            res.userAddress = rsUser->isNull("address") ? "" : rsUser->getString("address").c_str();
+            // 💡 std::string으로 안전하게 감싸서 메모리 깨짐 현상을 원천 차단합니다.
+            // DB의 Default 값(주소 미상, 일반)을 코드단에서도 방어적으로 세팅!
+            res.customerGrade = rsUser->isNull("customer_grade") ? "일반" : std::string(rsUser->getString("customer_grade"));
+            res.cardNumber = rsUser->isNull("card_number") ? "" : std::string(rsUser->getString("card_number"));
+            res.accountNumber = rsUser->isNull("account_number") ? "" : std::string(rsUser->getString("account_number"));
+            res.userPoint = rsUser->isNull("point") ? 0 : rsUser->getInt("point");
+            res.userAddress = rsUser->isNull("address") ? "주소 미상" : std::string(rsUser->getString("address"));
         }
 
-        // 2. 매장 정보 조회 (MinOrder, DeliveryFee, Address, PickupTime)
+        // 🚀 2. 매장 정보 조회
         std::unique_ptr<sql::PreparedStatement> pstmtStore(conn->prepareStatement(
             "SELECT min_order_amount, delivery_fee, store_address, pickup_time "
             "FROM STORES WHERE store_id = ?"));
@@ -629,15 +630,15 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
         {
             res.minOrderAmount = rsStore->getInt("min_order_amount");
             res.deliveryFee = rsStore->getInt("delivery_fee");
-            res.storeAddress = rsStore->isNull("store_address") ? "" : rsStore->getString("store_address").c_str();
-            res.pickupTime = rsStore->isNull("pickup_time") ? "" : rsStore->getString("pickup_time").c_str();
+            res.storeAddress = rsStore->isNull("store_address") ? "" : std::string(rsStore->getString("store_address"));
+            res.pickupTime = rsStore->isNull("pickup_time") ? "" : std::string(rsStore->getString("pickup_time"));
         }
 
-        // 3. 비즈니스 로직: 와우 혜택 적용 (한글 패치 완료!)
+        // 🚀 3. 비즈니스 로직: 와우 혜택 적용 (주석 해제 완료!)
         if (res.customerGrade == "와우")
         {
-            // res.deliveryFee = 0;
-            std::cout << "[OrderHandler] 🎉 와우 회원 확인! 배달비 0원 혜택 적용." << std::endl;
+            res.deliveryFee = 0; // 와우 회원은 배달비 0원!
+            std::cout << "[OrderHandler] 🎉 와우 회원(" << req.userId << ") 접속! 배달비 0원 혜택 적용." << std::endl;
         }
 
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHECKOUT_INFO), nlohmann::json(res));
@@ -645,8 +646,9 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
     catch (const std::exception &e)
     {
         std::cerr << "🚨 [OrderHandler] handleCheckoutInfo 오류: " << e.what() << std::endl;
-        res.status = 500;
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHECKOUT_INFO), nlohmann::json(res));
+        ResCheckoutInfoDTO errRes;
+        errRes.status = 500;
+        session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHECKOUT_INFO), nlohmann::json(errRes));
     }
 }
 

@@ -1,0 +1,1021 @@
+nohup: 입력 무시
+===========================================
+       [ Its Bedalyo Server Booting ]      
+===========================================
+[INFO] Port        : 8000
+[INFO] ThreadPool  : 16 workers
+===========================================
+[DBManager] MariaDB 커넥션 풀 초기화 완료 (크기: 16)
+-------------------------------------------
+-------------------------------------------
+[ItsServer] 포트 8000에서 이츠 배달료 서버 정상 가동!
+[INFO] 모든 핸들러 및 데이터 로드 완료. 서비스를 시작합니다.
+[SessionManager] 세션 생성 완료 (FD: 21)
+[INFO] 새 클라이언트 접속 완료! (fd: 21, IP: 10.10.10.115)
+[CategoryHandler] 클라이언트(fd: 21) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 21 에게 메인 화면 데이터 전송 완료!
+[INFO] 클라이언트 접속 종료 (fd: 21)
+[SessionManager] 소켓 21 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 21)
+[INFO] 새 클라이언트 접속 완료! (fd: 21, IP: 10.10.10.115)
+[CategoryHandler] 클라이언트(fd: 21) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 21 에게 메인 화면 데이터 전송 완료!
+[SessionManager] 세션 생성 완료 (FD: 22)
+[INFO] 새 클라이언트 접속 완료! (fd: 22, IP: 10.10.10.103)
+[CategoryHandler] 클라이언트(fd: 22) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 22 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [와우] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [와우] 등급 세션 등록 완료.
+[INFO] 클라이언트 접속 종료 (fd: 21)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 21)
+[SessionManager] 소켓 21 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 21)
+[INFO] 새 클라이언트 접속 완료! (fd: 21, IP: 10.10.10.115)
+[CategoryHandler] 클라이언트(fd: 21) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 21 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [와우] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+[ERROR] read 실패
+[INFO] 클라이언트 접속 종료 (fd: 21)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 21)
+[SessionManager] 소켓 21 물리적 세션 제거 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2094
+[Dispatcher] 📦 Payload: {"action":1,"grade":"와우","userId":"asdf"}
+==================================================
+
+[UserHandler] ✅ 등급 변경 완료: asdf -> 와우 (Action: 1)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2026
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"asdf"}
+==================================================
+
+[SessionManager] 세션 생성 완료 (FD: 21)
+[INFO] 새 클라이언트 접속 완료! (fd: 21, IP: 10.10.10.109)
+[CategoryHandler] 클라이언트(fd: 21) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 21 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"1234","role":0,"userId":"jina"}
+==================================================
+
+[AuthDAO] 로그인 성공 (jina), Address: "광주광역시 광산구 소촌로152번길 37 (소촌동)"
+[SessionManager] 유저 등록 완료: jina (Role: 0)
+[UserHandler] 로그인 성공! 유저 'jina' [일반] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2016
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+[ReviewHandler] 🍜 메뉴(ID: 21) 리뷰 상세 조회 요청
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+[SessionManager] 세션 생성 완료 (FD: 23)
+[INFO] 새 클라이언트 접속 완료! (fd: 23, IP: 10.10.10.110)
+[CategoryHandler] 클라이언트(fd: 23) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 23 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"1234","role":1,"userId":"bedalyo"}
+==================================================
+
+[AuthDAO] 로그인 성공 (bedalyo), Address: ""
+[SessionManager] 유저 등록 완료: bedalyo (Role: 1)
+[UserHandler] 로그인 성공! 유저 'bedalyo' [일반] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2010
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2014
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[SessionManager] 세션 생성 완료 (FD: 24)
+[INFO] 새 클라이언트 접속 완료! (fd: 24, IP: 10.10.10.110)
+[CategoryHandler] 클라이언트(fd: 24) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 24 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5090
+[Dispatcher] 📦 Payload: {"adminId":"admin","role":3}
+==================================================
+
+[SessionManager] 유저 등록 완료: admin (Role: 3)
+
+==================================================
+[AdminHandler] 👑 백그라운드 관리자 인증 완료!
+ >>> [DEBUG] 등록된 ID: admin, Role: 3 (FD: 24)
+ >>> [DEBUG] 해당 소켓이 9040번(문의 푸시) 수신 대기 상태가 되었습니다.
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2090
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"bedalyo"}
+==================================================
+
+[ChatHandler] 🔔 사장님(bedalyo) 요청 관리자에게 전송 완료
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5000
+[Dispatcher] 📦 Payload: {"requesterId":"bedalyo","requesterType":"STORE_OWNER","result":"ACCEPT"}
+==================================================
+
+[ChatHandler] 🧑‍💻 관리자 수락: bedalyo (STORE_OWNER)
+[ChatRoomManager] 🏠 방 생성 완료! ID: 1 (고객: bedalyo <-> 관리자: admin)
+[ChatHandler] ✅ [Room: 1] 중계 채널 오픈 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2092
+[Dispatcher] 📦 Payload: {"content":"gd","roomId":1,"senderId":"bedalyo"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2092
+[Dispatcher] 📦 Payload: {"content":"gd","roomId":1,"senderId":"admin"}
+==================================================
+
+[SessionManager] 세션 생성 완료 (FD: 25)
+[INFO] 새 클라이언트 접속 완료! (fd: 25, IP: 10.10.10.115)
+[CategoryHandler] 클라이언트(fd: 25) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 25 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2098
+[Dispatcher] 📦 Payload: {"roomId":1}
+==================================================
+
+[ChatRoomManager] ♻️ 방 1 삭제 및 메모리 회수 완료.
+[ChatHandler] 🚪 채팅방(1) 양방향 종료 알림 전송 및 삭제 완료! (고객님 요청)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [와우] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+[INFO] 클라이언트 접속 종료 (fd: 25)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 25)
+[SessionManager] 소켓 25 물리적 세션 제거 완료.
+[ERROR] read 실패
+[INFO] 클라이언트 접속 종료 (fd: 24)
+[SessionManager] 유저 'admin'의 논리적 연결 해제 (fd: 24)
+[SessionManager] 소켓 24 물리적 세션 제거 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1030
+[Dispatcher] 📦 Payload: null
+==================================================
+
+[UserHandler] 유저 'bedalyo' 논리적 로그아웃 완료. (소켓 유지)
+[INFO] 클라이언트 접속 종료 (fd: 23)
+[SessionManager] 소켓 23 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 23)
+[INFO] 새 클라이언트 접속 완료! (fd: 23, IP: 10.10.10.110)
+[CategoryHandler] 클라이언트(fd: 23) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 23 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5090
+[Dispatcher] 📦 Payload: {"adminId":"admin","role":3}
+==================================================
+
+[SessionManager] 유저 등록 완료: admin (Role: 3)
+
+==================================================
+[AdminHandler] 👑 백그라운드 관리자 인증 완료!
+ >>> [DEBUG] 등록된 ID: admin, Role: 3 (FD: 23)
+ >>> [DEBUG] 해당 소켓이 9040번(문의 푸시) 수신 대기 상태가 되었습니다.
+==================================================
+
+[SessionManager] 세션 생성 완료 (FD: 24)
+[INFO] 새 클라이언트 접속 완료! (fd: 24, IP: 10.10.10.110)
+[CategoryHandler] 클라이언트(fd: 24) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 24 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"1234","role":1,"userId":"bedalyo"}
+==================================================
+
+[AuthDAO] 로그인 성공 (bedalyo), Address: ""
+[SessionManager] 유저 등록 완료: bedalyo (Role: 1)
+[UserHandler] 로그인 성공! 유저 'bedalyo' [일반] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2010
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2014
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2090
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"bedalyo"}
+==================================================
+
+[ChatHandler] 🔔 사장님(bedalyo) 요청 관리자에게 전송 완료
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5000
+[Dispatcher] 📦 Payload: {"requesterId":"bedalyo","requesterType":"STORE_OWNER","result":"ACCEPT"}
+==================================================
+
+[ChatHandler] 🧑‍💻 관리자 수락: bedalyo (STORE_OWNER)
+[ChatRoomManager] 🏠 방 생성 완료! ID: 2 (고객: bedalyo <-> 관리자: admin)
+[ChatHandler] ✅ [Room: 2] 중계 채널 오픈 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2092
+[Dispatcher] 📦 Payload: {"content":"gd","roomId":2,"senderId":"bedalyo"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2092
+[Dispatcher] 📦 Payload: {"content":"gd","roomId":2,"senderId":"admin"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2098
+[Dispatcher] 📦 Payload: {"roomId":2}
+==================================================
+
+[ChatRoomManager] ♻️ 방 2 삭제 및 메모리 회수 완료.
+[ChatHandler] 🚪 채팅방(2) 양방향 종료 알림 전송 및 삭제 완료! (고객님 요청)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2090
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"bedalyo"}
+==================================================
+
+[ChatHandler] 🔔 사장님(bedalyo) 요청 관리자에게 전송 완료
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5001
+[Dispatcher] 📦 Payload: {"requesterId":"bedalyo","requesterType":"STORE_OWNER","result":"REJECT"}
+==================================================
+
+⚠️ [WARNING] 등록되지 않은 알 수 없는 명령어 수신: 5001
+[ERROR] read 실패
+[INFO] 클라이언트 접속 종료 (fd: 24)
+[SessionManager] 유저 'bedalyo'의 논리적 연결 해제 (fd: 24)
+[SessionManager] 소켓 24 물리적 세션 제거 완료.
+[INFO] 클라이언트 접속 종료 (fd: 22)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 22)
+[SessionManager] 소켓 22 물리적 세션 제거 완료.
+[ERROR] read 실패
+[INFO] 클라이언트 접속 종료 (fd: 23)
+[SessionManager] 유저 'admin'의 논리적 연결 해제 (fd: 23)
+[SessionManager] 소켓 23 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 22)
+[INFO] 새 클라이언트 접속 완료! (fd: 22, IP: 10.10.10.115)
+[CategoryHandler] 클라이언트(fd: 22) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 22 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [와우] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2016
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+[ReviewHandler] 🍜 메뉴(ID: 21) 리뷰 상세 조회 요청
+[INFO] 클라이언트 접속 종료 (fd: 22)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 22)
+[SessionManager] 소켓 22 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 22)
+[INFO] 새 클라이언트 접속 완료! (fd: 22, IP: 10.10.10.110)
+[CategoryHandler] 클라이언트(fd: 22) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 22 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"1234","role":1,"userId":"bedalyo"}
+==================================================
+
+[AuthDAO] 로그인 성공 (bedalyo), Address: ""
+[SessionManager] 유저 등록 완료: bedalyo (Role: 1)
+[UserHandler] 로그인 성공! 유저 'bedalyo' [일반] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2010
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2014
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[SessionManager] 세션 생성 완료 (FD: 23)
+[INFO] 새 클라이언트 접속 완료! (fd: 23, IP: 10.10.10.110)
+[CategoryHandler] 클라이언트(fd: 23) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 23 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5090
+[Dispatcher] 📦 Payload: {"adminId":"admin","role":3}
+==================================================
+
+[SessionManager] 유저 등록 완료: admin (Role: 3)
+
+==================================================
+[AdminHandler] 👑 백그라운드 관리자 인증 완료!
+ >>> [DEBUG] 등록된 ID: admin, Role: 3 (FD: 23)
+ >>> [DEBUG] 해당 소켓이 9040번(문의 푸시) 수신 대기 상태가 되었습니다.
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2090
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"bedalyo"}
+==================================================
+
+[ChatHandler] 🔔 사장님(bedalyo) 요청 관리자에게 전송 완료
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5000
+[Dispatcher] 📦 Payload: {"requesterId":"bedalyo","requesterType":"STORE_OWNER","result":"ACCEPT"}
+==================================================
+
+[ChatHandler] 🧑‍💻 관리자 수락: bedalyo (STORE_OWNER)
+[ChatRoomManager] 🏠 방 생성 완료! ID: 3 (고객: bedalyo <-> 관리자: admin)
+[ChatHandler] ✅ [Room: 3] 중계 채널 오픈 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2092
+[Dispatcher] 📦 Payload: {"content":"싫어","roomId":3,"senderId":"bedalyo"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2098
+[Dispatcher] 📦 Payload: {"roomId":3}
+==================================================
+
+[ChatRoomManager] ♻️ 방 3 삭제 및 메모리 회수 완료.
+[ChatHandler] 🚪 채팅방(3) 양방향 종료 알림 전송 및 삭제 완료! (고객님 요청)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2090
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"bedalyo"}
+==================================================
+
+[ChatHandler] 🔔 사장님(bedalyo) 요청 관리자에게 전송 완료
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5001
+[Dispatcher] 📦 Payload: {"requesterId":"bedalyo","requesterType":"STORE_OWNER","result":"REJECT"}
+==================================================
+
+⚠️ [WARNING] 등록되지 않은 알 수 없는 명령어 수신: 5001
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1030
+[Dispatcher] 📦 Payload: null
+==================================================
+
+[UserHandler] 유저 'bedalyo' 논리적 로그아웃 완료. (소켓 유지)
+[INFO] 클라이언트 접속 종료 (fd: 22)
+[SessionManager] 소켓 22 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 22)
+[INFO] 새 클라이언트 접속 완료! (fd: 22, IP: 10.10.10.103)
+[CategoryHandler] 클라이언트(fd: 22) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 22 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [와우] 등급 세션 등록 완료.
+[ERROR] read 실패
+[INFO] 클라이언트 접속 종료 (fd: 23)
+[SessionManager] 유저 'admin'의 논리적 연결 해제 (fd: 23)
+[SessionManager] 소켓 23 물리적 세션 제거 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2094
+[Dispatcher] 📦 Payload: {"action":1,"grade":"와우","userId":"asdf"}
+==================================================
+
+[UserHandler] ✅ 등급 변경 완료: asdf -> 와우 (Action: 1)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2094
+[Dispatcher] 📦 Payload: {"action":0,"grade":"일반","userId":"asdf"}
+==================================================
+
+[UserHandler] ✅ 등급 변경 완료: asdf -> 일반 (Action: 0)
+[SessionManager] 세션 생성 완료 (FD: 23)
+[INFO] 새 클라이언트 접속 완료! (fd: 23, IP: 10.10.10.110)
+[CategoryHandler] 클라이언트(fd: 23) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 23 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5090
+[Dispatcher] 📦 Payload: {"adminId":"admin","role":3}
+==================================================
+
+[SessionManager] 유저 등록 완료: admin (Role: 3)
+
+==================================================
+[AdminHandler] 👑 백그라운드 관리자 인증 완료!
+ >>> [DEBUG] 등록된 ID: admin, Role: 3 (FD: 23)
+ >>> [DEBUG] 해당 소켓이 9040번(문의 푸시) 수신 대기 상태가 되었습니다.
+==================================================
+
+[INFO] 클라이언트 접속 종료 (fd: 22)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 22)
+[SessionManager] 소켓 22 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 22)
+[INFO] 새 클라이언트 접속 완료! (fd: 22, IP: 10.10.10.110)
+[CategoryHandler] 클라이언트(fd: 22) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 22 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"1234","role":1,"userId":"bedalyo"}
+==================================================
+
+[AuthDAO] 로그인 성공 (bedalyo), Address: ""
+[SessionManager] 유저 등록 완료: bedalyo (Role: 1)
+[UserHandler] 로그인 성공! 유저 'bedalyo' [일반] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2010
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2014
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2090
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"bedalyo"}
+==================================================
+
+[ChatHandler] 🔔 사장님(bedalyo) 요청 관리자에게 전송 완료
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 5000
+[Dispatcher] 📦 Payload: {"requesterId":"bedalyo","requesterType":"STORE_OWNER","result":"ACCEPT"}
+==================================================
+
+[ChatHandler] 🧑‍💻 관리자 수락: bedalyo (STORE_OWNER)
+[ChatRoomManager] 🏠 방 생성 완료! ID: 4 (고객: bedalyo <-> 관리자: admin)
+[ChatHandler] ✅ [Room: 4] 중계 채널 오픈 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2092
+[Dispatcher] 📦 Payload: {"content":"안녕안녕","roomId":4,"senderId":"admin"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2092
+[Dispatcher] 📦 Payload: {"content":"나는\r\n운영자야~","roomId":4,"senderId":"bedalyo"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2092
+[Dispatcher] 📦 Payload: {"content":"지나다라마바사","roomId":4,"senderId":"admin"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2098
+[Dispatcher] 📦 Payload: {"roomId":4}
+==================================================
+
+[ChatRoomManager] ♻️ 방 4 삭제 및 메모리 회수 완료.
+[ChatHandler] 🚪 채팅방(4) 양방향 종료 알림 전송 및 삭제 완료! (관리자 요청)
+[SessionManager] 세션 생성 완료 (FD: 24)
+[INFO] 새 클라이언트 접속 완료! (fd: 24, IP: 10.10.10.115)
+[CategoryHandler] 클라이언트(fd: 24) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 24 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [일반] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2016
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+[ReviewHandler] 🍜 메뉴(ID: 21) 리뷰 상세 조회 요청
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2026
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"asdf"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2020
+[Dispatcher] 📦 Payload: {"deliveryAddress":"광주광역시 서구 화운로 1 (화정동)","items":[{"menuId":21,"menuName":"해물 쟁반짜장","options":[],"quantity":6,"selectedOptions":[2102,2103,2104],"unitPrice":12000}],"riderRequest":"문 앞에 놔주세요 (초인종 O)","storeId":1,"storeRequest":"","totalPrice":73000,"userId":"asdf"}
+==================================================
+
+[OrderHandler] 📦 신규 주문 생성 요청 (UserID: asdf, StoreID: 1)
+>>> [DEBUG] getMenuName 호출됨! 넘어온 menuId: 21
+>>> [DEBUG][MenuDAO] 🔍 옵션 이름 조회 시도... (메뉴: 21, 옵션: 2102)
+>>> [DEBUG][MenuDAO] ✅ 옵션 찾음! (ID: 2102 -> 이름: [매운맛])
+>>> [DEBUG][MenuDAO] 🔍 옵션 이름 조회 시도... (메뉴: 21, 옵션: 2103)
+>>> [DEBUG][MenuDAO] ✅ 옵션 찾음! (ID: 2103 -> 이름: [곱빼기])
+>>> [DEBUG][MenuDAO] 🔍 옵션 이름 조회 시도... (메뉴: 21, 옵션: 2104)
+>>> [DEBUG][MenuDAO] ✅ 옵션 찾음! (ID: 2104 -> 이름: [계란후라이])
+[OrderHandler] ✅ 주문 생성 및 DB 저장 완벽 성공! (OrderID: ORD-20260327214205-383-asdf)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 3010
+[Dispatcher] 📦 Payload: {"orderId":"ORD-20260327214205-383-asdf","rejectReason":"배달 불가 지역입니다."}
+==================================================
+
+[OrderHandler] 🛑 주문 거절 처리 (OrderID: ORD-20260327214205-383-asdf)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+[SessionManager] 세션 생성 완료 (FD: 25)
+[INFO] 새 클라이언트 접속 완료! (fd: 25, IP: 10.10.10.103)
+[CategoryHandler] 클라이언트(fd: 25) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 25 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2016
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+[ReviewHandler] 🍜 메뉴(ID: 21) 리뷰 상세 조회 요청
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [일반] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2094
+[Dispatcher] 📦 Payload: {"action":1,"grade":"와우","userId":"asdf"}
+==================================================
+
+[UserHandler] ✅ 등급 변경 완료: asdf -> 와우 (Action: 1)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2094
+[Dispatcher] 📦 Payload: {"action":0,"grade":"일반","userId":"asdf"}
+==================================================
+
+[UserHandler] ✅ 등급 변경 완료: asdf -> 일반 (Action: 0)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2094
+[Dispatcher] 📦 Payload: {"action":1,"grade":"와우","userId":"asdf"}
+==================================================
+
+[UserHandler] ✅ 등급 변경 완료: asdf -> 와우 (Action: 1)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":1}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 1
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2026
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"asdf"}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":21}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2026
+[Dispatcher] 📦 Payload: {"storeId":1,"userId":"asdf"}
+==================================================
+
+[INFO] 클라이언트 접속 종료 (fd: 24)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 24)
+[SessionManager] 소켓 24 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 24)
+[INFO] 새 클라이언트 접속 완료! (fd: 24, IP: 10.10.10.115)
+[CategoryHandler] 클라이언트(fd: 24) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 24 에게 메인 화면 데이터 전송 완료!
+[INFO] 클라이언트 접속 종료 (fd: 25)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 25)
+[SessionManager] 소켓 25 물리적 세션 제거 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1040
+[Dispatcher] 📦 Payload: {"userId":"zxcv"}
+==================================================
+
+[SessionManager] 세션 생성 완료 (FD: 25)
+[INFO] 새 클라이언트 접속 완료! (fd: 25, IP: 10.10.10.103)
+[CategoryHandler] 클라이언트(fd: 25) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 25 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [와우] 등급 세션 등록 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2080
+[Dispatcher] 📦 Payload: {"userId":"asdf"}
+==================================================
+
+[OrderHandler] 📜 주문 내역 조회 요청 (UserID: asdf)
+[OrderHandler] ✅ 주문 내역 7건 전송 완료
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2094
+[Dispatcher] 📦 Payload: {"action":1,"grade":"와우","userId":"asdf"}
+==================================================
+
+[UserHandler] ✅ 등급 변경 완료: asdf -> 와우 (Action: 1)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2094
+[Dispatcher] 📦 Payload: {"action":0,"grade":"일반","userId":"asdf"}
+==================================================
+
+[UserHandler] ✅ 등급 변경 완료: asdf -> 일반 (Action: 0)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1042
+[Dispatcher] 📦 Payload: {"phoneNumber":"01012345678","role":0}
+==================================================
+
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1020
+[Dispatcher] 📦 Payload: {"accountNumber":"","address":"ㅣㄴㄻ아ㅣㅜ;ㄴㄹㅇ미ㅜ;ㄴㄹㅇ무;ㅣㅏㄴㅇㄻ","businessNumber":"","category":"","password":"as1234!@#$","phoneNumber":"01012345678","role":0,"storeAddress":"","storeName":"","userId":"zxcv","userName":"홍홍붉을홍"}
+==================================================
+
+[UserDAO] 회원가입 성공 (ID: zxcv)
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2000
+[Dispatcher] 📦 Payload: {"categoryId":1}
+==================================================
+
+[StoreHandler] 상점 목록 요청 수신 - 카테고리 ID: 1
+>>> [DEBUG] 전송할 JSON 데이터:
+{
+    "message": "",
+    "status": 200,
+    "stores": [
+        {
+            "brandName": "",
+            "category": "한식",
+            "deliveryFee": 0,
+            "deliveryTime": "",
+            "deliveryTimeRange": "20~30분",
+            "grade": "",
+            "iconPath": "korean.png",
+            "minOrderAmount": 10000,
+            "minOrderPrice": 1633699264,
+            "pickupTime": "",
+            "rating": 0.0,
+            "reviewCount": 0,
+            "storeId": 3,
+            "storeName": "남도미역국밥"
+        },
+        {
+            "brandName": "",
+            "category": "한식",
+            "deliveryFee": 0,
+            "deliveryTime": "",
+            "deliveryTimeRange": "20~30분",
+            "grade": "",
+            "iconPath": "korean.png",
+            "minOrderAmount": 12000,
+            "minOrderPrice": 1633699264,
+            "pickupTime": "",
+            "rating": 0.0,
+            "reviewCount": 0,
+            "storeId": 4,
+            "storeName": "엄마손 김치찌개"
+        },
+        {
+            "brandName": "",
+            "category": "한식",
+            "deliveryFee": 0,
+            "deliveryTime": "",
+            "deliveryTimeRange": "20~30분",
+            "grade": "",
+            "iconPath": "korean.png",
+            "minOrderAmount": 9000,
+            "minOrderPrice": 1633699264,
+            "pickupTime": "",
+            "rating": 0.0,
+            "reviewCount": 0,
+            "storeId": 5,
+            "storeName": "전주 콩나물해장국"
+        },
+        {
+            "brandName": "",
+            "category": "한식",
+            "deliveryFee": 0,
+            "deliveryTime": "",
+            "deliveryTimeRange": "20~30분",
+            "grade": "",
+            "iconPath": "korean.png",
+            "minOrderAmount": 15000,
+            "minOrderPrice": 1633699264,
+            "pickupTime": "",
+            "rating": 0.0,
+            "reviewCount": 0,
+            "storeId": 6,
+            "storeName": "불향 쭈꾸미볶음"
+        },
+        {
+            "brandName": "",
+            "category": "한식",
+            "deliveryFee": 0,
+            "deliveryTime": "",
+            "deliveryTimeRange": "20~30분",
+            "grade": "",
+            "iconPath": "korean.png",
+            "minOrderAmount": 11000,
+            "minOrderPrice": 1633699264,
+            "pickupTime": "",
+            "rating": 0.0,
+            "reviewCount": 0,
+            "storeId": 7,
+            "storeName": "할매 보리밥정식"
+        },
+        {
+            "brandName": "",
+            "category": "한식",
+            "deliveryFee": 1000,
+            "deliveryTime": "",
+            "deliveryTimeRange": "20~30분",
+            "grade": "",
+            "iconPath": "korean.png",
+            "minOrderAmount": 10000,
+            "minOrderPrice": 1633699264,
+            "pickupTime": "",
+            "rating": 0.0,
+            "reviewCount": 0,
+            "storeId": 52,
+            "storeName": "김밥지옥"
+        }
+    ]
+}
+[StoreHandler] 전송 완료.
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2002
+[Dispatcher] 📦 Payload: {"storeId":52}
+==================================================
+
+[StoreHandler] 매장 상세 조회 완료 - storeId: 52
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 2012
+[Dispatcher] 📦 Payload: {"menuId":41}
+==================================================
+
+[ERROR] read 실패
+[INFO] 클라이언트 접속 종료 (fd: 24)
+[SessionManager] 소켓 24 물리적 세션 제거 완료.
+[INFO] 클라이언트 접속 종료 (fd: 25)
+[SessionManager] 유저 'asdf'의 논리적 연결 해제 (fd: 25)
+[SessionManager] 소켓 25 물리적 세션 제거 완료.
+[INFO] 클라이언트 접속 종료 (fd: 21)
+[SessionManager] 유저 'jina'의 논리적 연결 해제 (fd: 21)
+[SessionManager] 소켓 21 물리적 세션 제거 완료.
+[SessionManager] 세션 생성 완료 (FD: 21)
+[INFO] 새 클라이언트 접속 완료! (fd: 21, IP: 10.10.10.103)
+[CategoryHandler] 클라이언트(fd: 21) 메인 화면 통합 데이터 요청!
+[CategoryHandler] 메인 화면 데이터(카테고리 10개, 1등 매장 10개) 한방에 전송 완료!
+       -> 🎁 [서버 웰컴 선물] fd 21 에게 메인 화면 데이터 전송 완료!
+
+==================================================
+[Dispatcher] 📥 수신된 CmdID: 1010
+[Dispatcher] 📦 Payload: {"password":"asdf","role":0,"userId":"asdf"}
+==================================================
+
+[AuthDAO] 로그인 성공 (asdf), Address: "광주광역시 서구 화운로 1 (화정동)"
+[SessionManager] 유저 등록 완료: asdf (Role: 0)
+[UserHandler] 로그인 성공! 유저 'asdf' [일반] 등급 세션 등록 완료.

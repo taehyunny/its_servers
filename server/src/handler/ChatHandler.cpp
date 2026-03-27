@@ -128,3 +128,48 @@ void ChatHandler::handleChatSend(std::shared_ptr<ClientSession> session, const s
         std::cerr << "🚨 [ChatHandler] 메시지 전송 에러: " << e.what() << std::endl;
     }
 }
+// 🚀 [CmdID: 5002] 관리자 혹은 사장님이 채팅 종료를 요청했을 때
+// 🚀 [CmdID: 5002] 채팅 종료 요청 (관리자 or 사장님 누구든 호출 가능)
+void ChatHandler::handleChatClose(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
+{
+    try
+    {
+        auto req = nlohmann::json::parse(jsonBody);
+        int roomId = req.value("roomId", -1);
+
+        // 🚀 가짜 ID 방지! (서버 세션 진짜 ID 강제 주입)
+        std::string requesterId = session->getUserId();
+
+        // 1. 방 정보 확인
+        auto room = ChatRoomManager::getInstance().getRoom(roomId);
+        if (!room)
+        {
+            throw std::runtime_error("이미 종료되었거나 존재하지 않는 방입니다.");
+        }
+
+        std::string closerName = (requesterId == room->adminId) ? "관리자" : "고객님";
+
+        // 2. 양쪽 모두에게 똑같이 보낼 '방 폭파' 알림 메시지 조립
+        nlohmann::json notify = {
+            {"roomId", roomId},
+            {"message", closerName + "이(가) 채팅을 종료하였습니다."}};
+
+        // 🚀 3. 핵심: 관리자와 고객(사장님) 양쪽 모두에게 동시에 알림 쏘기! (예: CmdID 9033)
+        uint16_t notifyCmdId = static_cast<uint16_t>(CmdID::NOTIFY_CHAT_EXIT); // 프로젝트 규격에 맞는 NOTIFY_CHAT_CLOSED 번호로 맞추세요.
+        SessionManager::getInstance().sendToUser(room->customerId, notifyCmdId, notify);
+        SessionManager::getInstance().sendToUser(room->adminId, notifyCmdId, notify);
+
+        // 4. 양쪽에 신호를 무사히 보냈으니, 이제 메모리에서 방을 안전하게 삭제!
+        ChatRoomManager::getInstance().removeRoom(roomId);
+
+        std::cout << "[ChatHandler] 🚪 채팅방(" << roomId << ") 양방향 종료 알림 전송 및 삭제 완료! (" << closerName << " 요청)" << std::endl;
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "🚨 [ChatHandler] 채팅 종료 에러: " << e.what() << std::endl;
+
+        // 에러가 났을 때만 요청자에게 실패 응답을 줍니다.
+        nlohmann::json errRes = {{"status", 1}, {"message", "종료 처리 중 오류가 발생했습니다."}};
+        session->sendPacket(static_cast<uint16_t>(CmdID::NOTIFY_CHAT_EXIT), errRes);
+    }
+}

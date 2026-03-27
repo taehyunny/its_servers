@@ -118,13 +118,15 @@ const std::unordered_map<CmdID, Dispatcher::HandlerFunc> Dispatcher::_handlerMap
      { SearchHandler::handleSearchStoreReq(s, b); }},
     // ── 7. 마이페이지 등 기타 (MyPage & Misc) ──
     {CmdID::REQ_GRADE_UPDATE, [](auto s, auto b)
-     { UserHandler::handleGradeUpdate(s, b); }},
+     { UserHandler::handleGradeUpdate(s, b); }}, // 🚀 신규: 등급 업그레이드 요청 (고객용)
 
     // ── 8. 1:1 채팅 상담 (Chat) ──
     {CmdID::REQ_CHAT_CONNECT, [](auto s, auto b)
      { ChatHandler::handleChatRequest(s, b); }},
     {CmdID::REQ_CHAT_SEND, [](auto s, auto b)
      { ChatHandler::handleChatSend(s, b); }},
+    {CmdID::REQ_CHAT_CLOSE, [](auto s, auto b)
+     { ChatHandler::handleChatClose(s, b); }}, // 🚀 신규: 채팅 종료 요청 (관리자 또는 사장님이 채팅 종료를 요청했을 때)
 
     // ── 9. 라이더 관련 (Rider) ──
     {CmdID::REQ_RIDER_ORDER_LIST, [](auto s, auto b)
