@@ -100,7 +100,7 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
             session->authenticate(res.userId, dbRole);
 
             // 💡 이름이 바뀐 registerUser를 호출합니다!
-        SessionManager::getInstance().registerUser(res.userId, dbRole, session);
+            SessionManager::getInstance().registerUser(res.userId, dbRole, session);
 
             std::cout << "[UserHandler] 로그인 성공! 유저 '" << res.userId << "' [" << res.grade << "] 등급 세션 등록 완료." << std::endl;
         }
@@ -250,15 +250,23 @@ void UserHandler::handleLogout(std::shared_ptr<ClientSession> session, const std
 
 void UserHandler::handleGradeUpdate(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
+    auto conn = DBManager::getInstance().getConnection();
     try
     {
         // 1. DTO 파싱
         auto req = nlohmann::json::parse(jsonBody).get<ReqGradeUpdateDTO>();
-        auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 action 값에 따른 메시지 분기 처리
-        // 1: 신규 구독(wow), 2: 해지 예약(일반) 등으로 매핑한다고 가정합니다.
+        // 🚀 디버깅용: 파싱이 제대로 됐는지 확인!
+        std::cout << "[UserHandler] 파싱된 데이터 - UserID: [" << req.userId << "], Grade: [" << req.grade << "]" << std::endl;
+
+        // 💡 만약 req.userId가 비어있다면, JSON 키 대소문자가 안 맞는 것입니다!
+        if (req.userId.empty())
+        {
+            throw std::runtime_error("UserId가 비어있습니다. JSON 키값을 확인하세요.");
+        }
+
         std::string displayMsg = "";
+        std::string targetGrade = (req.action == 1) ? "와우" : "일반"; // 클라이언트가 "wow"로 보내도 DB엔 "와우"로 강제 세팅
 
         if (req.action == 1)
         {
@@ -269,25 +277,43 @@ void UserHandler::handleGradeUpdate(std::shared_ptr<ClientSession> session, cons
             displayMsg = "멤버십 해지가 예약되었습니다. 이용 기간 종료 후 일반 등급으로 변경됩니다.";
         }
 
-        // 2. DB 업데이트 (USERS 테이블의 grade 컬럼 수정)
-        std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(
+        // 🚀 2. 트랜잭션 시작 (USERS와 CUSTOMERS 둘 다 동기화!)
+        conn->setAutoCommit(false);
+
+        // [2-A] USERS 테이블 업데이트
+        std::unique_ptr<sql::PreparedStatement> pstmtUser(conn->prepareStatement(
             "UPDATE USERS SET grade = ? WHERE user_id = ?"));
+        pstmtUser->setString(1, targetGrade);
+        pstmtUser->setString(2, req.userId);
+        pstmtUser->executeUpdate();
 
-        pstmt->setString(1, req.grade); // "wow" 또는 "일반"
-        pstmt->setString(2, req.userId);
-        pstmt->executeUpdate();
+        // [2-B] CUSTOMERS 테이블 업데이트 (결제 혜택 연동!)
+        std::unique_ptr<sql::PreparedStatement> pstmtCustomer(conn->prepareStatement(
+            "UPDATE CUSTOMERS SET customer_grade = ? WHERE user_id = ?"));
+        pstmtCustomer->setString(1, targetGrade);
+        pstmtCustomer->setString(2, req.userId);
+        pstmtCustomer->executeUpdate();
 
-        // 3. 성공 응답 (status 200) 전송
+        // 모두 성공하면 영구 반영
+        conn->commit();
+        conn->setAutoCommit(true);
+
+        // 3. 성공 응답 전송
         ResGradeUpdateDTO res;
-        res.status = 200; // 성공
+        res.status = 200;
         res.message = displayMsg;
 
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_GRADE_UPDATE), nlohmann::json(res));
 
-        std::cout << "[UserHandler] ✅ 등급 변경 완료: " << req.userId << " -> " << req.grade << " (Action: " << req.action << ")" << std::endl;
+        std::cout << "[UserHandler] ✅ 등급 변경 완료: " << req.userId << " -> " << targetGrade << " (Action: " << req.action << ")" << std::endl;
     }
     catch (const std::exception &e)
     {
+        if (conn)
+        {
+            conn->rollback();
+            conn->setAutoCommit(true);
+        }
         std::cerr << "🚨 [UserHandler] 등급 업데이트 에러: " << e.what() << std::endl;
         ResGradeUpdateDTO res = {500, "서버 오류로 등급 변경에 실패했습니다."};
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_GRADE_UPDATE), nlohmann::json(res));

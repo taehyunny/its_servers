@@ -162,14 +162,12 @@ void ReviewHandler::handleReviewReply(std::shared_ptr<ClientSession> session, co
     }
 }
 
-// 🚀 [CmdID: 2016] 특정 메뉴에 대한 리뷰만 쏙쏙 골라오기
 void ReviewHandler::handleMenuReviewList(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     json req = json::parse(jsonBody);
     json res;
     try
     {
-        // 1. 요청받은 menuId 확인
         int menuId = req.value("menuId", 0);
 
         if (menuId == 0)
@@ -180,15 +178,14 @@ void ReviewHandler::handleMenuReviewList(std::shared_ptr<ClientSession> session,
             return;
         }
 
-        std::cout << "[ReviewHandler] 🍜 메뉴(ID: " << menuId << ") 리뷰 상세 조회 요청" << std::endl;
-
         auto conn = DBManager::getInstance().getConnection();
 
-        // 2. 쿼리 최적화: REVIEWS 테이블에서 직접 menu_id로 필터링 (JOIN 필요 없음!)
-        std::string query = "SELECT review_id, user_id, rating, content, owner_reply, created_at "
-                            "FROM REVIEWS "
-                            "WHERE menu_id = ? "
-                            "ORDER BY created_at DESC";
+        // 🚀 핵심 수정: REVIEWS와 ORDER_ITEMS를 JOIN하여, 해당 메뉴가 포함된 리뷰만 가져옵니다!
+        std::string query = "SELECT R.review_id, R.user_id, R.rating, R.content, R.owner_reply, R.created_at "
+                            "FROM REVIEWS R "
+                            "JOIN ORDER_ITEMS OI ON R.order_id = OI.order_id "
+                            "WHERE OI.menu_id = ? "
+                            "ORDER BY R.created_at DESC";
 
         std::unique_ptr<sql::PreparedStatement> pstmt(conn->prepareStatement(query));
         pstmt->setInt(1, menuId);
@@ -208,10 +205,9 @@ void ReviewHandler::handleMenuReviewList(std::shared_ptr<ClientSession> session,
             reviews.push_back(rv);
         }
 
-        // 3. 응답 조립 (아까 성공했던 jina 로그 규격에 맞춤)
         res["status"] = 200;
         res["message"] = "조회 성공";
-        res["menuId"] = menuId; // 에코(Echo) 데이터
+        res["menuId"] = menuId;
         res["reviews"] = reviews;
 
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_MENU_REVIEW_LIST), res);

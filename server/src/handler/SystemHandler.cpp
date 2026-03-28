@@ -23,7 +23,7 @@ void SystemHandler::handleHeartbeat(std::shared_ptr<ClientSession> session, cons
 
         // 🚀 2. 매출 1등 매장 (UI 동기화용 풀세트)
         std::unique_ptr<sql::PreparedStatement> pstmtStore(conn->prepareStatement(
-            "SELECT store_id, store_name, total_sales, rating, delivery_fee, "
+            "SELECT store_id, store_name, category, total_sales, rating, delivery_fee, " // 👈 category 추가
             "min_order_amount, review_count, delivery_time_range, icon_name "
             "FROM STORES ORDER BY total_sales DESC LIMIT 10"));
         std::unique_ptr<sql::ResultSet> rsStore(pstmtStore->executeQuery());
@@ -31,17 +31,16 @@ void SystemHandler::handleHeartbeat(std::shared_ptr<ClientSession> session, cons
         res["topStores"] = nlohmann::json::array();
         while (rsStore->next())
         {
-            res["topStores"].push_back({
-                {"storeId", rsStore->getInt("store_id")},
-                {"storeName", std::string(rsStore->getString("store_name"))},
-                {"totalSales", rsStore->getInt("total_sales")},
-                {"rating", rsStore->getDouble("rating")},
-                {"deliveryFee", rsStore->getInt("delivery_fee")},
-                {"minOrderAmount", rsStore->getInt("min_order_amount")},
-                {"reviewCount", rsStore->getInt("review_count")},
-                {"deliveryTimeRange", std::string(rsStore->getString("delivery_time_range"))},
-                {"iconName", std::string(rsStore->getString("icon_name"))}
-            });
+            res["topStores"].push_back({{"storeId", rsStore->getInt("store_id")},
+                                        {"storeName", std::string(rsStore->getString("store_name"))},
+                                        {"categoryName", std::string(rsStore->getString("category"))}, // 👈 프론트가 요청한 변수 추가!
+                                        {"totalSales", rsStore->getInt("total_sales")},
+                                        {"rating", rsStore->getDouble("rating")},
+                                        {"deliveryFee", rsStore->getInt("delivery_fee")},
+                                        {"minOrderAmount", rsStore->getInt("min_order_amount")},
+                                        {"reviewCount", rsStore->getInt("review_count")},
+                                        {"deliveryTimeRange", std::string(rsStore->getString("delivery_time_range"))},
+                                        {"iconName", std::string(rsStore->getString("icon_name"))}});
         }
 
         // 🚀 3. 초경량화된 하트비트 응답 전송!
