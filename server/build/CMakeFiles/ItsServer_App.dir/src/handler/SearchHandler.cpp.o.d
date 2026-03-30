@@ -154,6 +154,9 @@ CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o: \
  /usr/include/c++/13/bits/uses_allocator_args.h \
  /home/lms/Documents/its_server/server/../dto/AllDTOs.h \
  /home/lms/Documents/its_server/server/../dto/BaseDTO.h \
+ /usr/include/c++/13/vector /usr/include/c++/13/bits/stl_vector.h \
+ /usr/include/c++/13/bits/stl_bvector.h \
+ /usr/include/c++/13/bits/vector.tcc \
  /home/lms/Documents/its_server/server/../include/json.hpp \
  /usr/include/c++/13/algorithm /usr/include/c++/13/bits/stl_algo.h \
  /usr/include/c++/13/bits/algorithmfwd.h \
@@ -167,10 +170,7 @@ CMakeFiles/ItsServer_App.dir/src/handler/SearchHandler.cpp.o: \
  /usr/include/c++/13/bits/hashtable_policy.h \
  /usr/include/c++/13/bits/enable_special_members.h \
  /usr/include/c++/13/bits/node_handle.h \
- /usr/include/c++/13/bits/erase_if.h /usr/include/c++/13/vector \
- /usr/include/c++/13/bits/stl_vector.h \
- /usr/include/c++/13/bits/stl_bvector.h \
- /usr/include/c++/13/bits/vector.tcc /usr/include/c++/13/array \
+ /usr/include/c++/13/bits/erase_if.h /usr/include/c++/13/array \
  /usr/include/c++/13/compare /usr/include/c++/13/iterator \
  /usr/include/c++/13/bits/stream_iterator.h \
  /usr/include/c++/13/bits/streambuf_iterator.h \

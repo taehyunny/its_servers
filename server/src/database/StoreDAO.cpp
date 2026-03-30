@@ -59,7 +59,7 @@ std::vector<TopStoreInfo> StoreDAO::getTopStoresByCategory()
 // ---------------------------------------------------------
 // 2. 특정 카테고리의 전체 매장 추출 (상세 리스트용)
 // ---------------------------------------------------------
-std::vector<TopStoreInfo> StoreDAO::getStoresByCategoryId(int categoryId)
+std::vector<TopStoreInfo> StoreDAO::getStoresByCategory(int categoryId, const std::string &brandName)
 {
     std::vector<TopStoreInfo> stores;
     try

@@ -61,10 +61,9 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
         // 1. AuthDAO 호출 (ID, PW, Role 검증)
         auto [resultCode, userJson] = AuthDAO::getInstance().validateLogin(req.userId, req.password, req.role);
 
-        AuthResDTO res;
-
         if (resultCode == LoginResult::SUCCESS)
         {
+            AuthResDTO res;
             res.status = 200;
             res.message = "로그인 성공";
             res.userId = userJson.value("userId", "");
@@ -96,30 +95,35 @@ void UserHandler::handleLogin(std::shared_ptr<ClientSession> session, const std:
                 res.deliveryFee = userJson.value("deliveryFee", 0);
             }
 
-            // 🚀 [중요 수정] 세션에 정보 저장 및 SessionManager 등록
+            // 🚀 [핵심 로직] 세션 등록 (이게 있어야 다른 API 통신이 안 끊깁니다!)
             session->authenticate(res.userId, dbRole);
-
-            // 💡 이름이 바뀐 registerUser를 호출합니다!
             SessionManager::getInstance().registerUser(res.userId, dbRole, session);
 
             std::cout << "[UserHandler] 로그인 성공! 유저 '" << res.userId << "' [" << res.grade << "] 등급 세션 등록 완료." << std::endl;
-        }
-        else if (resultCode == LoginResult::ID_PASS_WRONG)
-        {
-            res.status = 401;
-            res.message = "아이디/비밀번호가 틀렸거나 권한이 맞지 않습니다.";
+
+            // 🚀 3. 다이어트된 순수한 DTO 전송 (여기에 brandCategories는 없습니다!)
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_LOGIN), res);
         }
         else
         {
-            res.status = 500;
-            res.message = "로그인 처리 중 서버 오류가 발생했습니다.";
+            // ❌ 실패 시 빈 res 객체가 아니라, 에러 메시지를 담은 객체를 보냅니다.
+            AuthResDTO errRes;
+            if (resultCode == LoginResult::ID_PASS_WRONG)
+            {
+                errRes.status = 401;
+                errRes.message = "아이디/비밀번호가 틀렸거나 권한이 맞지 않습니다.";
+            }
+            else
+            {
+                errRes.status = 500;
+                errRes.message = "로그인 처리 중 서버 오류가 발생했습니다.";
+            }
+            session->sendPacket(static_cast<uint16_t>(CmdID::RES_LOGIN), errRes);
         }
-
-        session->sendPacket(static_cast<uint16_t>(CmdID::RES_LOGIN), res);
     }
     catch (const std::exception &e)
     {
-        std::cerr << "[UserHandler] Login Error: " << e.what() << std::endl;
+        std::cerr << "🚨 [UserHandler] Login Error: " << e.what() << std::endl;
     }
 }
 

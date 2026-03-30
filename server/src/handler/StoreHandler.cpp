@@ -11,25 +11,32 @@
 using nlohmann::json;
 
 // ── 1. 매장 목록 조회 ──────────────────────────────────────────
+// ── 1. 매장 목록 조회 ──────────────────────────────────────────
 void StoreHandler::handleStoreListRequest(std::shared_ptr<ClientSession> session, const std::string &jsonBody)
 {
     try
     {
-        json requestJson = json::parse(jsonBody);
-        int categoryId = requestJson.value("categoryId", 0);
+        // 🚀 1. json 파싱 대신, 새로 업데이트한 DTO를 사용해 brandName까지 쏙 뽑아옵니다!
+        auto req = json::parse(jsonBody).get<StoreListReqDTO>();
+        int categoryId = req.categoryId;
+        std::string brandName = req.brandName; // 👈 프론트가 보낸 브랜드명!
 
-        std::cout << "[StoreHandler] 상점 목록 요청 수신 - 카테고리 ID: " << categoryId << std::endl;
+        std::cout << "[StoreHandler] 상점 목록 요청 수신 - 카테고리 ID: " << categoryId
+                  << " / 브랜드명: " << (brandName.empty() ? "없음" : brandName) << std::endl;
 
         StoreListResDTO resDto;
         resDto.status = 200;
 
-        if (categoryId == 0)
+        if (categoryId == 0 && brandName.empty())
         {
+            // 카테고리도 0이고 브랜드명도 없으면 진짜 전체 매장
             resDto.stores = StoreDAO::getInstance().getAllStores();
         }
         else
         {
-            resDto.stores = StoreDAO::getInstance().getStoresByCategoryId(categoryId);
+            // 🚀 2. DAO에게 categoryId와 brandName을 "둘 다" 넘겨줍니다!
+            // (함수 이름도 getStoresByCategory 로 통일하는 게 좋습니다)
+            resDto.stores = StoreDAO::getInstance().getStoresByCategory(categoryId, brandName);
         }
 
         nlohmann::json resJson = resDto;
@@ -41,7 +48,7 @@ void StoreHandler::handleStoreListRequest(std::shared_ptr<ClientSession> session
     }
     catch (const std::exception &e)
     {
-        std::cerr << "[StoreHandler] 에러 발생: " << e.what() << std::endl;
+        std::cerr << "🚨 [StoreHandler] 에러 발생: " << e.what() << std::endl;
         StoreListResDTO errorDto;
         errorDto.status = 500;
         nlohmann::json errorJson = errorDto;
