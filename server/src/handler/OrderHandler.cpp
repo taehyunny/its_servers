@@ -601,7 +601,7 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
 
         auto conn = DBManager::getInstance().getConnection();
 
-        // 🚀 1. 유저 정보 조회 (CUSTOMERS 테이블과 완벽 매칭!)
+        // 🚀 1. 유저 정보 조회 (방어적 매핑)
         std::unique_ptr<sql::PreparedStatement> pstmtUser(conn->prepareStatement(
             "SELECT customer_grade, card_number, account_number, point, address "
             "FROM CUSTOMERS WHERE user_id = ?"));
@@ -610,8 +610,6 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
 
         if (rsUser->next())
         {
-            // 💡 std::string으로 안전하게 감싸서 메모리 깨짐 현상을 원천 차단합니다.
-            // DB의 Default 값(주소 미상, 일반)을 코드단에서도 방어적으로 세팅!
             res.customerGrade = rsUser->isNull("customer_grade") ? "일반" : std::string(rsUser->getString("customer_grade"));
             res.cardNumber = rsUser->isNull("card_number") ? "" : std::string(rsUser->getString("card_number"));
             res.accountNumber = rsUser->isNull("account_number") ? "" : std::string(rsUser->getString("account_number"));
@@ -629,16 +627,20 @@ void OrderHandler::handleCheckoutInfo(std::shared_ptr<ClientSession> session, co
         if (rsStore->next())
         {
             res.minOrderAmount = rsStore->getInt("min_order_amount");
-            res.deliveryFee = rsStore->getInt("delivery_fee");
+            res.deliveryFee = rsStore->getInt("delivery_fee"); // 원본 배달비 보존
             res.storeAddress = rsStore->isNull("store_address") ? "" : std::string(rsStore->getString("store_address"));
             res.pickupTime = rsStore->isNull("pickup_time") ? "" : std::string(rsStore->getString("pickup_time"));
         }
 
-        // 🚀 3. 비즈니스 로직: 와우 혜택 적용 (주석 해제 완료!)
+        // 🚀 3. 비즈니스 로직: 와우 혜택 적용 (적용 배달비 분리)
         if (res.customerGrade == "와우")
         {
-            res.deliveryFee = 0; // 와우 회원은 배달비 0원!
-            std::cout << "[OrderHandler] 🎉 와우 회원(" << req.userId << ") 접속! 배달비 0원 혜택 적용." << std::endl;
+            res.appliedDeliveryFee = 0; // 프론트엔드 계산용 실제 청구 배달비
+            std::cout << "[OrderHandler] 🎉 와우 회원(" << req.userId << ") 접속! 배달비 무료 혜택 적용." << std::endl;
+        }
+        else
+        {
+            res.appliedDeliveryFee = res.deliveryFee;
         }
 
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_CHECKOUT_INFO), nlohmann::json(res));
@@ -764,14 +766,13 @@ void OrderHandler::handleOrderDetail(std::shared_ptr<ClientSession> session, con
 
         auto conn = DBManager::getInstance().getConnection();
         ResOrderDetailDTO res;
-        res.status = 0; // 🚀 아키텍처 규격: 0(성공), 1(실패)
+        res.status = 0; // 0(성공), 1(실패)
         res.orderId = orderId;
 
-        // 🚀 1. 3단 JOIN: 주문 기본 정보 + 상점 + 고객 등급 조회
+        // 🚀 1. 3단 JOIN: 이제 O.delivery_fee와 O.wow_discount를 DB에서 직접 꺼내옵니다!
         std::unique_ptr<sql::PreparedStatement> pstmtOrder(conn->prepareStatement(
-            "SELECT S.store_name, S.delivery_fee, "
-            "O.created_at, O.delivery_address, O.total_price, "
-            "C.customer_grade, C.card_number "
+            "SELECT S.store_name, O.created_at, O.delivery_address, O.total_price, "
+            "O.delivery_fee, O.wow_discount, C.card_number "
             "FROM ORDERS O "
             "JOIN STORES S ON O.store_id = S.store_id "
             "JOIN CUSTOMERS C ON O.user_id = C.user_id "
@@ -782,12 +783,15 @@ void OrderHandler::handleOrderDetail(std::shared_ptr<ClientSession> session, con
 
         if (rsOrder->next())
         {
-            // 🚀 문자열 안전 복사 (std::string 생성자로 감싸서 깨짐 방지)
             res.storeName = std::string(rsOrder->getString("store_name"));
             res.createdAt = std::string(rsOrder->getString("created_at"));
             res.deliveryAddress = std::string(rsOrder->getString("delivery_address"));
             res.totalPrice = rsOrder->getInt("total_price");
+            
+            // 🚀 핵심: 실시간 계산이 아닌, 과거 결제 당시의 스냅샷 데이터를 그대로 사용
             res.deliveryFee = rsOrder->getInt("delivery_fee");
+            res.wowDiscount = rsOrder->getInt("wow_discount");
+            res.couponDiscount = 0; // 쿠폰 할인 로직 추가 시 확장 가능
 
             // 결제 수단 포맷팅
             std::string cardNum = rsOrder->isNull("card_number") ? "" : std::string(rsOrder->getString("card_number"));
@@ -799,26 +803,13 @@ void OrderHandler::handleOrderDetail(std::shared_ptr<ClientSession> session, con
             {
                 res.paymentMethod = "신용카드 결제";
             }
-
-            // 🚀 2. 와우 할인 로직 정상화 (와우 회원일 때 배달비만큼 할인)
-            std::string grade = rsOrder->isNull("customer_grade") ? "" : std::string(rsOrder->getString("customer_grade"));
-            if (grade == "와우")
-            {
-                res.wowDiscount = res.deliveryFee; // 와우 회원이면 할인 혜택 적용!
-            }
-            else
-            {
-                res.wowDiscount = 0; // 일반 회원은 할인 없음
-            }
-            res.couponDiscount = 0;
         }
         else
         {
             throw std::runtime_error("해당 주문을 찾을 수 없습니다.");
         }
 
-        // 🚀 3. 상세 메뉴 조회 (ORDER_ITEMS + MENUS JOIN)
-        // 💡 스키마 팩트 체크: ORDER_ITEMS에는 menu_name이 없으므로 MENUS와 JOIN해야 함!
+        // 🚀 2. 상세 메뉴 조회 (ORDER_ITEMS + MENUS JOIN)
         std::unique_ptr<sql::PreparedStatement> pstmtItems(conn->prepareStatement(
             "SELECT OI.menu_id, M.menu_name, OI.quantity, OI.unit_price, OI.selected_options "
             "FROM ORDER_ITEMS OI "
@@ -837,11 +828,11 @@ void OrderHandler::handleOrderDetail(std::shared_ptr<ClientSession> session, con
             item.menuId = rsItems->getInt("menu_id");
             item.menuName = std::string(rsItems->getString("menu_name"));
             item.quantity = rsItems->getInt("quantity");
-            item.unitPrice = rsItems->getInt("unit_price"); // 💡 스키마상 unit_price가 맞음!
+            item.unitPrice = rsItems->getInt("unit_price"); 
 
             calculatedTotalMenuPrice += (item.unitPrice * item.quantity);
 
-            // 옵션 JSON 파싱
+            // 옵션 JSON 파싱 방어 코드
             std::string optsStr = rsItems->isNull("selected_options") ? "[]" : std::string(rsItems->getString("selected_options"));
             try
             {
@@ -856,7 +847,6 @@ void OrderHandler::handleOrderDetail(std::shared_ptr<ClientSession> session, con
 
         res.totalMenuPrice = calculatedTotalMenuPrice;
 
-        // 디버깅 로그
         std::cout << "[OrderHandler] ✅ 영수증 데이터 전송 준비 완료 (Items: " << res.items.size() << ")" << std::endl;
         session->sendPacket(static_cast<uint16_t>(CmdID::RES_ORDER_DETAIL), nlohmann::json(res));
     }
