@@ -1,75 +1,82 @@
-# 🛵 이츠 배달료 (Its Bedalyo)
-> 현재 버전: ver 0.0.9
-> 서버 포트번호 : 8080
-> 서버 IP : 10.10.10.123
----
-MARIADB 접속 계정
----
-> 리눅스 : mariadb -h 10.10.10.123  -u bedalyo -p
+# Its_bedalyo Server Prototype
 
-> 윈도우 cmd창 : mysql -h 10.10.10.123 -u bedalyo -p
+배달 주문 흐름에서 주문 당시 메뉴·가격·결제 정보를 서버 기준 스냅샷으로 저장하는 팀 프로젝트 프로토타입입니다.
 
-> 비밀번호 : 1234
----
-## 🚩 진행 상황 (Status)
-- [x] **[필독]** 필수 사항 Git pull 후 현재 진행 상황 확인 부탁드립니다.
-- [ ] JSON 헤더 + 바디 설계중
-- [ ] 로그인, 상점, 주문 , 기본 DTO 설계 완료 ( 참조 하여 설계 )
-- [ ] 공통 프로토콜 헤더(`Global_protocol.h`) 정의 중
-- [ ] 각 파트별 프로토콜 요구사항 정의 중
-- [ ] 이번주 금요일 하나의 흐름으로 회원가입 목표
----
-## 🔄 업데이트 이력 (Release Notes)
-ver 0.0.15
+## Portfolio Evidence
 
-ver 0.0.12
-- 사용자 클라이언트 포토토콜 정의
-- 가게(사장님) MFC 회원가입 부분 수정중
+- Role: Team lead / server flow owner
+- Scope: C++ TCP/IP protocol, 8-byte header, JSON body, MariaDB order snapshot flow
+- Evidence: protocol rule, DTO structure, server request flow, snapshot schema
+- Boundary: This is a team prototype, not a production service.
 
-ver 0.0.9 (수정중)
-- 서버 회원가입 로직 구현중
-- DTO 설계 완료 ( 추후 추가 예정 )
-- DTO #include 참조 방법 아래 확인
+## What this project proves
 
+이 프로젝트는 주문 이후 메뉴·가격이 바뀌어도 결제 당시 기준의 주문 데이터가 유지되도록, 서버 요청과 DB 저장 기준을 분리해 설계한 흐름을 보여줍니다.
 
-ver 0.0.8 (수정중)
-- DB 구조 설계 진행중
-- Cmake로 헤더 경로 문제 해결 
-- 프로토콜 정의 예시 코드 ( 수정 부탁드립니다.)
+## Architecture Summary
 
+```text
+Client Order UI
+-> TCP/IP Request
+-> 8-byte Header + JSON Body
+-> Server-side validation
+-> MariaDB order snapshot
+-> Review / order history check
+```
 
-ver 0.0.7 (수정중)
-- DB 구조 설계 진행중 
-- 프로토콜 정의 예시 코드 ( 수정 부탁드립니다.)
+## Protocol Summary
 
-ver 0.0.6 (서버 수정중)
-- 서버 폴더 및 파일 생성
+| Field | Size | Purpose |
+|---|---:|---|
+| Signature | 2 bytes | 프로젝트 패킷 식별 |
+| CmdID | 2 bytes | 요청 기능 구분 |
+| BodySize | 4 bytes | JSON Body 크기 |
+| JSON Body | variable | 실제 요청 데이터 |
 
-ver 0.0.4 (작업 완료)
-- 프로토콜 정의 예시 및 가이드 추가
-- DTO & DAO 예시 추가
+## Data Snapshot Fields
 
-ver 0.0.3 (작업 완료)
-- `json.hpp` 라이브러리 추가 및 환경 세팅 완료
-- 프로토콜 정의 예시 및 가이드 추가
+| Field | Purpose |
+|---|---|
+| order_id | 주문 식별자 |
+| menu_snapshot | 주문 당시 메뉴 정보 |
+| price_snapshot | 주문 당시 가격 정보 |
+| payment_state | 결제 상태 |
+| created_at | 주문 생성 시각 |
 
-ver 0.0.1 (2026-03-15)
-- 분산 시스템 대응 다중 클라이언트 폴더 구조 생성
-- 프로젝트 초기 설정 및 협업 가이드라인 배치 완료
+## Environment Example
 
----
-## 🎯 각 파트별 요구 사항 
-> [공지] 클라이언트 팀원분들은 통신 시 이 파일 하나만 #include 하시면 됩니다!
-> 예: #include "dto/AllDTOs.h"
+실제 접속 정보는 공개 저장소에 포함하지 않습니다. 로컬 실행 시 `.env.example`을 참고해 환경 변수를 설정합니다.
 
+```env
+DB_HOST=your-db-host
+DB_PORT=3306
+DB_NAME=your-db-name
+DB_USER=your-db-user
+DB_PASSWORD=your-password
+SERVER_PORT=8080
+```
 
-📡 통신 프로토콜 규약 
- 8바이트 헤더 규칙을 반드시 준수해야 합니다.
- [ 필드          크기            설명 ]
-  Signature  - 2 Bytes - "우리 팀 패킷 맞지?" 확인용 예(0x4543)
+## Server Evidence Map
 
-   CmdID     - 2 Bytes - "어떤 기능 실행해?" 결정
+| Evidence | Where to look | What it shows |
+|---|---|---|
+| Protocol rule | `include/Global_protocol.h`, packet framing code | 8-byte header와 JSON body 기준 |
+| DTO structure | `dto/`, `server/src/handler/` | 요청·응답 데이터 구조 |
+| Server request flow | `server/src/network/`, `server/src/service/` | TCP 요청 수신과 서버 검증 흐름 |
+| Snapshot schema | `server/src/database/`, DAO layer | 주문 당시 데이터 저장 기준 |
 
-   BodySize  - 4 Bytes - "뒤에 오는 JSON이 몇 글자야?"
+## Review Focus
 
-   JSON Body -   가변  -  실제 데이터 내용
+포트폴리오 검토 시에는 기능 목록보다 아래 흐름을 중심으로 확인해 주세요.
+
+1. 주문 요청이 TCP/IP 패킷으로 전달되는 방식
+2. 8-byte header와 JSON body로 요청을 구분하는 방식
+3. 서버에서 주문 요청을 검증하고 DTO/DAO 흐름으로 전달하는 방식
+4. 주문 당시 메뉴·가격·결제 정보를 스냅샷 형태로 저장하는 기준
+5. 주문 내역과 리뷰 화면에서 동일 기준의 주문 데이터를 확인하는 흐름
+
+## Security Boundary
+
+- 실제 서버 IP, DB 계정, 비밀번호는 README에 기록하지 않습니다.
+- 공개 저장소에는 실행 구조와 검증 근거만 남깁니다.
+- 운영 서비스가 아니라 팀 프로젝트 프로토타입입니다.
